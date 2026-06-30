@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高金利通貨のスワップ運用の合理的観測！第二弾 - 各通貨ペアを徹底比較</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif; background: #0a0a1a; color: #e0e0e0; line-height: 1.7; }
+.container { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+header { background: linear-gradient(135deg, #1a0533 0%, #0d1b3e 50%, #0a2a1a 100%); padding: 60px 0 50px; text-align: center; border-bottom: 3px solid #6c3baa; }
+header h1 { font-size: 28px; color: #fff; text-shadow: 0 0 30px rgba(108,59,170,0.8); margin-bottom: 8px; }
+header .subtitle { font-size: 15px; color: #b8a0d4; margin-bottom: 16px; }
+header .badge { display: inline-block; background: linear-gradient(90deg,#6c3baa,#2196F3); color: #fff; padding: 6px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+.update-date { text-align: center; padding: 12px; background: #111; font-size: 12px; color: #888; }
+.toc { background: #121225; border: 1px solid #2a2a4a; border-radius: 12px; margin: 30px auto; padding: 24px 30px; max-width: 700px; }
+.toc h3 { color: #b8a0d4; margin-bottom: 12px; font-size: 16px; }
+.toc ol { padding-left: 20px; }
+.toc li { margin: 6px 0; }
+.toc a { color: #7eb8f7; text-decoration: none; font-size: 14px; }
+.toc a:hover { text-decoration: underline; }
+section { margin: 40px 0; }
+h2 { background: linear-gradient(90deg, #1a0533, #0d1b3e); padding: 16px 20px; border-left: 5px solid #6c3baa; font-size: 20px; color: #e8d5ff; margin-bottom: 20px; border-radius: 0 8px 8px 0; }
+h3 { color: #7eb8f7; font-size: 17px; margin: 24px 0 12px; padding-left: 12px; border-left: 3px solid #7eb8f7; }
+h4 { color: #f0c040; font-size: 15px; margin: 18px 0 10px; }
+p { margin: 10px 0; font-size: 14px; line-height: 1.8; padding: 0 4px; }
+.highlight-box { background: linear-gradient(135deg, #1a1a3a, #0d2b1a); border: 1px solid #3a5a3a; border-radius: 10px; padding: 20px; margin: 20px 0; }
+.warning-box { background: linear-gradient(135deg, #2a1a1a, #3a1a0d); border: 1px solid #5a3a3a; border-radius: 10px; padding: 16px 20px; margin: 20px 0; }
+.warning-box::before { content: "⚠ "; color: #f44; font-weight: bold; }
+.info-box { background: #0d1b2e; border: 1px solid #1a3a5a; border-radius: 10px; padding: 16px 20px; margin: 20px 0; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+th { background: #1a1a3a; color: #b8a0d4; padding: 10px 8px; text-align: center; border: 1px solid #2a2a4a; font-weight: 600; white-space: nowrap; }
+td { padding: 9px 8px; text-align: center; border: 1px solid #1a1a3a; }
+tr:nth-child(even) { background: #0f0f1f; }
+tr:nth-child(odd) { background: #0a0a18; }
+tr:hover { background: #1a1a2f; }
+.currency-tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+.tag-major { background: #1a3a5a; color: #7eb8f7; }
+.tag-emerging { background: #3a1a3a; color: #d4a0d4; }
+.best { color: #4caf50; font-weight: bold; }
+.good { color: #8bc34a; }
+.warn { color: #ff9800; }
+.danger { color: #f44336; }
+.rank-1 { color: #ffd700; font-weight: bold; }
+.rank-2 { color: #c0c0c0; font-weight: bold; }
+.rank-3 { color: #cd7f32; font-weight: bold; }
+.sim-card { background: #111122; border: 1px solid #2a2a4a; border-radius: 12px; padding: 20px; margin: 20px 0; }
+.sim-card .pair-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.sim-card .pair-name { font-size: 18px; font-weight: bold; }
+.sim-card .pair-meta { font-size: 12px; color: #888; }
+.lev-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 12px 0; }
+.lev-item { background: #0a0a1a; border: 1px solid #2a2a4a; border-radius: 8px; padding: 10px; text-align: center; font-size: 12px; }
+.lev-item .lev-label { color: #888; font-size: 11px; }
+.lev-item .lev-value { font-size: 16px; font-weight: bold; margin: 4px 0; }
+.yield-bar { height: 6px; background: #1a1a3a; border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.yield-fill { height: 100%; border-radius: 3px; }
+.section-nav { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+.section-nav a { background: #1a1a3a; color: #b8a0d4; padding: 6px 14px; border-radius: 16px; text-decoration: none; font-size: 12px; }
+.fx-company-badge { display: inline-block; background: #2a1a3a; border: 1px solid #5a3a7a; padding: 3px 10px; border-radius: 14px; font-size: 11px; color: #d4a0d4; margin: 2px; }
+.comparison-row-best td { background: rgba(76,175,80,0.1) !important; }
+footer { background: #080818; border-top: 1px solid #2a2a4a; padding: 30px 0; text-align: center; font-size: 12px; color: #666; margin-top: 60px; }
+@media (max-width: 600px) {
+  header h1 { font-size: 20px; }
+  h2 { font-size: 16px; }
+  table { font-size: 11px; }
+  th, td { padding: 6px 4px; }
+  .lev-grid { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="badge">AI分析 第二弾</div>
+    <h1>高金利通貨のスワップ運用の合理的観測！</h1>
+    <p class="subtitle">各通貨ペアの特徴を徹底比較 ― 10万円から始めるスワップ投資完全ガイド</p>
+  </div>
+</header>
+<div class="update-date">最終更新：2026年6月30日 ｜ データ出典：金融先物取引業協会・BIS・各FX会社公式サイト</div>
+
+<div class="container">
+
+<!-- 目次 -->
+<div class="toc">
+  <h3>📋 目次</h3>
+  <ol>
+    <li><a href="#sec1">通貨ペア別ベストFX会社</a></li>
+    <li><a href="#sec2">高金利通貨ペア 人気ランキング＆基本データ</a></li>
+    <li><a href="#sec3">10万円投資シミュレーション（レバレッジ別）</a></li>
+    <li><a href="#sec4">スワップ再投資の複利効果</a></li>
+    <li><a href="#sec5">総合比較表</a></li>
+    <li><a href="#sec6">国内FX取引量ランキング</a></li>
+    <li><a href="#sec7">世界の通貨ペア取引量ランキング</a></li>
+    <li><a href="#sec8">スワップポイント FX会社別比較</a></li>
+    <li><a href="#sec9">各国政策金利一覧</a></li>
+    <li><a href="#sec10">投資タイプ別おすすめ通貨ペア</a></li>
+    <li><a href="#sec11">リスク指標</a></li>
+    <li><a href="#sec12">FX会社総合ランキング</a></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 1: ベストFX会社 -->
+<!-- ============================================================ -->
+<section id="sec1">
+<h2>1. 通貨ペア別ベストFX会社 ― まずはここを押さえる</h2>
+
+<p>どの通貨ペアをどのFX会社で取引すればスワップが最も有利か、2026年6月時点のデータで比較しました。上位3社まで掲載しています。</p>
+
+<table>
+  <tr>
+    <th>通貨ペア</th>
+    <th>TOP3 FX会社（買いスワップ/日）</th>
+    <th>スプレッド</th>
+    <th>ポイント</th>
+  </tr>
+  <tr style="background:#0d1b2e !important;">
+    <td colspan="4" style="text-align:left;color:#7eb8f7;font-weight:bold;padding:10px;">▼ 主要通貨ペア（G7通貨）</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY</strong><br>米ドル/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> セントラル短資FX <strong class="best">150.8円</strong><br><span class="rank-2">2位</span> インヴァスト証券 149.0円<br><span class="rank-3">3位</span> GMO外貨 145.6円</div></td>
+    <td>0.18銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">国内取引量No.1。会社間の差は小さい</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/JPY</strong><br>ユーロ/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> マネースクエア <strong class="best">100.0円</strong><br><span class="rank-2">2位</span> GMO外貨/GMOクリック証券 80.0円<br><span class="rank-3">3位</span> インヴァスト証券 79.3円</div></td>
+    <td>0.4銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">マネースクエアはトラリピ専門で別枠首位</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY</strong><br>英ポンド/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> くりっく365 <strong class="best">188.0円</strong><br><span class="rank-2">2位</span> インヴァスト証券 185.8円<br><span class="rank-3">3位</span> FXブロードネット 184.2円</div></td>
+    <td>変動制</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">店頭ではインヴァスト証券が最高</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</strong><br>豪ドル/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> GMO外貨 <strong class="best">117.0円</strong><br><span class="rank-2">2位</span> インヴァスト証券 114.0円<br><span class="rank-3">3位</span> セントラル短資FX 113.0円</div></td>
+    <td>0.4銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">豪ドル円は会社間の差が大きめ</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/nz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">NZD/JPY</strong><br>NZドル/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> くりっく365 <strong class="best">47.3円</strong><br><span class="rank-2">2位</span> GMO外貨 46.8円<br><span class="rank-3">3位</span> インヴァスト証券 46.0円</div></td>
+    <td>変動制</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">店頭ではGMO外貨が最高</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/ca.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CAD/JPY</strong><br>カナダドル/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> セントラル短資FX <strong class="best">40円</strong><br><span style="color:#888">取扱会社数が少なく比較データ限定的</span></div></td>
+    <td>0.5銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">資源国通貨。原油価格と連動</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CHF/JPY</strong><br>スイスフラン/円</td>
+    <td style="text-align:center;font-size:12px;color:#f44"><div style="display:block;width:92%;margin:0 auto;text-align:left">買い:-52円（マイナススワップ）<br><span style="color:#888">金利0%のため全社マイナス共通</span></div></td>
+    <td>1.8銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">金利0%でマイナススワップ。売り向き</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/USD</strong><br>ユーロ/米ドル</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> GMOクリック証券 <strong class="best">売り+17pips</strong><br><span style="color:#888">ドルストレートは会社間の差が小さい</span></div></td>
+    <td>0.3pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">世界取引量1位。売りスワップ狙い可</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/USD</strong><br>英ポンド/米ドル</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> GMOクリック証券 <strong class="best">微小</strong><br><span style="color:#888">金利差が小さくスワップは僅少</span></div></td>
+    <td>0.9pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">世界4位。為替差益狙い向け</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/USD</strong><br>豪ドル/米ドル</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> GMO外貨 <strong class="best">買い+8pips</strong><br><span style="color:#888">豪ドル金利＞米ドル金利で買いが有利</span></div></td>
+    <td>0.4pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">世界6位。豪ドル金利>米ドル金利</div></td>
+  </tr>
+  <tr style="background:#0d1b2e !important;">
+    <td colspan="4" style="text-align:left;color:#d4a0d4;font-weight:bold;padding:10px;">▼ 新興国・高金利通貨ペア</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</strong><br>メキシコペソ/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> インヴァスト証券 <strong class="best">149円</strong><br><span class="rank-2">2位</span> セントラル短資FX/くりっく365 146円<br><span class="rank-3">3位</span> GMO外貨 143円<span style="font-size:10px;color:#888"><br>（10万通貨あたり）</span></div></td>
+    <td>0.3銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">ペソ円で業界トップ</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY</strong><br>南アランド/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> セントラル短資FX <strong class="best">152円</strong><br><span class="rank-2">2位</span> JFX 150円<br><span class="rank-3">3位</span> くりっく365 146円<span style="font-size:10px;color:#888"><br>（10万通貨あたり）</span></div></td>
+    <td>0.3銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">みんなのFXも同水準</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</strong><br>トルコリラ/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> くりっく365 <strong class="best">28.9円</strong><br><span class="rank-2">2位</span> セントラル短資FX 26.4円<br><span class="rank-3">3位</span> GMOクリック証券 26.2円</div></td>
+    <td>変動制</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">店頭ではセントラル短資が最高</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/br.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">BRL/JPY</strong><br>ブラジルレアル/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> IG証券 <strong class="best">155円</strong><br><span class="rank-2">2位</span> SBI FXトレード 60円<br><span class="rank-3">3位</span> SBI証券 60円</div></td>
+    <td>6.0〜30銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">取扱会社が少ない。政策金利15%と超高金利</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/cn.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CNY/JPY</strong><br>人民元/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> セントラル短資FX <strong class="best">11.0円</strong><br><span class="rank-2">2位</span> JFX/GMO外貨 10.0円<br><span class="rank-3">3位</span> くりっく365 6.2円</div></td>
+    <td>0.7銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">JFX・GMO外貨も10円で高水準</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</strong><br>ハンガリーフォリント/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> GMOクリック証券 <strong class="best">1.86円</strong><br><span class="rank-2">2位</span> 楽天証券 1.0円<br><span class="rank-3">3位</span> LIGHT FX 0.9円</div></td>
+    <td>0.3銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">フォリント円で圧倒的No.1</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/cz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CZK/JPY</strong><br>チェココルナ/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> GMOクリック証券 <strong class="best">80円</strong><br><span class="rank-2">2位</span> みんなのFX/LIGHT FX 50円<br><span class="rank-3">3位</span> 外為どっとコム 50円<span style="font-size:10px;color:#888"><br>（10万通貨あたり）</span></div></td>
+    <td>0.2銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">スプレッドも最狭。上昇トレンド</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/pl.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">PLN/JPY</strong><br>ポーランドズロチ/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">1位</span> 三菱UFJ eスマート <strong class="best">35.0円</strong><br><span class="rank-2">2位</span> GMOクリック証券 33.7円<br><span class="rank-3">3位</span> くりっく365 33.1円</div></td>
+    <td>2.8銭</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">GMOクリック33.7円も高水準</div></td>
+  </tr>
+  <tr style="background:#0d1b2e !important;">
+    <td colspan="4" style="text-align:left;color:#f0c040;font-weight:bold;padding:10px;">▼ クロスペア・アジア通貨（その他）</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/hk.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HKD/JPY</strong><br>香港ドル/円</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">GMO外貨で取扱あり<br><span style="color:#888">スワップは日によって0円近辺まで変動。USDにペッグ制で金利差は小さめ</span></div></td>
+    <td>—</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">取扱会社が少ない。SBI FXトレードも対応</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/GBP</strong><br>ユーロ/英ポンド</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">GMO外貨：<strong class="best">売り+60円</strong><br><span style="color:#888">買いは-60円。英金利＞ユーロ圏金利のため売り有利</span></div></td>
+    <td>1.0pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">欧州通貨同士。値動きは比較的小さい</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/AUD</strong><br>ユーロ/豪ドル</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">GMO外貨：<strong class="best">売り+90円</strong><br><span style="color:#888">買いは-90円。豪金利＞ユーロ圏金利のため売り有利</span></div></td>
+    <td>2.0pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">資源国通貨と欧州通貨の金利差を狙う</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/AUD</strong><br>英ポンド/豪ドル</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">GMO外貨：<strong class="best">売り+30円</strong><br><span style="color:#888">買いは-30円。豪金利＞英金利のため売り有利</span></div></td>
+    <td>2.5pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">金利差は小さめ、為替差益向き</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/nz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">NZD/USD</strong><br>NZドル/米ドル</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">GMO外貨：<strong class="best">売り+45円</strong><br><span style="color:#888">買いは-45円。米金利＞NZ金利のため売り有利</span></div></td>
+    <td>1.2pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">資源国通貨とドルの代表的な組み合わせ</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/CHF</strong><br>米ドル/スイスフラン</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">GMO外貨：<strong class="best">買い+150円</strong><br><span style="color:#888">米金利＞スイス金利(0%)のため買いが有利</span></div></td>
+    <td>1.8pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">「安全資産」スイスフランとドルの組み合わせ</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/CHF</strong><br>ユーロ/スイスフラン</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">GMO外貨：<strong class="best">買い+80円</strong><br><span style="color:#888">ユーロ圏金利＞スイス金利のため買いが有利</span></div></td>
+    <td>1.5pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">スイス中銀の介入リスクに注意</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/CHF</strong><br>英ポンド/スイスフラン</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">GMO外貨：<strong class="best">買い+185円</strong><br><span style="color:#888">英金利＞スイス金利でクロスペア中最高水準</span></div></td>
+    <td>2.5pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">クロスペアの中ではスワップ最大</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/CHF</strong><br>豪ドル/スイスフラン</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">GMO外貨：<strong class="best">買い+106円</strong><br><span style="color:#888">豪金利＞スイス金利のため買いが有利</span></div></td>
+    <td>2.2pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">資源国通貨と安全資産の組み合わせ</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/ca.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CAD/CHF</strong><br>カナダドル/スイスフラン</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">GMO外貨：<strong class="best">買い+38円</strong><br><span style="color:#888">加金利＞スイス金利だが金利差は小さめ</span></div></td>
+    <td>2.5pips</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">クロスペアの中では地味だが安定</div></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CHF/TRY</strong><br>スイスフラン/トルコリラ</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left"><span class="rank-1">取扱</span> みんなのFX・LIGHT FX・外為どっとコム<span style="font-size:10px;color:#888">（証拠金率4%）</span><br><strong class="best">売り（TRY買い）</strong>でプラススワップ傾向</div></td>
+    <td>変動制</td>
+    <td style="text-align:center;font-size:12px"><div style="display:block;width:92%;margin:0 auto;text-align:left">金利差37%は全ペア中最大級。IG証券・サクソバンクは証拠金率15〜25%と高めでスワップ受取不可</div></td>
+  </tr>
+</table>
+
+<div class="highlight-box">
+  <h4>💡 FX会社選びのポイント</h4>
+  <p><strong>スワップ重視なら：</strong>セントラル短資FX・みんなのFX/LIGHT FX が多通貨で安定高水準<br>
+  <strong>新興国通貨なら：</strong>GMOクリック証券 がHUF・CZK・PLNで業界トップ<br>
+  <strong>くりっく365：</strong>GBP・NZD・TRYで店頭を上回るスワップ（取引所取引で透明性◎）<br>
+  <strong>少額から始めるなら：</strong>松井証券（1通貨〜）、SBI FXトレード（1通貨〜）<br>
+  <strong>ドルストレート：</strong><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/USD売りでスワップ狙いも可能（金利差USD>EUR）<br>
+  <strong>超高金利を狙うなら：</strong>BRL/JPYはIG証券が155円で唯一無二の高水準（ただし取扱会社は3社のみ）<br>
+  <strong>クロスペアなら：</strong>GMO外貨が9種類のクロスペアを網羅。GBP/CHFが買いスワップ185円で最大</p>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 2: 人気ランキング＆基本データ -->
+<!-- ============================================================ -->
+<section id="sec2">
+<h2>2. 全通貨ペア ― 人気ランキング＆基本データ</h2>
+
+<h3>主要通貨ペア（クロス円）</h3>
+<table>
+  <tr>
+    <th>人気順</th>
+    <th>通貨ペア</th>
+    <th>分類</th>
+    <th>レート</th>
+    <th>政策金利</th>
+    <th>金利差<br>(対日本)</th>
+    <th>買いスワップ<br>/日/1万通貨</th>
+    <th>証拠金<br>(1万通貨/25倍)</th>
+  </tr>
+  <tr>
+    <td class="rank-1">1位</td>
+    <td><strong><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>161.50円</td>
+    <td>3.50%</td>
+    <td>+2.50%</td>
+    <td>156円</td>
+    <td>64,600円</td>
+  </tr>
+  <tr>
+    <td class="rank-2">2位</td>
+    <td><strong><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>111.50円</td>
+    <td>4.35%</td>
+    <td>+3.35%</td>
+    <td>112円</td>
+    <td>44,600円</td>
+  </tr>
+  <tr>
+    <td class="rank-3">3位</td>
+    <td><strong><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>213.40円</td>
+    <td>3.75%</td>
+    <td>+2.75%</td>
+    <td>188円</td>
+    <td>85,360円</td>
+  </tr>
+  <tr>
+    <td>4位</td>
+    <td><strong><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/JPY</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>184.00円</td>
+    <td>2.40%</td>
+    <td>+1.40%</td>
+    <td>80円</td>
+    <td>73,600円</td>
+  </tr>
+  <tr>
+    <td>9位</td>
+    <td><strong><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CHF/JPY</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>199.30円</td>
+    <td>0.00%</td>
+    <td style="color:#f44">-1.00%</td>
+    <td style="color:#f44">-52円</td>
+    <td>79,720円</td>
+  </tr>
+  <tr>
+    <td>10位</td>
+    <td><strong><img src="https://flagcdn.com/w20/nz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">NZD/JPY</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>91.00円</td>
+    <td>2.25%</td>
+    <td>+1.25%</td>
+    <td>47円</td>
+    <td>36,400円</td>
+  </tr>
+  <tr>
+    <td>圏外</td>
+    <td><strong><img src="https://flagcdn.com/w20/ca.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CAD/JPY</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>113.70円</td>
+    <td>2.25%</td>
+    <td>+1.25%</td>
+    <td>40円</td>
+    <td>45,480円</td>
+  </tr>
+</table>
+
+<h3>ドルストレートペア（世界で人気）</h3>
+<table>
+  <tr>
+    <th>世界順位</th>
+    <th>通貨ペア</th>
+    <th>分類</th>
+    <th>レート</th>
+    <th>金利差</th>
+    <th>スワップ特徴</th>
+    <th>国内月間<br>取引額</th>
+    <th>証拠金<br>(1万通貨/25倍)</th>
+  </tr>
+  <tr>
+    <td class="rank-1">1位</td>
+    <td><strong><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/USD</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>1.1394$</td>
+    <td>EUR＜USD</td>
+    <td style="font-size:12px"><strong>売り</strong>でスワップ◎</td>
+    <td>17.8兆円</td>
+    <td>約73,600円</td>
+  </tr>
+  <tr>
+    <td>4位</td>
+    <td><strong><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/USD</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>1.3213$</td>
+    <td>GBP≒USD</td>
+    <td style="font-size:12px">スワップ微小</td>
+    <td>3.8兆円</td>
+    <td>約85,400円</td>
+  </tr>
+  <tr>
+    <td>6位</td>
+    <td><strong><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/USD</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>0.6906$</td>
+    <td>AUD＞USD</td>
+    <td style="font-size:12px"><strong>買い</strong>でスワップ小◎</td>
+    <td>10.0兆円</td>
+    <td>約44,600円</td>
+  </tr>
+</table>
+
+<h3>新興国・高金利通貨ペア</h3>
+<table>
+  <tr>
+    <th>人気順</th>
+    <th>通貨ペア</th>
+    <th>分類</th>
+    <th>レート</th>
+    <th>政策金利</th>
+    <th>金利差<br>(対日本)</th>
+    <th>買いスワップ<br>/日/1万通貨</th>
+    <th>証拠金<br>(1万通貨/25倍)</th>
+  </tr>
+  <tr>
+    <td>8位</td>
+    <td><strong><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</strong></td>
+    <td><span class="currency-tag tag-emerging">新興国</span></td>
+    <td>9.02円</td>
+    <td>6.50%</td>
+    <td>+5.50%</td>
+    <td>14.9円</td>
+    <td>3,608円</td>
+  </tr>
+  <tr>
+    <td>―</td>
+    <td><strong><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY</strong></td>
+    <td><span class="currency-tag tag-emerging">新興国</span></td>
+    <td>8.80円</td>
+    <td>6.75%</td>
+    <td>+5.75%</td>
+    <td>14.0円</td>
+    <td>3,520円</td>
+  </tr>
+  <tr>
+    <td>―</td>
+    <td><strong><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</strong></td>
+    <td><span class="currency-tag tag-emerging">新興国</span></td>
+    <td>3.55円</td>
+    <td>37.00%</td>
+    <td>+36.00%</td>
+    <td>25.5円</td>
+    <td>1,420円</td>
+  </tr>
+  <tr>
+    <td>―</td>
+    <td><strong><img src="https://flagcdn.com/w20/br.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">BRL/JPY</strong></td>
+    <td><span class="currency-tag tag-emerging">新興国</span></td>
+    <td>31.30円</td>
+    <td>15.00%</td>
+    <td>+14.00%</td>
+    <td>155円<br><span style="font-size:10px;color:#888">(IG証券)</span></td>
+    <td>50,080円</td>
+  </tr>
+  <tr>
+    <td>―</td>
+    <td><strong><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</strong></td>
+    <td><span class="currency-tag tag-emerging">新興国</span></td>
+    <td>0.50円</td>
+    <td>6.25%</td>
+    <td>+5.25%</td>
+    <td>1.7円</td>
+    <td>200円</td>
+  </tr>
+  <tr>
+    <td>―</td>
+    <td><strong><img src="https://flagcdn.com/w20/cn.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CNY/JPY</strong></td>
+    <td><span class="currency-tag tag-emerging">新興国</span></td>
+    <td>23.50円</td>
+    <td>3.00%</td>
+    <td>+2.00%</td>
+    <td>11.0円</td>
+    <td>9,400円</td>
+  </tr>
+  <tr>
+    <td>―</td>
+    <td><strong><img src="https://flagcdn.com/w20/cz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CZK/JPY</strong></td>
+    <td><span class="currency-tag tag-emerging">新興国</span></td>
+    <td>7.40円</td>
+    <td>3.50%</td>
+    <td>+2.50%</td>
+    <td>8.0円</td>
+    <td>2,960円</td>
+  </tr>
+  <tr>
+    <td>―</td>
+    <td><strong><img src="https://flagcdn.com/w20/pl.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">PLN/JPY</strong></td>
+    <td><span class="currency-tag tag-emerging">新興国</span></td>
+    <td>40.00円</td>
+    <td>4.00%</td>
+    <td>+3.00%</td>
+    <td>35.0円</td>
+    <td>16,000円</td>
+  </tr>
+</table>
+
+<h3>クロスペア・アジア通貨（その他）</h3>
+<table>
+  <tr>
+    <th>通貨ペア</th>
+    <th>分類</th>
+    <th>レート</th>
+    <th>金利差</th>
+    <th>スワップ特徴</th>
+    <th>証拠金目安</th>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/hk.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HKD/JPY</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>20.30円</td>
+    <td>USDにペッグ</td>
+    <td style="font-size:12px">変動大、0円近辺の日も</td>
+    <td>3,248円</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/GBP</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>0.863£</td>
+    <td>GBP＞EUR</td>
+    <td style="font-size:12px"><strong>売り</strong>+60円</td>
+    <td>約18,400円</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/AUD</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>1.653A$</td>
+    <td>AUD＞EUR</td>
+    <td style="font-size:12px"><strong>売り</strong>+90円</td>
+    <td>約73,800円</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/AUD</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>1.915A$</td>
+    <td>AUD＞GBP（小）</td>
+    <td style="font-size:12px"><strong>売り</strong>+30円</td>
+    <td>約85,500円</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/nz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">NZD/USD</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>0.585$</td>
+    <td>USD＞NZD</td>
+    <td style="font-size:12px"><strong>売り</strong>+45円</td>
+    <td>約16,200円</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/CHF</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>0.810Fr</td>
+    <td>USD＞CHF</td>
+    <td style="font-size:12px"><strong>買い</strong>+150円</td>
+    <td>約64,600円</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/CHF</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>0.922Fr</td>
+    <td>EUR＞CHF</td>
+    <td style="font-size:12px"><strong>買い</strong>+80円</td>
+    <td>約73,600円</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/CHF</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>1.068Fr</td>
+    <td>GBP＞CHF（最大）</td>
+    <td style="font-size:12px"><strong>買い</strong>+185円</td>
+    <td>約85,400円</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/CHF</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>0.558Fr</td>
+    <td>AUD＞CHF</td>
+    <td style="font-size:12px"><strong>買い</strong>+106円</td>
+    <td>約44,600円</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/ca.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CAD/CHF</strong></td>
+    <td><span class="currency-tag tag-major">主要</span></td>
+    <td>0.571Fr</td>
+    <td>CAD＞CHF（小）</td>
+    <td style="font-size:12px"><strong>買い</strong>+38円</td>
+    <td>約45,500円</td>
+  </tr>
+</table>
+<p style="font-size:12px;color:#888;">※人気順は国内FX取引量（金融先物取引業協会 2026年4月）。「―」はTOP10圏外。日本の政策金利: 1.00%<br>
+※全28通貨ペア掲載。CHF/JPYは日本より金利が低いため買いでマイナススワップ。クロスペアはGMO外貨のスワップデータ（2026年6月30日時点、1万通貨）を基準。EUR/USD・NZD/USDなどは売りポジションでスワップ収益可。</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 3: 10万円投資シミュレーション -->
+<!-- ============================================================ -->
+<section id="sec3">
+<h2>3. 10万円投資シミュレーション ― レバレッジ別比較</h2>
+
+<p>投資資金10万円でレバレッジ2倍〜10倍をかけた場合、各通貨を何通貨買えて、年間でどのくらいスワップが得られるかを計算しました。</p>
+
+<div class="warning-box">
+レバレッジが高いほどスワップ収益は増えますが、為替が逆方向に動いた場合のロスカットリスクも高まります。初心者は2〜3倍を推奨します。
+</div>
+
+<!-- TRY/JPY -->
+<div class="sim-card">
+  <div class="pair-header">
+    <span class="pair-name" style="color:#f44336"><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY（トルコリラ/円）</span>
+    <span class="pair-meta">レート: 3.55円 ｜ 金利: 37.00% ｜ スワップ: 25.5円/日/1万通貨</span>
+  </div>
+  <table>
+    <tr>
+      <th>レバレッジ</th><th>保有通貨数</th><th>1日スワップ</th><th>年間スワップ<br>(単純)</th><th>年間スワップ<br>(再投資)</th><th>年間利回り</th><th>ロスカット<br>目安※</th>
+    </tr>
+    <tr>
+      <td><strong>2倍</strong></td><td>56,338</td><td>143.7円</td><td>52,436円</td><td>59,199円</td><td class="best">52.4%</td><td>約1.78円<br>(-49.9%)</td>
+    </tr>
+    <tr>
+      <td><strong>3倍</strong></td><td>84,507</td><td>215.5円</td><td>78,654円</td><td>88,799円</td><td class="best">78.7%</td><td>約2.37円<br>(-33.2%)</td>
+    </tr>
+    <tr>
+      <td><strong>5倍</strong></td><td>140,845</td><td>359.2円</td><td>131,090円</td><td>147,998円</td><td class="warn">131.1%</td><td>約2.84円<br>(-20.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>8倍</strong></td><td>225,352</td><td>574.6円</td><td>209,744円</td><td>236,797円</td><td class="danger">209.7%</td><td>約3.11円<br>(-12.4%)</td>
+    </tr>
+    <tr>
+      <td><strong>10倍</strong></td><td>281,690</td><td>718.3円</td><td>262,180円</td><td>295,996円</td><td class="danger">262.2%</td><td>約3.19円<br>(-10.1%)</td>
+    </tr>
+  </table>
+  <p style="font-size:12px;color:#f44;">⚠ トルコリラは過去10年で約85%下落。高スワップでも為替差損で大幅マイナスになるリスクが非常に高い通貨です。</p>
+</div>
+
+<!-- MXN/JPY -->
+<div class="sim-card">
+  <div class="pair-header">
+    <span class="pair-name" style="color:#4caf50"><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY（メキシコペソ/円）</span>
+    <span class="pair-meta">レート: 9.02円 ｜ 金利: 6.50% ｜ スワップ: 14.5円/日/1万通貨</span>
+  </div>
+  <table>
+    <tr>
+      <th>レバレッジ</th><th>保有通貨数</th><th>1日スワップ</th><th>年間スワップ<br>(単純)</th><th>年間スワップ<br>(再投資)</th><th>年間利回り</th><th>ロスカット<br>目安※</th>
+    </tr>
+    <tr>
+      <td><strong>2倍</strong></td><td>22,172</td><td>32.1円</td><td>11,735円</td><td>12,029円</td><td>11.7%</td><td>約4.51円<br>(-50.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>3倍</strong></td><td>33,259</td><td>48.2円</td><td>17,604円</td><td>18,044円</td><td>17.6%</td><td>約6.01円<br>(-33.4%)</td>
+    </tr>
+    <tr>
+      <td><strong>5倍</strong></td><td>55,432</td><td>80.4円</td><td>29,339円</td><td>30,073円</td><td class="best">29.3%</td><td>約7.22円<br>(-20.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>8倍</strong></td><td>88,692</td><td>128.6円</td><td>46,939円</td><td>48,113円</td><td class="warn">46.9%</td><td>約7.89円<br>(-12.5%)</td>
+    </tr>
+    <tr>
+      <td><strong>10倍</strong></td><td>110,865</td><td>160.8円</td><td>58,674円</td><td>60,141円</td><td class="warn">58.7%</td><td>約8.11円<br>(-10.1%)</td>
+    </tr>
+  </table>
+  <p style="font-size:12px;color:#4caf50;">✅ 2020年以降は上昇トレンド。金利差＋為替差益のダブル収益も期待できる注目通貨。</p>
+</div>
+
+<!-- ZAR/JPY -->
+<div class="sim-card">
+  <div class="pair-header">
+    <span class="pair-name" style="color:#ff9800"><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY（南アフリカランド/円）</span>
+    <span class="pair-meta">レート: 8.80円 ｜ 金利: 6.75% ｜ スワップ: 14.0円/日/1万通貨</span>
+  </div>
+  <table>
+    <tr>
+      <th>レバレッジ</th><th>保有通貨数</th><th>1日スワップ</th><th>年間スワップ<br>(単純)</th><th>年間スワップ<br>(再投資)</th><th>年間利回り</th><th>ロスカット<br>目安※</th>
+    </tr>
+    <tr>
+      <td><strong>2倍</strong></td><td>22,727</td><td>31.8円</td><td>11,614円</td><td>11,893円</td><td>11.6%</td><td>約4.40円<br>(-50.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>3倍</strong></td><td>34,091</td><td>47.7円</td><td>17,422円</td><td>17,840円</td><td>17.4%</td><td>約5.87円<br>(-33.3%)</td>
+    </tr>
+    <tr>
+      <td><strong>5倍</strong></td><td>56,818</td><td>79.5円</td><td>29,036円</td><td>29,733円</td><td class="best">29.0%</td><td>約7.04円<br>(-20.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>8倍</strong></td><td>90,909</td><td>127.3円</td><td>46,454円</td><td>47,569円</td><td class="warn">46.5%</td><td>約7.70円<br>(-12.5%)</td>
+    </tr>
+    <tr>
+      <td><strong>10倍</strong></td><td>113,636</td><td>159.1円</td><td>58,068円</td><td>59,462円</td><td class="warn">58.1%</td><td>約7.92円<br>(-10.0%)</td>
+    </tr>
+  </table>
+</div>
+
+<!-- HUF/JPY -->
+<div class="sim-card">
+  <div class="pair-header">
+    <span class="pair-name" style="color:#2196f3"><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY（ハンガリーフォリント/円）</span>
+    <span class="pair-meta">レート: 0.50円 ｜ 金利: 6.25% ｜ スワップ: 1.7円/日/1万通貨</span>
+  </div>
+  <table>
+    <tr>
+      <th>レバレッジ</th><th>保有通貨数</th><th>1日スワップ</th><th>年間スワップ<br>(単純)</th><th>年間スワップ<br>(再投資)</th><th>年間利回り</th><th>ロスカット<br>目安※</th>
+    </tr>
+    <tr>
+      <td><strong>2倍</strong></td><td>400,000</td><td>68.0円</td><td>24,820円</td><td>26,209円</td><td>24.8%</td><td>約0.25円<br>(-50.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>3倍</strong></td><td>600,000</td><td>102.0円</td><td>37,230円</td><td>39,313円</td><td class="best">37.2%</td><td>約0.33円<br>(-33.3%)</td>
+    </tr>
+    <tr>
+      <td><strong>5倍</strong></td><td>1,000,000</td><td>170.0円</td><td>62,050円</td><td>65,522円</td><td class="best">62.1%</td><td>約0.40円<br>(-20.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>8倍</strong></td><td>1,600,000</td><td>272.0円</td><td>99,280円</td><td>104,836円</td><td class="warn">99.3%</td><td>約0.44円<br>(-12.5%)</td>
+    </tr>
+    <tr>
+      <td><strong>10倍</strong></td><td>2,000,000</td><td>340.0円</td><td>124,100円</td><td>131,044円</td><td class="danger">124.1%</td><td>約0.45円<br>(-10.0%)</td>
+    </tr>
+  </table>
+  <p style="font-size:12px;color:#2196f3;">✅ 超少額（証拠金200円/1万通貨）から投資可能。欧州通貨でEU加盟国の安定感あり。</p>
+</div>
+
+<!-- CZK/JPY -->
+<div class="sim-card">
+  <div class="pair-header">
+    <span class="pair-name" style="color:#9c27b0"><img src="https://flagcdn.com/w20/cz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CZK/JPY（チェココルナ/円）</span>
+    <span class="pair-meta">レート: 7.40円 ｜ 金利: 3.50% ｜ スワップ: 6.0円/日/1万通貨</span>
+  </div>
+  <table>
+    <tr>
+      <th>レバレッジ</th><th>保有通貨数</th><th>1日スワップ</th><th>年間スワップ<br>(単純)</th><th>年間スワップ<br>(再投資)</th><th>年間利回り</th><th>ロスカット<br>目安※</th>
+    </tr>
+    <tr>
+      <td><strong>2倍</strong></td><td>27,027</td><td>16.2円</td><td>5,921円</td><td>5,992円</td><td>5.9%</td><td>約3.70円<br>(-50.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>3倍</strong></td><td>40,541</td><td>24.3円</td><td>8,878円</td><td>8,985円</td><td>8.9%</td><td>約4.93円<br>(-33.4%)</td>
+    </tr>
+    <tr>
+      <td><strong>5倍</strong></td><td>67,568</td><td>40.5円</td><td>14,797円</td><td>14,975円</td><td>14.8%</td><td>約5.92円<br>(-20.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>8倍</strong></td><td>108,108</td><td>64.9円</td><td>23,676円</td><td>23,960円</td><td>23.7%</td><td>約6.48円<br>(-12.4%)</td>
+    </tr>
+    <tr>
+      <td><strong>10倍</strong></td><td>135,135</td><td>81.1円</td><td>29,594円</td><td>29,949円</td><td class="best">29.6%</td><td>約6.66円<br>(-10.0%)</td>
+    </tr>
+  </table>
+</div>
+
+<!-- USD/JPY -->
+<div class="sim-card">
+  <div class="pair-header">
+    <span class="pair-name" style="color:#7eb8f7"><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY（米ドル/円）</span>
+    <span class="pair-meta">レート: 161.50円 ｜ 金利: 3.50% ｜ スワップ: 153円/日/1万通貨</span>
+  </div>
+  <table>
+    <tr>
+      <th>レバレッジ</th><th>保有通貨数</th><th>1日スワップ</th><th>年間スワップ<br>(単純)</th><th>年間スワップ<br>(再投資)</th><th>年間利回り</th><th>ロスカット<br>目安※</th>
+    </tr>
+    <tr>
+      <td><strong>2倍</strong></td><td>1,238</td><td>18.9円</td><td>6,914円</td><td>7,018円</td><td>6.9%</td><td>約80.75円<br>(-50.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>3倍</strong></td><td>1,858</td><td>28.4円</td><td>10,376円</td><td>10,532円</td><td>10.4%</td><td>約107.67円<br>(-33.3%)</td>
+    </tr>
+    <tr>
+      <td><strong>5倍</strong></td><td>3,096</td><td>47.4円</td><td>17,293円</td><td>17,553円</td><td>17.3%</td><td>約129.20円<br>(-20.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>8倍</strong></td><td>4,954</td><td>75.8円</td><td>27,669円</td><td>28,084円</td><td>27.7%</td><td>約141.31円<br>(-12.5%)</td>
+    </tr>
+    <tr>
+      <td><strong>10倍</strong></td><td>6,192</td><td>94.7円</td><td>34,581円</td><td>35,100円</td><td>34.6%</td><td>約145.35円<br>(-10.0%)</td>
+    </tr>
+  </table>
+</div>
+
+<!-- GBP/JPY -->
+<div class="sim-card">
+  <div class="pair-header">
+    <span class="pair-name" style="color:#e8d5ff"><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY（英ポンド/円）</span>
+    <span class="pair-meta">レート: 213.40円 ｜ 金利: 3.75% ｜ スワップ: 182円/日/1万通貨</span>
+  </div>
+  <table>
+    <tr>
+      <th>レバレッジ</th><th>保有通貨数</th><th>1日スワップ</th><th>年間スワップ<br>(単純)</th><th>年間スワップ<br>(再投資)</th><th>年間利回り</th><th>ロスカット<br>目安※</th>
+    </tr>
+    <tr>
+      <td><strong>2倍</strong></td><td>937</td><td>17.1円</td><td>6,225円</td><td>6,306円</td><td>6.2%</td><td>約106.70円<br>(-50.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>3倍</strong></td><td>1,406</td><td>25.6円</td><td>9,339円</td><td>9,460円</td><td>9.3%</td><td>約142.27円<br>(-33.3%)</td>
+    </tr>
+    <tr>
+      <td><strong>5倍</strong></td><td>2,343</td><td>42.6円</td><td>15,565円</td><td>15,767円</td><td>15.6%</td><td>約170.72円<br>(-20.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>8倍</strong></td><td>3,749</td><td>68.2円</td><td>24,904円</td><td>25,228円</td><td>24.9%</td><td>約186.73円<br>(-12.5%)</td>
+    </tr>
+    <tr>
+      <td><strong>10倍</strong></td><td>4,687</td><td>85.3円</td><td>31,135円</td><td>31,540円</td><td>31.1%</td><td>約192.06円<br>(-10.0%)</td>
+    </tr>
+  </table>
+</div>
+
+<!-- AUD/JPY -->
+<div class="sim-card">
+  <div class="pair-header">
+    <span class="pair-name" style="color:#8bc34a"><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY（豪ドル/円）</span>
+    <span class="pair-meta">レート: 111.50円 ｜ 金利: 4.35% ｜ スワップ: 112円/日/1万通貨</span>
+  </div>
+  <table>
+    <tr>
+      <th>レバレッジ</th><th>保有通貨数</th><th>1日スワップ</th><th>年間スワップ<br>(単純)</th><th>年間スワップ<br>(再投資)</th><th>年間利回り</th><th>ロスカット<br>目安※</th>
+    </tr>
+    <tr>
+      <td><strong>2倍</strong></td><td>1,794</td><td>20.1円</td><td>7,334円</td><td>7,444円</td><td>7.3%</td><td>約55.75円<br>(-50.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>3倍</strong></td><td>2,691</td><td>30.1円</td><td>11,001円</td><td>11,166円</td><td>11.0%</td><td>約74.33円<br>(-33.3%)</td>
+    </tr>
+    <tr>
+      <td><strong>5倍</strong></td><td>4,484</td><td>50.2円</td><td>18,335円</td><td>18,610円</td><td>18.3%</td><td>約89.20円<br>(-20.0%)</td>
+    </tr>
+    <tr>
+      <td><strong>8倍</strong></td><td>7,175</td><td>80.4円</td><td>29,336円</td><td>29,776円</td><td>29.3%</td><td>約97.56円<br>(-12.5%)</td>
+    </tr>
+    <tr>
+      <td><strong>10倍</strong></td><td>8,969</td><td>100.5円</td><td>36,670円</td><td>37,221円</td><td>36.7%</td><td>約100.35円<br>(-10.0%)</td>
+    </tr>
+  </table>
+</div>
+
+<p style="font-size:12px;color:#888;">※ロスカット目安は証拠金維持率100%を下回る為替レート。実際のロスカット水準はFX会社により異なります。<br>
+※保有通貨数は理論値。実際の最小取引単位はFX会社により異なります（1通貨〜1万通貨）。<br>
+※スワップ再投資は月1回、その月のスワップ収入で追加購入した場合の概算です。</p>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 4: 再投資複利効果（レバレッジ別） -->
+<!-- ============================================================ -->
+<section id="sec4">
+<h2>4. スワップ再投資の複利効果 ― レバレッジ別シミュレーション</h2>
+
+<p>10万円投資・毎月スワップ再投資した場合、1年後にいくらになるか。レバレッジ3倍〜15倍で比較します。</p>
+
+<!-- リスクスケール -->
+<div style="display:flex;align-items:center;gap:0;margin:20px 0 10px;border-radius:8px;overflow:hidden;font-size:12px;font-weight:bold;text-align:center;">
+  <div style="flex:1;background:#1b5e20;padding:8px 4px;color:#fff;">3倍<br><span style="font-weight:normal;font-size:10px;">推奨</span></div>
+  <div style="flex:1;background:#33691e;padding:8px 4px;color:#fff;">5倍<br><span style="font-weight:normal;font-size:10px;">やや積極</span></div>
+  <div style="flex:1;background:#f57f17;padding:8px 4px;color:#fff;">8倍<br><span style="font-weight:normal;font-size:10px;">積極的</span></div>
+  <div style="flex:1;background:#e65100;padding:8px 4px;color:#fff;">10倍<br><span style="font-weight:normal;font-size:10px;">ハイリスク</span></div>
+  <div style="flex:1;background:#b71c1c;padding:8px 4px;color:#fff;">15倍<br><span style="font-weight:normal;font-size:10px;">超ハイリスク</span></div>
+</div>
+<p style="font-size:11px;color:#888;text-align:center;">← 安全　｜　右に行くほどハイリターンだがロスカットリスクが急増 →</p>
+
+<h3>10万円が1年後にいくらになるか（再投資込み）</h3>
+<div style="overflow-x:auto;">
+<table>
+  <tr>
+    <th rowspan="2">通貨ペア</th>
+    <th style="background:#1b5e20;color:#fff;">3倍</th>
+    <th style="background:#33691e;color:#fff;">5倍</th>
+    <th style="background:#f57f17;color:#fff;">8倍</th>
+    <th style="background:#e65100;color:#fff;">10倍</th>
+    <th style="background:#b71c1c;color:#fff;">15倍</th>
+  </tr>
+  <tr>
+    <th style="font-size:10px;">33%下落で<br>ロスカット</th>
+    <th style="font-size:10px;">20%下落で<br>ロスカット</th>
+    <th style="font-size:10px;">12.5%下落で<br>ロスカット</th>
+    <th style="font-size:10px;">10%下落で<br>ロスカット</th>
+    <th style="font-size:10px;">6.7%下落で<br>ロスカット</th>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</strong></td>
+    <td class="best">188,805円<br><span style="font-size:10px;">+88.8%</span></td>
+    <td class="best">248,010円<br><span style="font-size:10px;">+148.0%</span></td>
+    <td class="danger">336,784円<br><span style="font-size:10px;">+236.8%</span></td>
+    <td class="danger">395,981円<br><span style="font-size:10px;">+296.0%</span></td>
+    <td class="danger">544,023円<br><span style="font-size:10px;">+444.0%</span></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</strong></td>
+    <td class="best">139,315円<br><span style="font-size:10px;">+39.3%</span></td>
+    <td class="best">165,525円<br><span style="font-size:10px;">+65.5%</span></td>
+    <td class="warn">204,840円<br><span style="font-size:10px;">+104.8%</span></td>
+    <td class="danger">231,050円<br><span style="font-size:10px;">+131.1%</span></td>
+    <td class="danger">296,574円<br><span style="font-size:10px;">+196.6%</span></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</strong></td>
+    <td>118,033円<br><span style="font-size:10px;">+18.0%</span></td>
+    <td class="best">130,080円<br><span style="font-size:10px;">+30.1%</span></td>
+    <td class="warn">148,113円<br><span style="font-size:10px;">+48.1%</span></td>
+    <td class="warn">160,159円<br><span style="font-size:10px;">+60.2%</span></td>
+    <td class="danger">190,202円<br><span style="font-size:10px;">+90.2%</span></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY</strong></td>
+    <td>117,829円<br><span style="font-size:10px;">+17.8%</span></td>
+    <td class="best">129,714円<br><span style="font-size:10px;">+29.7%</span></td>
+    <td class="warn">147,580円<br><span style="font-size:10px;">+47.6%</span></td>
+    <td class="warn">159,466円<br><span style="font-size:10px;">+59.5%</span></td>
+    <td class="danger">189,179円<br><span style="font-size:10px;">+89.2%</span></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</strong></td>
+    <td>111,152円<br><span style="font-size:10px;">+11.2%</span></td>
+    <td>118,598円<br><span style="font-size:10px;">+18.6%</span></td>
+    <td>129,786円<br><span style="font-size:10px;">+29.8%</span></td>
+    <td class="warn">137,233円<br><span style="font-size:10px;">+37.2%</span></td>
+    <td class="warn">155,831円<br><span style="font-size:10px;">+55.8%</span></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY</strong></td>
+    <td>110,522円<br><span style="font-size:10px;">+10.5%</span></td>
+    <td>117,561円<br><span style="font-size:10px;">+17.6%</span></td>
+    <td>128,082円<br><span style="font-size:10px;">+28.1%</span></td>
+    <td class="warn">135,084円<br><span style="font-size:10px;">+35.1%</span></td>
+    <td class="warn">152,645円<br><span style="font-size:10px;">+52.6%</span></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY</strong></td>
+    <td>109,466円<br><span style="font-size:10px;">+9.5%</span></td>
+    <td>115,751円<br><span style="font-size:10px;">+15.8%</span></td>
+    <td>125,217円<br><span style="font-size:10px;">+25.2%</span></td>
+    <td>131,540円<br><span style="font-size:10px;">+31.5%</span></td>
+    <td class="warn">147,291円<br><span style="font-size:10px;">+47.3%</span></td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/cz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CZK/JPY</strong></td>
+    <td>108,976円<br><span style="font-size:10px;">+9.0%</span></td>
+    <td>114,960円<br><span style="font-size:10px;">+15.0%</span></td>
+    <td>123,973円<br><span style="font-size:10px;">+24.0%</span></td>
+    <td>129,957円<br><span style="font-size:10px;">+30.0%</span></td>
+    <td class="warn">144,917円<br><span style="font-size:10px;">+44.9%</span></td>
+  </tr>
+</table>
+</div>
+
+<h3>年間スワップ収益の内訳（再投資込み）</h3>
+<div style="overflow-x:auto;">
+<table>
+  <tr>
+    <th rowspan="2">通貨ペア</th>
+    <th colspan="2" style="background:#1b5e20;color:#fff;">3倍（推奨）</th>
+    <th colspan="2" style="background:#33691e;color:#fff;">5倍</th>
+    <th colspan="2" style="background:#f57f17;color:#fff;">8倍</th>
+    <th colspan="2" style="background:#e65100;color:#fff;">10倍</th>
+    <th colspan="2" style="background:#b71c1c;color:#fff;">15倍</th>
+  </tr>
+  <tr>
+    <th style="font-size:10px;">単純</th><th style="font-size:10px;">再投資</th>
+    <th style="font-size:10px;">単純</th><th style="font-size:10px;">再投資</th>
+    <th style="font-size:10px;">単純</th><th style="font-size:10px;">再投資</th>
+    <th style="font-size:10px;">単純</th><th style="font-size:10px;">再投資</th>
+    <th style="font-size:10px;">単純</th><th style="font-size:10px;">再投資</th>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</strong></td>
+    <td>78,658</td><td class="best">88,805</td>
+    <td>131,098</td><td class="best">148,010</td>
+    <td>209,729</td><td class="danger">236,784</td>
+    <td>262,180</td><td class="danger">295,981</td>
+    <td>393,288</td><td class="danger">444,023</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</strong></td>
+    <td>37,230</td><td class="best">39,315</td>
+    <td>62,050</td><td class="best">65,525</td>
+    <td>99,280</td><td class="warn">104,840</td>
+    <td>124,100</td><td class="danger">131,050</td>
+    <td>186,150</td><td class="danger">196,574</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</strong></td>
+    <td>17,593</td><td>18,033</td>
+    <td>29,346</td><td>30,080</td>
+    <td>46,939</td><td class="warn">48,113</td>
+    <td>58,692</td><td class="warn">60,159</td>
+    <td>88,002</td><td class="danger">90,202</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY</strong></td>
+    <td>17,411</td><td>17,829</td>
+    <td>29,018</td><td>29,714</td>
+    <td>46,465</td><td class="warn">47,580</td>
+    <td>58,072</td><td class="warn">59,466</td>
+    <td>87,089</td><td class="danger">89,179</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</strong></td>
+    <td>10,987</td><td>11,152</td>
+    <td>18,323</td><td>18,598</td>
+    <td>29,346</td><td>29,786</td>
+    <td>36,683</td><td>37,233</td>
+    <td>55,006</td><td>55,831</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY</strong></td>
+    <td>10,366</td><td>10,522</td>
+    <td>17,301</td><td>17,561</td>
+    <td>27,667</td><td>28,082</td>
+    <td>34,566</td><td>35,084</td>
+    <td>51,867</td><td>52,645</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY</strong></td>
+    <td>9,344</td><td>9,466</td>
+    <td>15,549</td><td>15,751</td>
+    <td>24,893</td><td>25,217</td>
+    <td>31,135</td><td>31,540</td>
+    <td>46,684</td><td>47,291</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/cz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CZK/JPY</strong></td>
+    <td>8,870</td><td>8,976</td>
+    <td>14,783</td><td>14,960</td>
+    <td>23,689</td><td>23,973</td>
+    <td>29,602</td><td>29,957</td>
+    <td>44,384</td><td>44,917</td>
+  </tr>
+</table>
+</div>
+<p style="font-size:12px;color:#888;">※単位：円。再投資＝毎月のスワップ収入で同通貨を追加購入（レバレッジなし）した場合の概算。</p>
+
+<h3>ロスカットまでの許容下落幅</h3>
+<p>レバレッジが高いほど、わずかな為替変動でロスカットされます。</p>
+<div style="overflow-x:auto;">
+<table>
+  <tr>
+    <th>通貨ペア</th>
+    <th style="background:#1b5e20;color:#fff;">3倍</th>
+    <th style="background:#33691e;color:#fff;">5倍</th>
+    <th style="background:#f57f17;color:#fff;">8倍</th>
+    <th style="background:#e65100;color:#fff;">10倍</th>
+    <th style="background:#b71c1c;color:#fff;">15倍</th>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</strong><br><span style="font-size:11px">現在3.55円</span></td>
+    <td>-1.17円<br>(<span class="best">-33%</span>)</td>
+    <td>-0.71円<br>(<span class="warn">-20%</span>)</td>
+    <td>-0.44円<br>(<span class="danger">-12.5%</span>)</td>
+    <td>-0.36円<br>(<span class="danger">-10%</span>)</td>
+    <td>-0.24円<br>(<span class="danger">-6.7%</span>)</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</strong><br><span style="font-size:11px">現在9.02円</span></td>
+    <td>-2.97円<br>(<span class="best">-33%</span>)</td>
+    <td>-1.80円<br>(<span class="warn">-20%</span>)</td>
+    <td>-1.13円<br>(<span class="danger">-12.5%</span>)</td>
+    <td>-0.90円<br>(<span class="danger">-10%</span>)</td>
+    <td>-0.60円<br>(<span class="danger">-6.7%</span>)</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY</strong><br><span style="font-size:11px">現在8.80円</span></td>
+    <td>-2.90円<br>(<span class="best">-33%</span>)</td>
+    <td>-1.76円<br>(<span class="warn">-20%</span>)</td>
+    <td>-1.10円<br>(<span class="danger">-12.5%</span>)</td>
+    <td>-0.88円<br>(<span class="danger">-10%</span>)</td>
+    <td>-0.59円<br>(<span class="danger">-6.7%</span>)</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</strong><br><span style="font-size:11px">現在0.50円</span></td>
+    <td>-0.165円<br>(<span class="best">-33%</span>)</td>
+    <td>-0.10円<br>(<span class="warn">-20%</span>)</td>
+    <td>-0.063円<br>(<span class="danger">-12.5%</span>)</td>
+    <td>-0.05円<br>(<span class="danger">-10%</span>)</td>
+    <td>-0.033円<br>(<span class="danger">-6.7%</span>)</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY</strong><br><span style="font-size:11px">現在161.50円</span></td>
+    <td>-53.3円<br>(<span class="best">-33%</span>)</td>
+    <td>-32.3円<br>(<span class="warn">-20%</span>)</td>
+    <td>-20.2円<br>(<span class="danger">-12.5%</span>)</td>
+    <td>-16.2円<br>(<span class="danger">-10%</span>)</td>
+    <td>-10.8円<br>(<span class="danger">-6.7%</span>)</td>
+  </tr>
+  <tr>
+    <td><strong><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</strong><br><span style="font-size:11px">現在111.50円</span></td>
+    <td>-36.8円<br>(<span class="best">-33%</span>)</td>
+    <td>-22.3円<br>(<span class="warn">-20%</span>)</td>
+    <td>-13.9円<br>(<span class="danger">-12.5%</span>)</td>
+    <td>-11.2円<br>(<span class="danger">-10%</span>)</td>
+    <td>-7.5円<br>(<span class="danger">-6.7%</span>)</td>
+  </tr>
+</table>
+</div>
+
+<div class="warning-box">
+<strong>15倍レバレッジの注意点：</strong>わずか6.7%の為替下落でロスカットされます。TRY/JPYなら約0.24円（1日で動く可能性あり）、MXN/JPYでも約0.60円の下落で全額失う計算です。参考データとしてご覧ください。初心者は<strong>3倍以下</strong>、経験者でも<strong>5〜8倍</strong>までを推奨します。
+</div>
+
+<div class="highlight-box">
+  <h4>💡 レバレッジ別の考え方</h4>
+  <p>
+  <strong>3倍（推奨）：</strong>33%の下落に耐えられる。MXN/JPYなら過去5年で最大下落幅（約25%）をカバー<br>
+  <strong>5倍：</strong>リターンと安全性のバランス型。中級者向け<br>
+  <strong>8倍：</strong>短期的な急落でロスカットリスクあり。損切りルール必須<br>
+  <strong>10倍：</strong>高いリターンだが10%下落で退場。常時監視が必要<br>
+  <strong>15倍：</strong>理論上のリターンは大きいが、実運用では極めて危険。参考値として掲載
+  </p>
+</div>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: 総合比較表 -->
+<!-- ============================================================ -->
+<section id="sec5">
+<h2>5. 総合比較表 ― レート・証拠金・スワップ・金利差を一目で比較</h2>
+
+<h3>主要国通貨（G7+α）</h3>
+<table>
+  <tr>
+    <th>通貨ペア</th><th>人気順(国内)</th><th>レート</th><th>証拠金<br>(1万通貨)</th><th>スワップ/日</th><th>政策金利</th><th>金利差</th>
+  </tr>
+  <tr><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY</td><td class="rank-1">1位</td><td>161.50円</td><td>64,600円</td><td>+156円</td><td>3.50%</td><td>+2.50%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</td><td class="rank-2">2位</td><td>111.50円</td><td>44,600円</td><td>+112円</td><td>4.35%</td><td>+3.35%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY</td><td class="rank-3">3位</td><td>213.40円</td><td>85,360円</td><td>+182円</td><td>3.75%</td><td>+2.75%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/JPY</td><td>4位</td><td>184.00円</td><td>73,600円</td><td>+75円</td><td>2.40%</td><td>+1.40%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CHF/JPY</td><td>9位</td><td>199.30円</td><td>79,720円</td><td>−52円</td><td>0.00%</td><td>−1.00%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/nz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">NZD/JPY</td><td>10位</td><td>91.00円</td><td>36,400円</td><td>+45円</td><td>2.25%</td><td>+1.25%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/ca.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CAD/JPY</td><td>圏外</td><td>113.70円</td><td>45,480円</td><td>+40円</td><td>2.25%</td><td>+1.25%</td></tr>
+</table>
+
+<h3>新興国・高金利通貨</h3>
+<table>
+  <tr>
+    <th>通貨ペア</th><th>人気順(国内)</th><th>レート</th><th>証拠金<br>(1万通貨)</th><th>スワップ/日</th><th>政策金利</th><th>金利差</th>
+  </tr>
+  <tr><td><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</td><td>8位</td><td>9.02円</td><td>3,608円</td><td>+14.5円</td><td>6.50%</td><td>+5.50%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY</td><td>圏外</td><td>8.80円</td><td>3,520円</td><td>+14.0円</td><td>6.75%</td><td>+5.75%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</td><td>圏外</td><td>3.55円</td><td>1,420円</td><td>+25.5円</td><td>37.00%</td><td>+36.00%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/cn.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CNY/JPY</td><td>圏外</td><td>23.50円</td><td>9,400円</td><td>+11円</td><td>3.00%</td><td>+2.00%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</td><td>圏外</td><td>0.50円</td><td>200円</td><td>+1.7円</td><td>6.25%</td><td>+5.25%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/cz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CZK/JPY</td><td>圏外</td><td>7.40円</td><td>2,960円</td><td>+6.0円</td><td>3.50%</td><td>+2.50%</td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/pl.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">PLN/JPY</td><td>圏外</td><td>40.00円</td><td>16,000円</td><td>+30円</td><td>4.00%</td><td>+3.00%</td></tr>
+</table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 6: 国内取引量ランキング -->
+<!-- ============================================================ -->
+<section id="sec6">
+<h2>6. 国内FX取引量ランキングTOP10（2026年4月）</h2>
+
+<table>
+  <tr><th>順位</th><th>通貨ペア</th><th>月間取引金額</th><th>分類</th></tr>
+  <tr><td class="rank-1">1</td><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY（米ドル/円）</td><td>768.5兆円</td><td><span class="currency-tag tag-major">主要</span></td></tr>
+  <tr><td class="rank-2">2</td><td><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY（豪ドル/円）</td><td>45.1兆円</td><td><span class="currency-tag tag-major">主要</span></td></tr>
+  <tr><td class="rank-3">3</td><td><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY（英ポンド/円）</td><td>28.2兆円</td><td><span class="currency-tag tag-major">主要</span></td></tr>
+  <tr><td>4</td><td><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/JPY（ユーロ/円）</td><td>22.1兆円</td><td><span class="currency-tag tag-major">主要</span></td></tr>
+  <tr><td>5</td><td><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/USD（ユーロ/米ドル）</td><td>17.8兆円</td><td><span class="currency-tag tag-major">主要</span></td></tr>
+  <tr><td>6</td><td><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/USD（豪ドル/米ドル）</td><td>10.0兆円</td><td><span class="currency-tag tag-major">主要</span></td></tr>
+  <tr><td>7</td><td><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/USD（英ポンド/米ドル）</td><td>3.8兆円</td><td><span class="currency-tag tag-major">主要</span></td></tr>
+  <tr><td>8</td><td><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY（メキシコペソ/円）</td><td>3.5兆円</td><td><span class="currency-tag tag-emerging">新興国</span></td></tr>
+  <tr><td>9</td><td><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CHF/JPY（スイスフラン/円）</td><td>3.4兆円</td><td><span class="currency-tag tag-major">主要</span></td></tr>
+  <tr><td>10</td><td><img src="https://flagcdn.com/w20/nz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">NZD/JPY（NZドル/円）</td><td>3.4兆円</td><td><span class="currency-tag tag-major">主要</span></td></tr>
+</table>
+<p style="font-size:12px;color:#888;">出典：金融先物取引業協会 店頭FX月次速報</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 7: 世界取引量ランキング -->
+<!-- ============================================================ -->
+<section id="sec7">
+<h2>7. 世界の通貨ペア取引量ランキング（BIS 2025年4月調査）</h2>
+
+<p>世界の1日平均外国為替取引高：<strong>9.6兆ドル（約1,550兆円）</strong></p>
+
+<table>
+  <tr><th>順位</th><th>通貨ペア</th><th>シェア</th></tr>
+  <tr><td class="rank-1">1</td><td><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/USD（ユーロ/米ドル）</td><td>21.2%</td></tr>
+  <tr><td class="rank-2">2</td><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY（米ドル/円）</td><td>14.3%</td></tr>
+  <tr><td class="rank-3">3</td><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/cn.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/CNY（米ドル/人民元）</td><td>8.1%</td></tr>
+  <tr><td>4</td><td><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/USD（英ポンド/米ドル）</td><td>7.6%</td></tr>
+  <tr><td>5</td><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ca.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/CAD（米ドル/カナダドル）</td><td>5.3%</td></tr>
+  <tr><td>6</td><td><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/USD（豪ドル/米ドル）</td><td>4.9%</td></tr>
+  <tr><td>6</td><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/CHF（米ドル/スイスフラン）</td><td>4.9%</td></tr>
+  <tr><td>8</td><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/hk.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/HKD（米ドル/香港ドル）</td><td>3.6%</td></tr>
+  <tr><td>9</td><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/sg.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/SGD（米ドル/シンガポールドル）</td><td>2.2%</td></tr>
+  <tr><td>10</td><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/in.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/INR（米ドル/インドルピー）</td><td>1.9%</td></tr>
+</table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 8: スワップ会社別比較（全社版） -->
+<!-- ============================================================ -->
+<section id="sec8">
+<h2>8. スワップポイント 全FX会社比較（2026年5月実績）</h2>
+
+<p>国内FX会社約25社の買いスワップを通貨ペア別に比較。<strong>緑色が各通貨ペアのTOP3</strong>です。データは2026年5月の1日平均値（ザイFX！調査）。</p>
+
+<h3>主要通貨ペア（1万通貨/日・買いスワップ）</h3>
+<div style="overflow-x:auto;">
+<table>
+  <tr>
+    <th style="min-width:140px">FX会社</th><th><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY</th><th><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/JPY</th><th><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY</th><th><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</th><th><img src="https://flagcdn.com/w20/nz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">NZD/JPY</th>
+  </tr>
+  <tr><td style="text-align:left"><strong>セントラル短資FX</strong></td><td class="best">150.8円</td><td>70.0円</td><td>180.0円</td><td class="best">113.0円</td><td class="best">45.0円</td></tr>
+  <tr><td style="text-align:left"><strong>インヴァスト証券</strong></td><td class="best">149.0円</td><td>79.3円</td><td class="best">185.8円</td><td class="best">114.0円</td><td class="best">46.0円</td></tr>
+  <tr><td style="text-align:left"><strong>GMO外貨</strong></td><td class="best">145.6円</td><td class="best">80.0円</td><td>183.4円</td><td class="best">117.0円</td><td class="best">46.8円</td></tr>
+  <tr><td style="text-align:left"><strong>みんなのFX</strong></td><td>145.2円</td><td>70.0円</td><td>169.2円</td><td>110.0円</td><td>40.0円</td></tr>
+  <tr><td style="text-align:left"><strong>LIGHT FX</strong></td><td>145.2円</td><td>70.0円</td><td>169.2円</td><td>110.0円</td><td>40.0円</td></tr>
+  <tr><td style="text-align:left"><strong>楽天証券</strong></td><td>143.2円</td><td>66.2円</td><td>167.5円</td><td>104.8円</td><td>34.0円</td></tr>
+  <tr><td style="text-align:left"><strong>GMOクリック証券</strong></td><td>141.1円</td><td class="best">80.0円</td><td class="best">183.7円</td><td>116.5円</td><td>45.3円</td></tr>
+  <tr><td style="text-align:left"><strong>FXTF GX-FX</strong></td><td>138.4円</td><td>71.6円</td><td>170.7円</td><td>110.2円</td><td>42.5円</td></tr>
+  <tr><td style="text-align:left"><strong>ヒロセ通商</strong></td><td>138.3円</td><td>70.7円</td><td>168.0円</td><td>110.7円</td><td>42.7円</td></tr>
+  <tr><td style="text-align:left"><strong>JFX</strong></td><td>138.3円</td><td>70.7円</td><td>168.0円</td><td>110.7円</td><td>42.7円</td></tr>
+  <tr><td style="text-align:left"><strong>FXブロードネット</strong></td><td>137.8円</td><td>74.3円</td><td>184.2円</td><td>112.3円</td><td>43.4円</td></tr>
+  <tr><td style="text-align:left"><strong>外為どっとコム</strong></td><td>136.5円</td><td>65.0円</td><td>171.3円</td><td>109.7円</td><td>40.4円</td></tr>
+  <tr><td style="text-align:left"><strong>くりっく365</strong></td><td>134.9円</td><td>71.7円</td><td class="best">188.0円</td><td>111.0円</td><td class="best">47.3円</td></tr>
+  <tr><td style="text-align:left"><strong>SBI FXトレード</strong></td><td>130.7円</td><td>63.4円</td><td>176.6円</td><td>110.6円</td><td>42.4円</td></tr>
+  <tr><td style="text-align:left"><strong>SBI証券</strong></td><td>130.7円</td><td>63.4円</td><td>176.6円</td><td>110.6円</td><td>42.4円</td></tr>
+  <tr><td style="text-align:left"><strong>マネックス証券</strong></td><td>121.3円</td><td>69.7円</td><td>151.1円</td><td>84.2円</td><td>13.9円</td></tr>
+  <tr><td style="text-align:left"><strong>松井証券</strong></td><td>120.0円</td><td>55.0円</td><td>155.0円</td><td>93.2円</td><td>42.2円</td></tr>
+  <tr><td style="text-align:left"><strong>三菱UFJ eスマート</strong></td><td>108.6円</td><td>50.0円</td><td>165.0円</td><td>93.0円</td><td>30.0円</td></tr>
+  <tr><td style="text-align:left"><strong>外為ファイネスト</strong></td><td>108.6円</td><td>38.4円</td><td>133.3円</td><td>93.1円</td><td>32.9円</td></tr>
+  <tr><td style="text-align:left"><strong>外為オンライン</strong></td><td>107.5円</td><td>60.0円</td><td>142.3円</td><td>91.2円</td><td>31.4円</td></tr>
+  <tr><td style="text-align:left"><strong>ひまわり証券</strong></td><td>107.5円</td><td>60.0円</td><td>142.3円</td><td>91.2円</td><td>31.4円</td></tr>
+  <tr><td style="text-align:left"><strong>マネースクエア</strong></td><td>103.3円</td><td class="best">100.0円</td><td>164.0円</td><td>122.6円</td><td>26.0円</td></tr>
+  <tr><td style="text-align:left"><strong>IG証券</strong></td><td>102.8円</td><td>38.0円</td><td>151.7円</td><td>96.4円</td><td>32.4円</td></tr>
+  <tr><td style="text-align:left"><strong>アイネット証券</strong></td><td>95.6円</td><td>56.9円</td><td>138.5円</td><td>80.6円</td><td>24.2円</td></tr>
+  <tr><td style="text-align:left"><strong>サクソバンク証券</strong></td><td>75.0円</td><td>1.0円</td><td>103.4円</td><td>72.5円</td><td>9.0円</td></tr>
+  <tr><td style="text-align:left"><strong>フィリップ証券</strong></td><td>60.9円</td><td>28.6円</td><td>82.6円</td><td>53.3円</td><td>19.1円</td></tr>
+</table>
+</div>
+
+<h3>高金利・新興国通貨ペア（1万通貨/日・買いスワップ）</h3>
+<p style="font-size:12px;color:#aaa;">※MXN/JPY・ZAR/JPYは10万通貨換算、CZK/JPYも10万通貨換算のFX会社あり。ここでは1万通貨あたりに統一。「—」は取扱なし。</p>
+<div style="overflow-x:auto;">
+<table>
+  <tr>
+    <th style="min-width:140px">FX会社</th><th><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</th><th><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY</th><th><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</th><th><img src="https://flagcdn.com/w20/cn.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CNY/JPY</th><th><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</th><th><img src="https://flagcdn.com/w20/cz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CZK/JPY</th><th><img src="https://flagcdn.com/w20/pl.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">PLN/JPY</th>
+  </tr>
+  <tr><td style="text-align:left"><strong>セントラル短資FX</strong></td><td class="best">14.6円</td><td class="best">15.2円</td><td class="best">26.4円</td><td class="best">11.0円</td><td>0.8円</td><td>—</td><td>—</td></tr>
+  <tr><td style="text-align:left"><strong>インヴァスト証券</strong></td><td class="best">14.9円</td><td>13.6円</td><td>25.5円</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td style="text-align:left"><strong>GMO外貨</strong></td><td class="best">14.3円</td><td>13.1円</td><td>25.1円</td><td class="best">10.0円</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td style="text-align:left"><strong>みんなのFX</strong></td><td>14.1円</td><td>13.1円</td><td>25.1円</td><td>2.8円</td><td>0.6円</td><td>7.9円</td><td>32.0円</td></tr>
+  <tr><td style="text-align:left"><strong>LIGHT FX</strong></td><td>14.1円</td><td>13.1円</td><td>25.1円</td><td>2.8円</td><td>0.9円</td><td>7.9円</td><td>32.0円</td></tr>
+  <tr><td style="text-align:left"><strong>楽天証券</strong></td><td>13.0円</td><td>13.0円</td><td>24.0円</td><td>0.0円</td><td>1.0円</td><td>5.0円</td><td>32.0円</td></tr>
+  <tr><td style="text-align:left"><strong>GMOクリック証券</strong></td><td>14.0円</td><td>13.0円</td><td class="best">26.2円</td><td>—</td><td class="best">1.9円</td><td class="best">8.0円</td><td class="best">33.7円</td></tr>
+  <tr><td style="text-align:left"><strong>FXTF GX-FX</strong></td><td>14.0円</td><td>13.0円</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td style="text-align:left"><strong>ヒロセ通商</strong></td><td>14.0円</td><td>13.0円</td><td>25.0円</td><td>2.0円</td><td>0.6円</td><td>5.0円</td><td>32.0円</td></tr>
+  <tr><td style="text-align:left"><strong>JFX</strong></td><td>14.0円</td><td class="best">15.0円</td><td>25.0円</td><td class="best">10.0円</td><td>—</td><td>5.0円</td><td>—</td></tr>
+  <tr><td style="text-align:left"><strong>FXブロードネット</strong></td><td>—</td><td>13.0円</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td style="text-align:left"><strong>外為どっとコム</strong></td><td>14.0円</td><td>13.0円</td><td>25.0円</td><td>1.9円</td><td>0.6円</td><td>7.9円</td><td>32.0円</td></tr>
+  <tr><td style="text-align:left"><strong>くりっく365</strong></td><td class="best">14.6円</td><td class="best">14.6円</td><td class="best">28.9円</td><td class="best">6.2円</td><td>0.6円</td><td>6.0円</td><td class="best">33.1円</td></tr>
+  <tr><td style="text-align:left"><strong>SBI FXトレード</strong></td><td>14.0円</td><td>13.0円</td><td>24.0円</td><td>1.8円</td><td>—</td><td>—</td><td>32.0円</td></tr>
+  <tr><td style="text-align:left"><strong>SBI証券</strong></td><td>14.0円</td><td>13.0円</td><td>24.0円</td><td>1.8円</td><td>—</td><td>—</td><td>32.0円</td></tr>
+  <tr><td style="text-align:left"><strong>マネックス証券</strong></td><td>14.0円</td><td>13.0円</td><td>24.0円</td><td>2.9円</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td style="text-align:left"><strong>松井証券</strong></td><td>13.0円</td><td>12.0円</td><td>25.0円</td><td>2.3円</td><td>0.5円</td><td>—</td><td>28.8円</td></tr>
+  <tr><td style="text-align:left"><strong>三菱UFJ eスマート</strong></td><td>14.0円</td><td>13.0円</td><td>24.0円</td><td>2.0円</td><td>0.5円</td><td>4.0円</td><td class="best">35.0円</td></tr>
+  <tr><td style="text-align:left"><strong>外為オンライン</strong></td><td>5.0円</td><td>10.0円</td><td>33.3円</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td style="text-align:left"><strong>ひまわり証券</strong></td><td>—</td><td>10.0円</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td style="text-align:left"><strong>マネースクエア</strong></td><td>7.0円</td><td>2.0円</td><td>5.7円</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td style="text-align:left"><strong>IG証券</strong></td><td>13.2円</td><td>13.0円</td><td>20.0円</td><td>-0.4円</td><td>0.6円</td><td>-1.2円</td><td>33.7円</td></tr>
+  <tr><td style="text-align:left"><strong>アイネット証券</strong></td><td>5.4円</td><td>9.7円</td><td>12.0円</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td style="text-align:left"><strong>サクソバンク証券</strong></td><td>11.3円</td><td>10.6円</td><td>30.2円</td><td>-5.7円</td><td>0.5円</td><td>—</td><td>28.6円</td></tr>
+  <tr><td style="text-align:left"><strong>フィリップ証券</strong></td><td>8.9円</td><td>9.1円</td><td>15.9円</td><td>0.6円</td><td>—</td><td>—</td><td>—</td></tr>
+</table>
+</div>
+<p style="font-size:12px;color:#888;">出典：ザイFX！ 2026年5月実績（1日あたり平均）</p>
+
+<h3>主要通貨スプレッド比較（代表的なFX会社）</h3>
+<table>
+  <tr>
+    <th>FX会社</th><th><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY</th><th><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/JPY</th><th><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY</th><th><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</th><th><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY</th><th><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</th>
+  </tr>
+  <tr><td style="text-align:left">GMO外貨</td><td class="best">0.1銭</td><td class="best">0.1銭</td><td class="best">0.4銭</td><td class="best">0.1銭</td><td class="best">0.1銭</td><td class="best">0.6銭</td></tr>
+  <tr><td style="text-align:left">松井証券</td><td class="best">0.1銭</td><td>0.4銭</td><td>0.5銭</td><td class="best">0.1銭</td><td>0.4銭</td><td>2.9銭</td></tr>
+  <tr><td style="text-align:left">みんなのFX</td><td>0.2銭</td><td>0.4銭</td><td>0.9銭</td><td>0.3銭</td><td>0.9銭</td><td>1.6銭</td></tr>
+  <tr><td style="text-align:left">LIGHT FX</td><td>0.2銭</td><td>0.4銭</td><td>0.9銭</td><td>0.3銭</td><td>0.9銭</td><td>1.6銭</td></tr>
+  <tr><td style="text-align:left">GMOクリック証券</td><td>0.2銭</td><td>0.4銭</td><td>0.9銭</td><td>0.2銭</td><td>0.9銭</td><td>1.4銭</td></tr>
+  <tr><td style="text-align:left">セントラル短資FX</td><td>0.2銭</td><td>0.4銭</td><td>0.6銭</td><td>0.1銭</td><td>0.3銭</td><td>0.8銭</td></tr>
+  <tr><td style="text-align:left">外為どっとコム</td><td>0.2銭</td><td>0.4銭</td><td>0.9銭</td><td>0.2銭</td><td>0.3銭</td><td>1.6銭</td></tr>
+  <tr><td style="text-align:left">SBI FXトレード</td><td>0.18銭</td><td>0.38銭</td><td>0.88銭</td><td>0.18銭</td><td>0.78銭</td><td>1.58銭</td></tr>
+  <tr><td style="text-align:left">ヒロセ通商</td><td>0.2銭</td><td>0.4銭</td><td>0.9銭</td><td>0.2銭</td><td>0.8銭</td><td>1.6銭</td></tr>
+  <tr><td style="text-align:left">楽天証券</td><td>0.2銭</td><td>0.5銭</td><td>0.9銭</td><td>0.2銭</td><td>0.9銭</td><td>1.6銭</td></tr>
+</table>
+<p style="font-size:12px;color:#888;">※スプレッドは原則固定（例外あり）。時間帯により変動する場合があります。</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 9: 政策金利一覧 -->
+<!-- ============================================================ -->
+<section id="sec9">
+<h2>9. 各国政策金利一覧（2026年6月時点）</h2>
+
+<h3>主要先進国</h3>
+<table>
+  <tr><th style="text-align:left;min-width:140px;">国・地域</th><th>中央銀行</th><th>政策金利</th><th>直近の変更</th></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/jp.png" width="28" height="20" alt="日本" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">日本</td><td>日銀（BOJ）</td><td>1.00%</td><td>2026/6/16 +25bp利上げ</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/us.png" width="28" height="20" alt="米国" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">米国</td><td>FRB</td><td>3.50-3.75%</td><td>2025/12/10 -25bp利下げ</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/eu.png" width="28" height="20" alt="EU" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">ユーロ圏</td><td>ECB</td><td>2.40%</td><td>2026/6/11 +25bp利上げ</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/gb.png" width="28" height="20" alt="英国" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">英国</td><td>BOE</td><td>3.75%</td><td>2025/12/18 -25bp利下げ</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/ca.png" width="28" height="20" alt="カナダ" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">カナダ</td><td>BOC</td><td>2.25%</td><td>2025/10/29 -25bp利下げ</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/au.png" width="28" height="20" alt="豪州" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">豪州</td><td>RBA</td><td>4.35%</td><td>2026/5/5 +25bp利上げ</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/nz.png" width="28" height="20" alt="NZ" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">NZ</td><td>RBNZ</td><td>2.25%</td><td>2025/11/26 -25bp利下げ</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/ch.png" width="28" height="20" alt="スイス" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">スイス</td><td>SNB</td><td>0.00%</td><td>2025/6/19 -25bp利下げ</td></tr>
+</table>
+
+<h3>新興国・高金利国</h3>
+<table>
+  <tr><th style="text-align:left;min-width:140px;">国・地域</th><th>中央銀行</th><th>政策金利</th><th>特徴</th></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/tr.png" width="28" height="20" alt="トルコ" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">トルコ</td><td>TCMB</td><td class="danger">37.00%</td><td>世界最高水準</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/br.png" width="28" height="20" alt="ブラジル" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">ブラジル</td><td>BCB</td><td class="danger">15.00%</td><td>超高金利（FX取引不可の会社多い）</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/za.png" width="28" height="20" alt="南アフリカ" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">南アフリカ</td><td>SARB</td><td class="warn">6.75%</td><td>安定的な高金利</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/mx.png" width="28" height="20" alt="メキシコ" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">メキシコ</td><td>Banxico</td><td class="warn">6.50%</td><td>利下げサイクル中</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/hu.png" width="28" height="20" alt="ハンガリー" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">ハンガリー</td><td>MNB</td><td>6.25%</td><td>欧州の高金利通貨</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/pl.png" width="28" height="20" alt="ポーランド" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">ポーランド</td><td>NBP</td><td>4.00%</td><td>EU加盟国で安定</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/cz.png" width="28" height="20" alt="チェコ" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">チェコ</td><td>CNB</td><td>3.50%</td><td>欧州の安定通貨</td></tr>
+  <tr><td style="text-align:left;white-space:nowrap;padding-left:24px;"><img src="https://flagcdn.com/w40/cn.png" width="28" height="20" alt="中国" style="vertical-align:middle;margin-right:6px;border:1px solid #333;border-radius:2px;">中国</td><td>PBOC</td><td>3.00%</td><td>LPR1年物</td></tr>
+</table>
+
+<h3>スイスフラン/トルコリラ（CHF/TRY）金利差サマリー</h3>
+<table>
+  <tr><th style="text-align:left;min-width:140px;">項目</th><th>内容</th></tr>
+  <tr><td style="text-align:left;padding-left:24px;">スイス政策金利（SNB）</td><td>0.00%</td></tr>
+  <tr><td style="text-align:left;padding-left:24px;">トルコ政策金利（TCMB）</td><td class="danger">37.00%</td></tr>
+  <tr><td style="text-align:left;padding-left:24px;">金利差</td><td class="danger"><strong>37.00%</strong>（世界最大級）</td></tr>
+  <tr><td style="text-align:left;padding-left:24px;">CHF/TRYを買う（CHF保有・TRY売り）</td><td>スワップ：マイナス（支払い）</td></tr>
+  <tr><td style="text-align:left;padding-left:24px;">CHF/TRYを売る（TRY保有・CHF売り）</td><td class="best">スワップ：プラス（受け取り）</td></tr>
+</table>
+
+<h4>CHF/TRY 取扱FX会社一覧（2026年）</h4>
+<div style="overflow-x:auto;">
+<table>
+  <tr><th style="text-align:left;min-width:160px;">FX会社</th><th>証拠金率</th><th>証拠金<br>(1万通貨)</th><th>建玉上限</th><th>スワップ受取</th></tr>
+  <tr><td style="text-align:left">みんなのFX</td><td>4%</td><td>約81,500円</td><td>10万通貨</td><td class="best">可能</td></tr>
+  <tr><td style="text-align:left">LIGHT FX</td><td>4%</td><td>約81,500円</td><td>10万通貨</td><td class="best">可能</td></tr>
+  <tr><td style="text-align:left">外為どっとコム（外貨ネクストネオ）</td><td>4%</td><td>約81,300円</td><td>700万通貨</td><td class="best">可能</td></tr>
+  <tr><td style="text-align:left">IG証券</td><td>15%</td><td>約305,700円</td><td>—</td><td class="danger">不可</td></tr>
+  <tr><td style="text-align:left">サクソバンク証券</td><td>25%</td><td>約509,500円</td><td>—</td><td class="danger">不可</td></tr>
+</table>
+</div>
+<p style="font-size:12px;color:#888;">※外為どっとコムは2026年4月にCHF/TRYを新規追加。みんなのFX・LIGHT FXは2025年9月27日に取扱開始</p>
+
+<div class="warning-box">
+  <p>トルコリラは長期的に対フランで大幅下落傾向。スワップ収入が為替損に相殺されるリスクが大きい点に注意。また証拠金率はFX会社により4%〜25%と大きく異なるため、レバレッジ効率を重視する場合はみんなのFX・LIGHT FX・外為どっとコムが有利です。</p>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 10: 投資タイプ別おすすめ -->
+<!-- ============================================================ -->
+<section id="sec10">
+<h2>10. 投資タイプ別おすすめ通貨ペア（各TOP10）</h2>
+
+<h3>スワップ狙い（長期保有）向け TOP10</h3>
+<table>
+  <tr><th>順位</th><th>おすすめ度</th><th>通貨ペア</th><th>年間スワップ目安<br>(10万通貨・単純)</th><th>証拠金<br>(10万通貨/25倍)</th><th>証拠金利回り</th></tr>
+  <tr><td class="rank-1">1</td><td>★★★★★</td><td><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</td><td>52,925円</td><td>36,080円</td><td class="best">146.7%</td></tr>
+  <tr><td class="rank-2">2</td><td>★★★★★</td><td><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY</td><td>51,100円</td><td>35,200円</td><td class="best">145.2%</td></tr>
+  <tr><td class="rank-3">3</td><td>★★★★☆</td><td><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</td><td>6,205円</td><td>2,000円</td><td class="best">310.3%</td></tr>
+  <tr><td>4</td><td>★★★★☆</td><td><img src="https://flagcdn.com/w20/cz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CZK/JPY</td><td>21,900円</td><td>29,600円</td><td>74.0%</td></tr>
+  <tr><td>5</td><td>★★★★☆</td><td><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</td><td>408,800円</td><td>446,000円</td><td>91.7%</td></tr>
+  <tr><td>6</td><td>★★★☆☆</td><td><img src="https://flagcdn.com/w20/pl.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">PLN/JPY</td><td>109,500円</td><td>160,000円</td><td>68.4%</td></tr>
+  <tr><td>7</td><td>★★★☆☆</td><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY</td><td>569,400円</td><td>646,000円</td><td>88.1%</td></tr>
+  <tr><td>8</td><td>★★★☆☆</td><td><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY</td><td>664,300円</td><td>853,600円</td><td>77.8%</td></tr>
+  <tr><td>9</td><td>★★★☆☆</td><td><img src="https://flagcdn.com/w20/nz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">NZD/JPY</td><td>164,250円</td><td>364,000円</td><td>45.1%</td></tr>
+  <tr><td>10</td><td>★★☆☆☆</td><td><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</td><td>93,075円</td><td>14,200円</td><td class="danger">655.5%※</td></tr>
+</table>
+<p style="font-size:12px;color:#f44;">※TRY/JPYは利回りが最大だが為替下落リスクが極めて高い。過去10年で約85%下落しており、スワップ収益を為替損が大きく上回る可能性あり。おすすめ度は利回りだけでなくリスクも加味した評価です。</p>
+
+<h3>為替差益狙い（短期〜中期）向け TOP10</h3>
+<table>
+  <tr><th>順位</th><th>通貨ペア</th><th>特徴</th><th>流動性</th><th>ボラティリティ</th></tr>
+  <tr><td class="rank-1">1</td><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY</td><td style="text-align:left;font-size:12px">圧倒的流動性、狭スプレッド</td><td>◎</td><td>★★☆</td></tr>
+  <tr><td class="rank-2">2</td><td><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/USD</td><td style="text-align:left;font-size:12px">世界最大の取引量、情報量豊富</td><td>◎</td><td>★★☆</td></tr>
+  <tr><td class="rank-3">3</td><td><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY</td><td style="text-align:left;font-size:12px">大きな値幅で利益機会多い</td><td>○</td><td>★★★</td></tr>
+  <tr><td>4</td><td><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/JPY</td><td style="text-align:left;font-size:12px">安定した値動き、情報豊富</td><td>◎</td><td>★★☆</td></tr>
+  <tr><td>5</td><td><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/USD</td><td style="text-align:left;font-size:12px">値動きが大きく短期トレード向き</td><td>○</td><td>★★★</td></tr>
+  <tr><td>6</td><td><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</td><td style="text-align:left;font-size:12px">資源国通貨、中国経済連動</td><td>○</td><td>★★☆</td></tr>
+  <tr><td>7</td><td><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/USD</td><td style="text-align:left;font-size:12px">資源国通貨同士、トレンド出やすい</td><td>○</td><td>★★☆</td></tr>
+  <tr><td>8</td><td><img src="https://flagcdn.com/w20/ch.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CHF/JPY</td><td style="text-align:left;font-size:12px">「安全資産」、有事に買われる</td><td>△</td><td>★★☆</td></tr>
+  <tr><td>9</td><td><img src="https://flagcdn.com/w20/nz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">NZD/JPY</td><td style="text-align:left;font-size:12px">豪ドルと連動性高い</td><td>○</td><td>★★☆</td></tr>
+  <tr><td>10</td><td><img src="https://flagcdn.com/w20/ca.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CAD/JPY</td><td style="text-align:left;font-size:12px">原油価格と連動、米国経済の影響大</td><td>△</td><td>★★☆</td></tr>
+</table>
+
+<h3>少額投資向け（必要証拠金が少ない）TOP10</h3>
+<table>
+  <tr><th>順位</th><th>通貨ペア</th><th>1万通貨の証拠金</th><th>特徴</th><th>おすすめ度</th></tr>
+  <tr><td class="rank-1">1</td><td><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</td><td class="best">200円</td><td style="text-align:left;font-size:12px">超少額OK、EU加盟国</td><td>★★★★★</td></tr>
+  <tr><td class="rank-2">2</td><td><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</td><td>1,420円</td><td style="text-align:left;font-size:12px">高スワップだが下落リスク大</td><td>★★☆☆☆</td></tr>
+  <tr><td class="rank-3">3</td><td><img src="https://flagcdn.com/w20/cz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CZK/JPY</td><td>2,960円</td><td style="text-align:left;font-size:12px">欧州安定通貨、上昇トレンド</td><td>★★★★☆</td></tr>
+  <tr><td>4</td><td><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY</td><td>3,520円</td><td style="text-align:left;font-size:12px">定番高金利、歴史長い</td><td>★★★☆☆</td></tr>
+  <tr><td>5</td><td><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</td><td>3,608円</td><td style="text-align:left;font-size:12px">人気急上昇中、経済安定</td><td>★★★★★</td></tr>
+  <tr><td>6</td><td><img src="https://flagcdn.com/w20/cn.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CNY/JPY</td><td>9,400円</td><td style="text-align:left;font-size:12px">中国経済の動向に注目</td><td>★★★☆☆</td></tr>
+  <tr><td>7</td><td><img src="https://flagcdn.com/w20/pl.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">PLN/JPY</td><td>16,000円</td><td style="text-align:left;font-size:12px">東欧の優良通貨、EU加盟国</td><td>★★★★☆</td></tr>
+  <tr><td>8</td><td><img src="https://flagcdn.com/w20/nz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">NZD/JPY</td><td>36,400円</td><td style="text-align:left;font-size:12px">主要通貨で少額から練習しやすい</td><td>★★★☆☆</td></tr>
+  <tr><td>9</td><td><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</td><td>44,600円</td><td style="text-align:left;font-size:12px">主要通貨で人気No.2</td><td>★★★★☆</td></tr>
+  <tr><td>10</td><td><img src="https://flagcdn.com/w20/ca.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CAD/JPY</td><td>45,480円</td><td style="text-align:left;font-size:12px">資源国通貨で安定感あり</td><td>★★★☆☆</td></tr>
+</table>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 11: リスク指標 -->
+<!-- ============================================================ -->
+<section id="sec11">
+<h2>11. リスク指標 ― 通貨ペア別リスク評価</h2>
+
+<table>
+  <tr>
+    <th>通貨ペア</th><th>ボラティリティ<br>(値動き)</th><th>流動性</th><th>カントリー<br>リスク</th><th>為替下落<br>リスク</th><th>総合<br>リスク</th>
+  </tr>
+  <tr><td><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY</td><td>★★☆</td><td>★★★</td><td>★☆☆</td><td>★☆☆</td><td style="color:#4caf50"><strong>低</strong></td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/eu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">EUR/JPY</td><td>★★☆</td><td>★★★</td><td>★☆☆</td><td>★☆☆</td><td style="color:#4caf50"><strong>低</strong></td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">GBP/JPY</td><td>★★★</td><td>★★☆</td><td>★☆☆</td><td>★☆☆</td><td style="color:#8bc34a"><strong>低〜中</strong></td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</td><td>★★☆</td><td>★★☆</td><td>★☆☆</td><td>★☆☆</td><td style="color:#8bc34a"><strong>低〜中</strong></td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/nz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">NZD/JPY</td><td>★★☆</td><td>★★☆</td><td>★☆☆</td><td>★★☆</td><td style="color:#8bc34a"><strong>低〜中</strong></td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</td><td>★★★</td><td>★★☆</td><td>★★☆</td><td>★★☆</td><td style="color:#ff9800"><strong>中</strong></td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/za.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">ZAR/JPY</td><td>★★★</td><td>★☆☆</td><td>★★☆</td><td>★★☆</td><td style="color:#ff9800"><strong>中〜高</strong></td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</td><td>★★☆</td><td>★☆☆</td><td>★★☆</td><td>★★☆</td><td style="color:#ff9800"><strong>中</strong></td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/cz.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CZK/JPY</td><td>★★☆</td><td>★☆☆</td><td>★☆☆</td><td>★☆☆</td><td style="color:#8bc34a"><strong>低〜中</strong></td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/pl.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">PLN/JPY</td><td>★★☆</td><td>★☆☆</td><td>★★☆</td><td>★★☆</td><td style="color:#ff9800"><strong>中</strong></td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</td><td>★★★</td><td>★☆☆</td><td>★★★</td><td>★★★</td><td style="color:#f44336"><strong>高</strong></td></tr>
+  <tr><td><img src="https://flagcdn.com/w20/cn.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">CNY/JPY</td><td>★★☆</td><td>★☆☆</td><td>★★☆</td><td>★★☆</td><td style="color:#ff9800"><strong>中</strong></td></tr>
+</table>
+
+<div class="warning-box">
+高金利通貨は金利が高い「理由」があります。高インフレ、政治不安、経常赤字などのリスクプレミアムが金利に反映されています。スワップ収益だけでなく、為替変動リスクも必ず考慮してください。
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 12: FX会社ランキング（全社版） -->
+<!-- ============================================================ -->
+<section id="sec12">
+<h2>12. FX会社総合ランキング ― スワップ運用に強い全25社</h2>
+
+<h3>スワップ総合力ランキング（USD/JPY基準・2026年5月実績）</h3>
+<table>
+  <tr>
+    <th>順位</th><th>FX会社</th><th><img src="https://flagcdn.com/w20/us.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">USD/JPY<br>スワップ</th><th>最小取引</th><th>取扱ペア数</th><th>得意な通貨</th><th>特徴</th>
+  </tr>
+  <tr><td class="rank-1">1</td><td><strong>セントラル短資FX</strong></td><td class="best">150.8円</td><td>1,000通貨</td><td>27</td><td>USD,AUD,TRY,ZAR</td><td>多通貨で安定トップ。スワップ未決済非課税</td></tr>
+  <tr><td class="rank-2">2</td><td><strong>インヴァスト証券</strong></td><td class="best">149.0円</td><td>1,000通貨</td><td>20</td><td>MXN,GBP,AUD</td><td>自動売買（トライオート）対応</td></tr>
+  <tr><td class="rank-3">3</td><td><strong>GMO外貨</strong></td><td class="best">145.6円</td><td>1,000通貨</td><td>24</td><td>USD,AUD,MXN</td><td>スプレッド最狭水準。年間実績トップ</td></tr>
+  <tr><td>4</td><td><strong>みんなのFX</strong></td><td>145.2円</td><td>1,000通貨</td><td>34</td><td>全般(LIGHTペア)</td><td>LIGHTペアで最高水準。途中受取OK</td></tr>
+  <tr><td>5</td><td><strong>LIGHT FX</strong></td><td>145.2円</td><td>1,000通貨</td><td>46</td><td>全般(LIGHTペア)</td><td>業界最多の通貨ペア数</td></tr>
+  <tr><td>6</td><td><strong>楽天証券</strong></td><td>143.2円</td><td>1,000通貨</td><td>28</td><td>HUF,PLN,CZK</td><td>楽天ポイント連携。東欧通貨充実</td></tr>
+  <tr><td>7</td><td><strong>GMOクリック証券</strong></td><td>141.1円</td><td>1,000通貨</td><td>20</td><td>GBP,HUF,CZK,PLN</td><td>新興国通貨でNo.1。ツール充実</td></tr>
+  <tr><td>8</td><td><strong>FXTF GX-FX</strong></td><td>138.4円</td><td>1,000通貨</td><td>30</td><td>USD,AUD</td><td>狭スプレッド。MT4も利用可</td></tr>
+  <tr><td>9</td><td><strong>ヒロセ通商</strong></td><td>138.3円</td><td>1,000通貨</td><td>54</td><td>多通貨</td><td>通貨ペア数54で国内最多級</td></tr>
+  <tr><td>10</td><td><strong>JFX</strong></td><td>138.3円</td><td>1,000通貨</td><td>41</td><td>ZAR,CNY</td><td>約定力に定評。スキャルピング公認</td></tr>
+  <tr><td>11</td><td><strong>FXブロードネット</strong></td><td>137.8円</td><td>1,000通貨</td><td>24</td><td>GBP</td><td>トラッキングトレード対応</td></tr>
+  <tr><td>12</td><td><strong>外為どっとコム</strong></td><td>136.5円</td><td>1,000通貨</td><td>30</td><td>全般</td><td>情報コンテンツ充実。初心者向け</td></tr>
+  <tr><td>13</td><td><strong>くりっく365</strong></td><td>134.9円</td><td>10,000通貨</td><td>30</td><td>TRY,GBP,CNY</td><td>取引所取引で均一・透明なスワップ</td></tr>
+  <tr><td>14</td><td><strong>SBI FXトレード</strong></td><td>130.7円</td><td><strong>1通貨〜</strong></td><td>34</td><td>全般</td><td>1通貨から取引可。積立FX対応</td></tr>
+  <tr><td>15</td><td><strong>SBI証券</strong></td><td>130.7円</td><td>1,000通貨</td><td>28</td><td>全般</td><td>株式口座と連携。NISA口座と一元管理</td></tr>
+  <tr><td>16</td><td><strong>マネックス証券</strong></td><td>121.3円</td><td>1,000通貨</td><td>16</td><td>MXN,CNY</td><td>株式口座との連携</td></tr>
+  <tr><td>17</td><td><strong>松井証券</strong></td><td>120.0円</td><td><strong>1通貨〜</strong></td><td>20</td><td>全般</td><td>1通貨〜。100円から始められる</td></tr>
+  <tr><td>18</td><td><strong>三菱UFJ eスマート</strong></td><td>108.6円</td><td>1,000通貨</td><td>26</td><td>PLN</td><td>大手証券の安心感。PLNスワップ高</td></tr>
+  <tr><td>19</td><td><strong>外為ファイネスト</strong></td><td>108.6円</td><td>1,000通貨</td><td>29</td><td>—</td><td>MT4/MT5対応。EA自動売買向け</td></tr>
+  <tr><td>20</td><td><strong>外為オンライン</strong></td><td>107.5円</td><td>1,000通貨</td><td>26</td><td>TRY</td><td>iサイクル2取引対応</td></tr>
+  <tr><td>21</td><td><strong>ひまわり証券</strong></td><td>107.5円</td><td>10,000通貨</td><td>24</td><td>—</td><td>ループ・イフダン対応</td></tr>
+  <tr><td>22</td><td><strong>マネースクエア</strong></td><td>103.3円</td><td>1,000通貨</td><td>17</td><td>EUR</td><td>トラリピ（自動売買）専門</td></tr>
+  <tr><td>23</td><td><strong>IG証券</strong></td><td>102.8円</td><td>10,000通貨</td><td>約100</td><td>PLN</td><td>取扱ペア100超。CFDも充実</td></tr>
+  <tr><td>24</td><td><strong>アイネット証券</strong></td><td>95.6円</td><td>1,000通貨</td><td>24</td><td>—</td><td>ループイフダン対応</td></tr>
+  <tr><td>25</td><td><strong>サクソバンク証券</strong></td><td>75.0円</td><td>1,000通貨</td><td>約150</td><td>TRY</td><td>取扱ペア150超。プロ向け</td></tr>
+  <tr><td>26</td><td><strong>フィリップ証券</strong></td><td>60.9円</td><td>1,000通貨</td><td>24</td><td>—</td><td>MT5対応</td></tr>
+</table>
+
+<div class="highlight-box">
+  <h4>🎯 目的別おすすめ</h4>
+  <p>
+  <strong>「迷ったらここ」：</strong>みんなのFX ― 全通貨でバランス良く高水準<br>
+  <strong>「メキシコペソ特化」：</strong>インヴァスト証券 or LIGHT FX<br>
+  <strong>「東欧通貨（HUF/CZK）」：</strong>GMOクリック証券<br>
+  <strong>「1通貨から試したい」：</strong>松井証券<br>
+  <strong>「複数通貨に分散」：</strong>セントラル短資FX（多通貨で安定トップ）
+  </p>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- まとめ -->
+<!-- ============================================================ -->
+<section>
+<h2>まとめ ― 10万円スワップ運用のAI推奨ポートフォリオ</h2>
+
+<div class="highlight-box">
+  <h4>📊 バランス型（リスク中・利回り中）― 初心者おすすめ</h4>
+  <p>投資資金10万円 ｜ レバレッジ3倍 ｜ 年間目標：約18,000〜39,000円</p>
+  <table>
+    <tr><th>通貨</th><th>配分</th><th>保有数</th><th>年間スワップ</th></tr>
+    <tr><td><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</td><td>40,000円</td><td>13,304通貨</td><td>約7,042円</td></tr>
+    <tr><td><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</td><td>30,000円</td><td>180,000通貨</td><td>約11,169円</td></tr>
+    <tr><td><img src="https://flagcdn.com/w20/au.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">AUD/JPY</td><td>30,000円</td><td>807通貨</td><td>約3,300円</td></tr>
+    <tr><td colspan="3" style="text-align:right"><strong>合計</strong></td><td><strong>約21,511円（利回り21.5%）</strong></td></tr>
+  </table>
+</div>
+
+<div class="highlight-box" style="border-color:#f0c040;">
+  <h4>⚡ 積極型（リスク高・利回り高）― 経験者向け</h4>
+  <p>投資資金10万円 ｜ レバレッジ5倍 ｜ 年間目標：約55,000〜65,000円</p>
+  <table>
+    <tr><th>通貨</th><th>配分</th><th>保有数</th><th>年間スワップ</th></tr>
+    <tr><td><img src="https://flagcdn.com/w20/mx.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">MXN/JPY</td><td>40,000円</td><td>22,173通貨</td><td>約11,735円</td></tr>
+    <tr><td><img src="https://flagcdn.com/w20/hu.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">HUF/JPY</td><td>30,000円</td><td>300,000通貨</td><td>約18,615円</td></tr>
+    <tr><td><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px" alt=""><img src="https://flagcdn.com/w20/jp.png" width="20" height="14" style="vertical-align:middle;border:1px solid #333;border-radius:1px;margin:0 4px 0 2px" alt="">TRY/JPY</td><td>30,000円</td><td>42,254通貨</td><td>約39,327円</td></tr>
+    <tr><td colspan="3" style="text-align:right"><strong>合計</strong></td><td><strong>約69,677円（利回り69.7%）</strong></td></tr>
+  </table>
+  <p style="font-size:12px;color:#f44;">※TRYは為替下落リスクが極めて高く、スワップ収益を上回る損失が発生する可能性があります</p>
+</div>
+
+<div class="info-box">
+  <p><strong>免責事項：</strong>本記事はAIによるデータ分析に基づく情報提供であり、投資助言ではありません。FX取引にはリスクが伴います。為替レート、スワップポイント、政策金利は日々変動します。投資判断はご自身の責任でお願いいたします。レバレッジをかけた取引では、投資額以上の損失が発生する可能性があります。</p>
+</div>
+</section>
+
+</div><!-- /.container -->
+
+<footer>
+  <div class="container">
+    <p>高金利通貨のスワップ運用の合理的観測！第二弾 ― 各通貨ペアを徹底比較</p>
+    <p>データ出典：金融先物取引業協会・BIS・ザイFX！・みんかぶ・各FX会社公式サイト・ジェトロ</p>
+    <p style="margin-top:8px;">© 2026 AI Analysis Report</p>
+  </div>
+</footer>
+
+</body>
+</html>

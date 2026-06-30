@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FXスワップ運用シミュレーター（国内維持率・実効レバ対応版）</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size: 28px; text-align: center; color: #fff; background-color: #2980b9; padding: 16px 20px; border-radius: 6px; margin-bottom: 20px; letter-spacing: 2px; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select { padding: 10px; font-size: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        select { background-color: #fff; cursor: pointer; }
+        button { background-color: #3498db; color: #fff; border: none; padding: 15px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; margin-bottom: 20px; }
+        button:hover { background-color: #2980b9; }
+        .table-wrapper { overflow-x: auto; max-height: 600px; border: 1px solid #ddd; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+        thead { position: sticky; top: 0; background-color: #2c3e50; color: #fff; z-index: 10; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { text-align: center; font-weight: normal; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        td:hover { background-color: #d6eaf8 !important; cursor: default; }
+        .dsw-val { font-weight: bold; color: #e74c3c; }
+        .note { font-size: 12px; color: #7f8c8d; margin-top: 15px; line-height: 1.8; }
+
+        /* 列のスタイル設定 */
+        .asset-header { background-color: #27ae60 !important; font-weight: bold !important; }
+        .asset-val { font-weight: bold; color: #27ae60; background-color: #f4faf6; }
+        .maintenance-header { background-color: #e67e22 !important; font-weight: bold !important; }
+        .maintenance-val { font-weight: bold; color: #d35400; background-color: #fffaf5; text-align: center; }
+        .maintenance-safe { font-weight: bold; color: #000; background-color: #fffaf5; text-align: center; }
+        .maintenance-blue { font-weight: bold; color: #2980b9; background-color: #fffaf5; text-align: center; }
+        .leverage-header { background-color: #3498db !important; font-weight: bold !important; }
+        .leverage-val { font-weight: bold; color: #2980b9; background-color: #f4f9fd; text-align: center; }
+        .highlight-col { font-weight: bold; color: #e74c3c; background-color: #fdf5f5; }
+        .margin-warn  { font-weight: bold; color: #fff; background-color: #e74c3c; }
+        .loss-cut-hit    { font-weight: bold; color: #fff; background-color: #c0392b; letter-spacing: 1px; }
+        .capital-zero    { font-weight: bold; color: #fff; background-color: #e74c3c; }
+        .lev-danger { font-weight: bold; color: #fff; background-color: #e74c3c; }
+        .lev-pink   { font-weight: bold; color: #c0392b; background-color: #ffd6e0; }
+        .month-col { text-align: center; background-color: #ecf0f1; font-weight: bold; }
+
+        /* 為替レート範囲セクション */
+        .rate-section { background-color: #f0f4ff; border: 1px solid #b0c4de; border-radius: 6px; padding: 15px; margin-bottom: 20px; }
+        .rate-section h3 { font-size: 14px; color: #2c3e50; margin: 0 0 12px 0; }
+        #rateChart { width: 100%; height: 130px; border: 1px solid #ccc; border-radius: 4px; background: #fff; display: block; margin-top: 12px; }
+
+        /* 口座資産グラフ */
+        .chart-section { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 20px; display: none; }
+        .chart-section h3 { font-size: 14px; color: #2c3e50; margin: 0 0 10px 0; }
+        #capitalChart { width: 100%; height: 260px; display: block; }
+        .btn-toggle { background-color: #27ae60; color: #fff; border: none; padding: 15px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; margin-bottom: 10px; }
+        .btn-toggle:hover { background-color: #219a52; }
+        .btn-toggle.off { background-color: #95a5a6; }
+        .btn-toggle.off:hover { background-color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>FXスワップ運用シミュレーター</h1>
+
+    <div class="input-grid">
+        <div class="input-group">
+            <label>運用方法</label>
+            <select id="reinvestMode" onchange="document.getElementById('reinvestLevGroup').style.display = this.value === 'compound' ? '' : 'none'">
+                <option value="compound">複利（スワップを再投資）</option>
+                <option value="simple">単利（スワップを貯める）</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>初期の口座資金 (円)</label>
+            <input type="number" id="initialCapital" value="1000000" step="10000">
+        </div>
+        <div class="input-group">
+            <label>初期ロット数</label>
+            <input type="number" id="lots" value="100" step="1" min="1">
+        </div>
+        <div class="input-group" id="reinvestLevGroup">
+            <label>再投資レバレッジ (倍) ※複利時</label>
+            <input type="number" id="reinvestLev" value="8" step="0.5" min="0">
+            <span style="font-size:11px;color:#888;margin-top:3px">0 = ロット数固定（再投資なし）</span>
+        </div>
+        <div class="input-group">
+            <label>1ロットの通貨単位</label>
+            <input type="number" id="unitsPerLot" value="10000" step="1000">
+        </div>
+        <div class="input-group">
+            <label>スワップポイント (円/ロット/日)</label>
+            <input type="number" id="swapPerLot" value="25" step="1">
+        </div>
+        <div class="input-group">
+            <label>スワップ年間減少率 (%)</label>
+            <input type="number" id="swapDecayRate" value="10" step="0.5" min="0" max="100">
+            <span style="font-size:11px;color:#888;margin-top:3px">0 = 変動なし　例: 5 → 毎年5%ずつ低下</span>
+        </div>
+        <div class="input-group">
+            <label>レバレッジ 最大(倍)</label>
+            <input type="number" id="marginRate" value="25" step="1" min="1">
+        </div>
+        <div class="input-group">
+            <label>シミュレーション期間 (ヶ月)</label>
+            <input type="number" id="months" value="24" step="1" min="1" max="120">
+        </div>
+    </div>
+
+    <!-- 為替レート範囲設定（ランダムウォーク） -->
+    <div class="rate-section">
+        <h3>為替レート設定（ランダムウォーク）</h3>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>初期レート (円/通貨)</label>
+                <input type="number" id="initialRate" value="3.47" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>最小レート (円)　※下限</label>
+                <input type="number" id="minRate" value="3.1" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>最大レート (円)　※上限</label>
+                <input type="number" id="maxRate" value="3.5" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>月次変動幅 (円・標準偏差)</label>
+                <input type="number" id="monthlyVol" value="0.1" step="0.01" min="0.01">
+            </div>
+            <div class="input-group">
+                <label>上昇確率 (%)</label>
+                <input type="number" id="upProb" value="50" step="1" min="0" max="100" oninput="document.getElementById('downProbDisplay').textContent = 100 - this.value">
+            </div>
+            <div class="input-group">
+                <label>下降確率 (%)</label>
+                <div style="padding:10px;font-size:15px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;box-sizing:border-box;">
+                    <span id="downProbDisplay">50</span>
+                </div>
+            </div>
+        </div>
+        <canvas id="rateChart"></canvas>
+    </div>
+
+    <button onclick="simulate()">シミュレーション実行</button>
+    <button class="btn-toggle off" id="chartToggleBtn" onclick="toggleCapitalChart()">📈 口座資産グラフ　OFF</button>
+
+    <div class="chart-section" id="chartSection">
+        <h3>口座資産の推移</h3>
+        <canvas id="capitalChart"></canvas>
+    </div>
+
+    <div id="result"></div>
+    <p class="note" id="notes"></p>
+</div>
+
+<script>
+    let capitalHistory = []; // シミュレーション結果を保持
+
+    function toggleCapitalChart() {
+        const section = document.getElementById('chartSection');
+        const btn     = document.getElementById('chartToggleBtn');
+        const isOff   = section.style.display === 'none' || section.style.display === '';
+        if (isOff) {
+            if (capitalHistory.length === 0) { alert('先にシミュレーションを実行してください。'); return; }
+            section.style.display = 'block';
+            btn.textContent = '📈 口座資産グラフ　ON';
+            btn.classList.remove('off');
+            drawCapitalChart(capitalHistory);
+        } else {
+            section.style.display = 'none';
+            btn.textContent = '📈 口座資産グラフ　OFF';
+            btn.classList.add('off');
+        }
+    }
+
+    function drawCapitalChart(capitals) {
+        const canvas = document.getElementById('capitalChart');
+        const ctx    = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth || 900;
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const pad    = { top: 30, bottom: 40, left: 80, right: 20 };
+        const innerW = w - pad.left - pad.right;
+        const innerH = h - pad.top - pad.bottom;
+        const minVal = Math.min(...capitals);
+        const maxVal = Math.max(...capitals);
+        const span   = (maxVal - minVal) || 1;
+
+        const toX = i => pad.left + (i / (capitals.length - 1)) * innerW;
+        const toY = v => pad.top + (1 - (v - minVal) / span) * innerH;
+
+        // グリッドと Y軸ラベル（5分割）
+        ctx.strokeStyle = '#eee';
+        ctx.lineWidth = 1;
+        ctx.fillStyle = '#666';
+        ctx.font = '11px Arial';
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= 4; i++) {
+            const val = minVal + (span / 4) * i;
+            const y   = toY(val);
+            ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
+            ctx.fillText(Math.round(val).toLocaleString(), pad.left - 6, y + 4);
+        }
+
+        // X軸ラベル（月）
+        ctx.fillStyle = '#666';
+        ctx.textAlign = 'center';
+        const step = Math.ceil(capitals.length / 12);
+        for (let i = 0; i < capitals.length; i += step) {
+            ctx.fillText(i + '月', toX(i), h - pad.bottom + 16);
+        }
+        ctx.fillText((capitals.length - 1) + '月', toX(capitals.length - 1), h - pad.bottom + 16);
+
+        // 初期資金の基準線（破線）
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = '#e74c3c';
+        ctx.lineWidth = 1;
+        const initY = toY(capitals[0]);
+        ctx.beginPath(); ctx.moveTo(pad.left, initY); ctx.lineTo(w - pad.right, initY); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#e74c3c';
+        ctx.textAlign = 'left';
+        ctx.fillText('初期: ' + Math.round(capitals[0]).toLocaleString() + '円', pad.left + 4, initY - 4);
+
+        // 口座資産ライン
+        ctx.strokeStyle = '#27ae60';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        capitals.forEach((v, i) => i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v)));
+        ctx.stroke();
+
+        // 塗りつぶし
+        ctx.beginPath();
+        capitals.forEach((v, i) => i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v)));
+        ctx.lineTo(toX(capitals.length - 1), pad.top + innerH);
+        ctx.lineTo(pad.left, pad.top + innerH);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(39,174,96,0.12)';
+        ctx.fill();
+
+        // 最終値ラベル
+        const lastY = toY(capitals[capitals.length - 1]);
+        ctx.fillStyle = '#27ae60';
+        ctx.textAlign = 'right';
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText(Math.round(capitals[capitals.length - 1]).toLocaleString() + '円', toX(capitals.length - 1) - 4, lastY - 6);
+
+        // 軸枠
+        ctx.strokeStyle = '#ccc';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(pad.left, pad.top, innerW, innerH);
+    }
+
+    // Box-Muller法で正規分布乱数を生成
+    function randomNormal(mean, std) {
+        let u = 0, v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return mean + std * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    }
+
+    // 為替レートのランダムウォーク生成（上昇確率バイアス対応）
+    function generateRateWalk(initialRate, minRate, maxRate, monthlyVol, numMonths, upProb) {
+        const rates = [initialRate];
+        let current = initialRate;
+        for (let i = 0; i < numMonths; i++) {
+            const magnitude = Math.abs(randomNormal(0, monthlyVol));
+            const change = Math.random() < upProb ? magnitude : -magnitude;
+            current = Math.max(minRate, Math.min(maxRate, current + change));
+            rates.push(parseFloat(current.toFixed(2)));
+        }
+        return rates;
+    }
+
+    // キャンバスにレート推移チャートを描画
+    function drawRateChart(rates, minRate, maxRate) {
+        const canvas = document.getElementById('rateChart');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth || 800;
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const pad = { top: 15, bottom: 20, left: 38, right: 10 };
+        const innerW = w - pad.left - pad.right;
+        const innerH = h - pad.top - pad.bottom;
+
+        const dataMin = Math.min(minRate, ...rates);
+        const dataMax = Math.max(maxRate, ...rates);
+        const span = dataMax - dataMin || 1;
+
+        const toX = (i) => pad.left + (i / (rates.length - 1)) * innerW;
+        const toY = (r) => pad.top + (1 - (r - dataMin) / span) * innerH;
+
+        // 範囲帯（min〜max）を薄青で塗る
+        ctx.fillStyle = 'rgba(52, 152, 219, 0.08)';
+        ctx.fillRect(pad.left, toY(maxRate), innerW, toY(minRate) - toY(maxRate));
+
+        // 上限・下限の破線
+        ctx.setLineDash([5, 4]);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#e74c3c';
+        ctx.beginPath(); ctx.moveTo(pad.left, toY(maxRate)); ctx.lineTo(w - pad.right, toY(maxRate)); ctx.stroke();
+        ctx.strokeStyle = '#3498db';
+        ctx.beginPath(); ctx.moveTo(pad.left, toY(minRate)); ctx.lineTo(w - pad.right, toY(minRate)); ctx.stroke();
+        ctx.setLineDash([]);
+
+        // レート推移ライン
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        rates.forEach((r, i) => i === 0 ? ctx.moveTo(toX(i), toY(r)) : ctx.lineTo(toX(i), toY(r)));
+        ctx.stroke();
+
+        // Y軸ラベル
+        ctx.fillStyle = '#555';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillText(maxRate.toFixed(1), pad.left - 2, toY(maxRate) + 4);
+        ctx.fillStyle = '#3498db';
+        ctx.fillText(minRate.toFixed(1), pad.left - 2, toY(minRate) + 4);
+
+        // 始値・終値ラベル
+        ctx.fillStyle = '#2c3e50';
+        ctx.textAlign = 'left';
+        ctx.fillText(rates[0].toFixed(2) + '円', toX(0) + 3, toY(rates[0]) - 4);
+        ctx.textAlign = 'right';
+        ctx.fillText(rates[rates.length - 1].toFixed(2) + '円', toX(rates.length - 1) - 3, toY(rates[rates.length - 1]) - 4);
+    }
+
+    function simulate() {
+        const reinvestMode   = document.getElementById('reinvestMode').value;
+        const initialCapital = parseFloat(document.getElementById('initialCapital').value);
+        const initialLots    = parseFloat(document.getElementById('lots').value);
+        const unitsPerLot    = parseFloat(document.getElementById('unitsPerLot').value);
+        const swapPerLot     = parseFloat(document.getElementById('swapPerLot').value);
+        const marginRate     = 1 / parseFloat(document.getElementById('marginRate').value);
+        const numMonths      = parseInt(document.getElementById('months').value);
+        const initialRate    = parseFloat(document.getElementById('initialRate').value);
+        const minRate        = parseFloat(document.getElementById('minRate').value);
+        const maxRate        = parseFloat(document.getElementById('maxRate').value);
+        const monthlyVol     = parseFloat(document.getElementById('monthlyVol').value);
+        const reinvestLev    = parseFloat(document.getElementById('reinvestLev').value);
+        const swapDecayRate  = parseFloat(document.getElementById('swapDecayRate').value) / 100;
+        const upProb         = parseFloat(document.getElementById('upProb').value) / 100;
+
+        // ランダムウォークでレート系列を生成
+        const rates = generateRateWalk(initialRate, minRate, maxRate, monthlyVol, numMonths, upProb);
+        drawRateChart(rates, minRate, maxRate);
+
+        let capital          = initialCapital;
+        let currentLots      = initialLots;
+        let accumulatedSwap  = 0;
+        let avgEntryRate     = initialRate;
+        capitalHistory       = [initialCapital]; // グラフ用データをリセット
+
+        let html = `<div class="table-wrapper"><table>
+            <thead>
+                <tr>
+                    <th class="month-col" rowspan="2" style="font-size:15px;background-color:#bdc3c7;">月</th>
+                    <th class="leverage-header" rowspan="2">為替レート<br>(円)</th>
+                    <th class="asset-header" colspan="5">資産・スワップ</th>
+                    <th class="maintenance-header" colspan="2">証拠金・維持率</th>
+                    <th class="leverage-header" rowspan="2">実効<br>レバレッジ</th>
+                    <th class="maintenance-header" rowspan="2">ロスカット<br>レート</th>
+                </tr>
+                <tr>
+                    <th class="asset-header">口座資産 (円)</th>
+                    <th class="asset-header">保有ロット数</th>
+                    <th class="asset-header">1DSW（円）</th>
+                    <th class="asset-header">1MSW（円）</th>
+                    <th class="asset-header">1YSW（円）</th>
+                    <th class="maintenance-header">必要証拠金 (円)</th>
+                    <th class="maintenance-header">維持率 (%)</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        const fmt = (n, dec = 0) => parseFloat(n.toFixed(dec)).toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
+
+        // 実質資産（含み損益考慮）
+        const calcEffectiveEquity = (cap, currentRate, entryRate, lots) =>
+            cap + (currentRate - entryRate) * lots * unitsPerLot;
+
+        // ロスカットレート（実質資産ベース）
+        const calcLossCutRate = (rate, effEquity, lots) => {
+            const v = rate - effEquity / (lots * unitsPerLot);
+            return v / (1 - marginRate);
+        };
+
+        // 0ヶ月目（初期状態）
+        const initPos       = currentLots * unitsPerLot * rates[0];
+        const initMargin    = initPos * marginRate;
+        const initEffEquity = calcEffectiveEquity(capital, rates[0], avgEntryRate, currentLots);
+        const initRatio     = (initEffEquity / initMargin) * 100;
+        const initLev       = initPos / (initEffEquity > 0 ? initEffEquity : 1);
+        const initDaily     = currentLots * swapPerLot;
+        const initLossCutRate = calcLossCutRate(rates[0], initEffEquity, currentLots);
+        const initLossClass   = (initLossCutRate >= rates[0] * 0.9) ? 'highlight-col' : 'maintenance-val';
+
+        html += `<tr>
+            <td class="month-col">0</td>
+            <td class="leverage-val">${rates[0].toFixed(3)}</td>
+            <td class="asset-val">${Math.round(capital).toLocaleString()}</td>
+            <td class="asset-val">${fmt(currentLots, 2)}</td>
+            <td class="dsw-val">${Math.round(initDaily).toLocaleString()}</td>
+            <td class="asset-val">-</td>
+            <td class="asset-val">${Math.round(initDaily * 365).toLocaleString()}</td>
+            <td class="maintenance-val">${Math.round(initMargin).toLocaleString()}</td>
+            <td class="maintenance-val">${fmt(initRatio, 1)}</td>
+            <td class="${initLev > 20 ? 'lev-danger' : initLev > 10 ? 'lev-pink' : 'leverage-val'}">${initLev.toFixed(2)}倍</td>
+            <td class="${initLossClass}">${initLossCutRate > 0 ? initLossCutRate.toFixed(3) : '危険'}</td>
+        </tr>`;
+
+        let lossCutTriggered = false;
+
+        for (let m = 1; m <= numMonths; m++) {
+            const rate            = rates[m];
+            const currentSwap     = swapPerLot * Math.pow(1 - swapDecayRate, m / 12);
+            const monthlySwap     = currentLots * currentSwap * 30;
+
+            accumulatedSwap += monthlySwap;
+
+            if (!lossCutTriggered) {
+                capital += monthlySwap;
+
+                if (reinvestMode === 'compound' && reinvestLev > 0) {
+                    const newLots   = Math.floor((capital * reinvestLev) / (unitsPerLot * rate) * 100) / 100;
+                    const addedLots = Math.max(0, newLots - currentLots);
+                    if (addedLots > 0) {
+                        avgEntryRate = (avgEntryRate * currentLots + rate * addedLots) / newLots;
+                    }
+                    currentLots = Math.max(initialLots, newLots);
+                }
+            }
+            capitalHistory.push(lossCutTriggered ? 0 : capital);
+
+            const currentDaily  = currentLots * currentSwap;
+            const yearlySwap    = currentDaily * 365;
+            const posValue      = currentLots * unitsPerLot * rate;
+            const reqMargin     = posValue * marginRate;
+            const effEquity     = calcEffectiveEquity(capital, rate, avgEntryRate, currentLots);
+            const maintRatio    = (effEquity / reqMargin) * 100;
+            const effLev        = posValue / (effEquity > 0 ? effEquity : 1);
+            const lossCutRate   = calcLossCutRate(rate, effEquity, currentLots);
+            const isLossCut     = maintRatio <= 50;
+            const isLevLossCut  = effLev >= 25;
+            const triggered     = isLossCut || isLevLossCut;
+
+            if (triggered && !lossCutTriggered) {
+                lossCutTriggered = true;
+                capital = 0;
+            }
+
+            const isMarginWarn = maintRatio < 100 && !isLossCut;
+            const marginClass  = (isLossCut || lossCutTriggered) ? 'loss-cut-hit'
+                               : isMarginWarn                    ? 'margin-warn'
+                               : maintRatio > 300                ? 'maintenance-safe'
+                               : maintRatio >= 250               ? 'maintenance-blue'
+                               :                                   'maintenance-val';
+            const levClass     = effLev > 20  ? 'lev-danger'
+                               : effLev > 10  ? 'lev-pink'
+                               :                'leverage-val';
+            const lossClass    = (triggered || lossCutTriggered) ? 'loss-cut-hit'
+                               : lossCutRate >= rate * 0.9       ? 'highlight-col'
+                               :                                   'maintenance-val';
+            const lossDisplay  = (triggered || lossCutTriggered) ? 'ロスカット'
+                               : lossCutRate > 0                 ? lossCutRate.toFixed(3)
+                               :                                   '危険';
+            const capitalClass   = lossCutTriggered ? 'capital-zero' : 'asset-val';
+            const capitalDisplay = lossCutTriggered ? '0' : Math.round(capital).toLocaleString();
+
+            html += `<tr>
+                <td class="month-col">${m}</td>
+                <td class="leverage-val">${rate.toFixed(3)}</td>
+                <td class="${capitalClass}">${capitalDisplay}</td>
+                <td class="asset-val">${fmt(currentLots, 2)}</td>
+                <td class="dsw-val">${Math.round(currentDaily).toLocaleString()}</td>
+                <td class="asset-val">${Math.round(currentLots * currentSwap * 30).toLocaleString()}</td>
+                <td class="asset-val">${Math.round(yearlySwap).toLocaleString()}</td>
+                <td class="${marginClass}">${Math.round(reqMargin).toLocaleString()}</td>
+                <td class="${marginClass}">${fmt(maintRatio, 1)}</td>
+                <td class="${levClass}">${effLev.toFixed(2)}倍</td>
+                <td class="${lossClass}">${lossDisplay}</td>
+            </tr>`;
+        }
+
+        html += '</tbody></table></div>';
+        document.getElementById('result').innerHTML = html;
+
+        const finalRate  = rates[numMonths];
+        const totalAsset = capital;
+        const totalReturn = ((totalAsset - initialCapital) / initialCapital * 100).toFixed(1);
+
+        document.getElementById('notes').innerHTML =
+            `※ 為替レートはランダムウォーク（正規分布ステップ）でシミュレートされます。実行するたびに結果が変わります。<br>
+             ※ レート範囲: ${minRate}円〜${maxRate}円 ／ 月次変動幅（標準偏差）: ±${monthlyVol}円<br>
+             ※ 維持率が100%を下回ると強制ロスカットのリスクがあります（赤色表示）。<br>
+             ※ 再投資レバレッジ: ${reinvestLev > 0 ? reinvestLev + '倍（複利時に毎月ロット数を自動調整）' : '設定なし（ロット数固定）'}<br>
+             ※ 終了時の為替レート: ${finalRate.toFixed(2)}円 ／ 総収益率: ${totalReturn}%<br>
+             ※ スワップ年間減少率: ${swapDecayRate > 0 ? (swapDecayRate * 100).toFixed(1) + '%（終了時のスワップ: ' + (swapPerLot * Math.pow(1 - swapDecayRate, numMonths / 12)).toFixed(2) + '円/ロット/日）' : '設定なし（固定）'}<br>
+             ※ 税金・手数料・スリッページは考慮していません。`;
+
+        // グラフが表示中なら再描画
+        if (document.getElementById('chartSection').style.display === 'block') {
+            drawCapitalChart(capitalHistory);
+        }
+    }
+</script>
+</body>
+</html>
