@@ -1,0 +1,41 @@
+export const DEFAULT_STOCKS = [
+  { symbol: 'NKD=F', name: '日経先物(時間外)', region: 'アジア' },
+  { symbol: '1306.T', name: 'TOPIX(ETF)', region: 'アジア' },
+  { symbol: '2516.T', name: 'グロース250(ETF)', region: 'アジア' },
+  { symbol: '^DJI', name: 'NYダウ', region: '米国' },
+  { symbol: '^GSPC', name: 'S&P 500', region: '米国' },
+  { symbol: '^IXIC', name: 'NASDAQ', region: '米国' },
+  { symbol: '^VIX', name: 'VIX恐怖指数', region: '米国' },
+  { symbol: '^SOX', name: '半導体指数', region: '米国' },
+  { symbol: '^NYFANG', name: 'FANG+', region: '米国' },
+  { symbol: 'ACWI', name: 'オールカントリー(ACWI)', region: '米国' },
+  { symbol: 'BTC-USD', name: 'ビットコイン(USD)', region: '暗号資産' },
+  { symbol: 'BTC-JPY', name: 'ビットコイン(円)', region: '暗号資産' },
+  { symbol: 'GC=F', name: '金先物', region: '商品' },
+  { symbol: 'SI=F', name: '銀先物', region: '商品' },
+  { symbol: 'PL=F', name: 'プラチナ先物', region: '商品' },
+  { symbol: 'HG=F', name: '銅先物', region: '商品' },
+  { symbol: 'CL=F', name: '原油先物(WTI)', region: '商品' },
+  { symbol: 'RB=F', name: 'ガソリン先物', region: '商品' },
+  { symbol: 'USDJPY=X', name: 'ドル/円', region: '為替' },
+  { symbol: 'EURUSD=X', name: 'EUR/USD', region: '為替' },
+  { symbol: 'GBPJPY=X', name: 'ポンド/円', region: '為替' },
+  { symbol: 'TRYJPY=X', name: 'トルコリラ/円', region: '為替' },
+  { symbol: 'MXNJPY=X', name: 'メキシコペソ/円', region: '為替' },
+  { symbol: 'ZARJPY=X', name: 'ランド/円', region: '為替' },
+  { symbol: 'USDTRY=X', name: 'ドル/トルコリラ', region: '為替' },
+  { symbol: '^TNX', name: '米国債10年利回り', region: '債券' },
+  { symbol: '1482.T', name: '日本国債10年(ETF)', region: '債券' },
+];
+
+export const REGIONS = ['すべて', '米国', 'アジア', '欧州', '為替', '商品', '暗号資産'];
+
+export const DEFAULT_LAYOUT = DEFAULT_STOCKS.map((stock, i) => ({
+  i: stock.symbol,
+  x: (i % 8) * 10,
+  y: Math.floor(i / 8) * 10,
+  w: 10,
+  h: 10,
+  minW: 1,
+  minH: 1,
+}));
