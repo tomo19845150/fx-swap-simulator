@@ -1,0 +1,27 @@
+{
+  "nodes": [
+    {"id": "step1", "type": "text", "text": "① リサーチ\nnotebooklmスキルで5〜7クエリに分解して調査\n→ ask で引用元付きの要点を抽出", "x": 0, "y": 0, "width": 280, "height": 140, "color": "4"},
+    {"id": "ref1", "type": "file", "file": "ブログ記事/アメブロ執筆ワークフロー.md", "x": 0, "y": 200, "width": 280, "height": 60},
+
+    {"id": "step2", "type": "text", "text": "② 執筆\n8,000〜12,000字・固定構成\n冒頭挨拶＋末尾免責文は必須", "x": 340, "y": 0, "width": 280, "height": 140, "color": "5"},
+    {"id": "ref2", "type": "file", "file": "ブログ記事/mxnjpy_blog_article.md", "x": 340, "y": 200, "width": 280, "height": 60},
+
+    {"id": "step3", "type": "text", "text": "③ 図解生成\ndatavizスキル + matplotlib\n桁違いデータは対数軸、既定パレット準拠", "x": 680, "y": 0, "width": 280, "height": 140, "color": "3"},
+    {"id": "ref3", "type": "file", "file": "data/メキシコペソ円データ集.md", "x": 680, "y": 200, "width": 280, "height": 60},
+
+    {"id": "step4", "type": "text", "text": "④ 投稿自動化\n分離Chromiumを起動 → CodeMirrorへHTML流し込み\n必ず「下書き保存」で停止。公開は必ずユーザー自身", "x": 1020, "y": 0, "width": 280, "height": 160, "color": "1"},
+
+    {"id": "step5", "type": "text", "text": "⑤ 公開後\n公開URLをupload/に控える", "x": 1020, "y": 240, "width": 280, "height": 100, "color": "2"},
+    {"id": "ref5", "type": "file", "file": "upload/シミュレーターURL.txt", "x": 1020, "y": 380, "width": 280, "height": 60}
+  ],
+  "edges": [
+    {"id": "e1", "fromNode": "step1", "toNode": "step2", "label": "要点整理後"},
+    {"id": "e2", "fromNode": "step2", "toNode": "step3", "label": "本文確定後"},
+    {"id": "e3", "fromNode": "step3", "toNode": "step4", "label": "画像生成後"},
+    {"id": "e4", "fromNode": "step4", "toNode": "step5", "label": "ユーザーが公開後"},
+    {"id": "r1", "fromNode": "step1", "toNode": "ref1", "label": "手順書"},
+    {"id": "r2", "fromNode": "step2", "toNode": "ref2", "label": "実例"},
+    {"id": "r3", "fromNode": "step3", "toNode": "ref3", "label": "データ元の例"},
+    {"id": "r5", "fromNode": "step5", "toNode": "ref5", "label": "控え場所"}
+  ]
+}

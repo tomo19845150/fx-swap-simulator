@@ -1,0 +1,60 @@
+{
+  "items": [
+    {
+      "type": "group",
+      "ctime": 1783334000000,
+      "title": "📌 管理ノート",
+      "items": [
+        { "type": "file", "ctime": 1783334000001, "path": "状況.md" },
+        { "type": "file", "ctime": 1783334000002, "path": "INDEX.md" },
+        { "type": "file", "ctime": 1783334000003, "path": "CLAUDE.md" }
+      ]
+    },
+    {
+      "type": "group",
+      "ctime": 1783334000010,
+      "title": "✍️ 執筆・ブログ",
+      "items": [
+        { "type": "folder", "ctime": 1783334000011, "path": "ブログ記事" },
+        { "type": "folder", "ctime": 1783334000012, "path": "blog" },
+        { "type": "folder", "ctime": 1783334000013, "path": "images" }
+      ]
+    },
+    {
+      "type": "group",
+      "ctime": 1783334000020,
+      "title": "📊 データ",
+      "items": [
+        { "type": "folder", "ctime": 1783334000021, "path": "data" }
+      ]
+    },
+    {
+      "type": "group",
+      "ctime": 1783334000030,
+      "title": "🛠 ツール開発・公開",
+      "items": [
+        { "type": "folder", "ctime": 1783334000031, "path": "stock-dashboard" },
+        { "type": "folder", "ctime": 1783334000032, "path": "html_tools" },
+        { "type": "folder", "ctime": 1783334000033, "path": "netlify_upload" },
+        { "type": "folder", "ctime": 1783334000034, "path": "upload" }
+      ]
+    },
+    {
+      "type": "group",
+      "ctime": 1783334000040,
+      "title": "🤖 AI作業用",
+      "items": [
+        { "type": "folder", "ctime": 1783334000041, "path": "ai_workspace" }
+      ]
+    },
+    {
+      "type": "group",
+      "ctime": 1783334000050,
+      "title": "🗑 その他・個人",
+      "items": [
+        { "type": "folder", "ctime": 1783334000051, "path": "trash" },
+        { "type": "file", "ctime": 1783334000052, "path": "シフト長須賀202607AA.gsheet" }
+      ]
+    }
+  ]
+}
