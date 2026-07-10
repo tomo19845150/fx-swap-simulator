@@ -1,5 +1,5 @@
 ---
-status: 下書き
+status: 公開済み
 tags:
   - メキシコペソ
   - MXNJPY
@@ -8,6 +8,9 @@ tags:
 date: 2026-07-06
 account: rational-lab
 data: "[[メキシコペソ円データ集]]"
+url: "https://ameblo.jp/rational-lab/entry-12971869938.html"
+entry_id: "12971869938"
+likes: 3
 ---
 
 【2026年最新版】メキシコペソ円の長期スワップ運用は「安全」に稼げるのか？過去・現在・未来データで徹底解説

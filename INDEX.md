@@ -10,7 +10,7 @@
 ## 種類別データ
 - `blog/` — ブログ記事の原稿（運営先ごとに `blog/ameba/` のようにサブフォルダ管理。各フォルダに `articles/`（過去記事）と `template.md`（進化するテンプレ）あり。詳細は[blog/README.md](blog/README.md)）
   - `blog/ameba/sidebar_tools/` — アメブロのサイドバー表示用HTMLツール（FXシミュレーター等）をツール・バージョンごとに管理。詳細は[blog/ameba/sidebar_tools/README.md](blog/ameba/sidebar_tools/README.md)
-- `ブログ記事/` — rational-lab（Ameba）向けブログ記事の実作業場所。`blog/`とは別系統。詳細は[ブログ記事/README.md](ブログ記事/README.md)
+  - `blog/アメブロブログ記事/` — rational-lab（Ameba）向けブログ記事の実作業場所（2026-07-09に`blog/`直下へ移動）。詳細は[blog/アメブロブログ記事/README.md](blog/アメブロブログ記事/README.md)
 - `data/` — 通貨・経済データ集
 - `images/` — スクリーンショット・画像
 - `html_tools/` — HTMLツールの草稿・バックアップ

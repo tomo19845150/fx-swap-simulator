@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head><meta charset="utf-8"><title>FX複利運用シュミレーター公開！　主にトルコリラ円の複利運用、他通貨もOKバージョン</title></head>
+<body>
+<article>
+<div class="skinArticle"><div class="skinArticle2"><div class="skinArticle3"><div class="skinArticleHeader"><div class="skinArticleHeader2"><h1><a aria-current="page" data-google-interstitial="false" class="skinArticleTitle" rel="bookmark" href="/rational-lab/entry-12970279047.html">FX複利運用シュミレーター公開！　主にトルコリラ円の複利運用、他通貨もOKバージョン</a></h1></div></div><div class="skinArticleBody"><div class="skinArticleBody2"><div class="_9JU2vhO0 articleDetailArea skinWeakColor"><div class="_4t2Sdpjn _9Lq6Vj23"><div class="_31Bj_4iF"><span class="articleTime"><time datetime="2026-06-20" pubdate="pubdate">2026-06-20 20:18:13</time></span></div></div><div class="_6EYVjh0b"><span class="articleTheme">テーマ：<a data-google-interstitial="false" class="" rel="tag" href="/rational-lab/theme-10122335046.html">FXシュミレーター<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 24 24" role="img" aria-hidden="true"><path d="M9.41 21c-.26 0-.51-.1-.71-.29a.996.996 0 0 1 0-1.41L16 12 8.71 4.71a.996.996 0 1 1 1.41-1.41l7.29 7.29c.78.78.78 2.05 0 2.83l-7.29 7.29c-.19.19-.45.29-.71.29"></path></svg></a></span></div></div><div class="js-blogGenreRank blogGenreEntryRankInfo__block"></div><div data-google-interstitial="false" class="articleText _3NmYViIm" id="entryBody"><p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h1><b>こんにちは、rational-lab です。</b></h1>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div><b>誰も待っていなかった！かもだけど。</b></div>
+<div>&nbsp;</div>
+<div><b>かなりAIで自分なりに作りこんだFX複利シュミレーションを作ってみました。</b></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div><b>今回は・・・・・みなさんが使えるように・・・バグがなければ・・・</b></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div><b>使えるようになったと思います！パチパチパチ！</b></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div><b><a href="https://ameblo.jp/rational-lab/image-12970279047-15794855350.html" class="detailOn userImageLink" id="i15794855350" data-image-id="15794855350"><img alt="" contenteditable="inherit" height="290" src="https://stat.ameba.jp/user_images/20260620/19/rational-lab/4f/4b/p/o1830076015794855350.png?caw=800" width="700" class="PhotoSwipeImage" data-entry-id="12970279047" data-image-id="15794855350" data-image-order="1" data-amb-layout="fill-width" loading="eager"></a></b></div><div style="max-height: 250px;
+     margin: 24px 0;
+     display: flex;
+     flex-direction: row;
+     justify-content: center;
+    "><div data-slot="injected" data-is-auto-gen-slot="true" data-injection-type="withHeight" data-position="middle" data-layout-type="301" style="min-height: 250px;
+     max-height: 250px;
+     height: 250px;
+     width: 300px;
+     display:inline-block;
+     max-width: 100%;
+     " data-horizontal-position="left" class="in-article-injected-ad-1" data-order-id="1"><div id="blogInreadAdGeneral12970279047-1-left"></div></div><div style="width: 20px"></div><div data-slot="injected" data-is-auto-gen-slot="true" data-injection-type="withHeight" data-position="middle" data-layout-type="301" style="min-height: 250px;
+     max-height: 250px;
+     height: 250px;
+     width: 300px;
+     display:inline-block;
+     max-width: 100%;
+     " data-horizontal-position="right" class="in-article-injected-ad-1" data-order-id="1"><div id="blogInreadAdGeneral12970279047-1-right"></div></div></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>①運用方法→（Ａ）スワップを再投資（再投資する場合は再投資レバレッジに沿って再投資した場合）</div>
+<div>　　　　　　　<span style="font-size:0.83em;">再投資レバレッジは実際には目標レバレッジになるように再投資した最終レバレッジを</span></div>
+<div><span style="font-size:0.83em;">　　　　　　　　&nbsp;自分で確認し、証券会社内の実行レバレッジを調整して発注する事により、想定ロスカットレート</span></div>
+<div><span style="font-size:0.83em;">　　　　　　　　&nbsp; を確認しながら想定内レート内で微調整を可能にしています。</span></div>
+<div>&nbsp;</div>
+<div><span style="font-size:0.83em;">　　　　　　　　（Ｂ）単利（付与スワップは再投資せず、口座資金のみ増加（証拠金維持率は増加、</span></div>
+<div><span style="font-size:0.83em;">　　　　　　　　　　実行レバレッジは減少）</span></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div><span style="font-size:0.83em;">②</span>初期の口座資金 (円)→シュミレーションしたい資金額（10万円で始めたい場合10万と入力）</div>
+<div>　もしくは今証券口座にトルコリラ円を保有している場合今現在の口座資金額を入れても良い。</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>③初期ロット数→想定初期運用額、もしくは今現在の保有ロット数を入れる。</div>
+<div>&nbsp;</div>
+<div>④再投資レバレッジ (倍) ※複利時（希望する再投資レバレッジにより、</div>
+<div>　　　　　　　　　　　　複利運用時実行レバレッジは</div>
+<div>　　　　　　　　　　　　そのレバレッジに近づいた投資になる事をシュミレーションできる。</div>
+<div>　　　　　　　　　　　　単利の場合は表示されない仕様です。</div>
+<div>&nbsp;</div>
+<div>➄1ロットの通貨単位→そのままでだいたいの証券会社は１万通貨</div>
+<div>　　　　　　　　　　　　　＊（1000通貨が1ロットの場合もあり）</div>
+<div>&nbsp;</div>
+<div>⑥⑦スワップポイント (円/ロット/日)→今現在の取引ペアのスワップポイント数　</div>
+<div>　　　　　　　　　　　　　（証券会社によって違う）</div>
+<div>&nbsp;</div>
+<div>　　　　　　　　　　　　</div>
+<div>あくまで今現在の想定スワップポイント数を入れれば、その後の下落率</div>
+<div>　　　　　上昇率は任意で変動できますのであくまでも今現在でいいと思います。</div>
+<div>　　　　　年間下落率は過去の実績をご自分で解析し、例（トルコリラ円は年間10～13%）</div>
+<div>　　　　　の下落率です。その値を入力してもいいし、未来予測した％をカスタマイズ可能</div>
+<div>&nbsp;</div>
+<div>⑦レバレッジ 最大(倍)　→個人口座は国内証券口座でだいたいが25倍</div>
+<div>　　　　　　　　　　　法人口座、海外口座はこの値を変更できます。</div>
+<div>&nbsp;</div>
+<div>⑧シミュレーション期間 (ヶ月)→任意に設定できます。　</div>
+<div>　　　　　　　　　　　　スワップポイントの減少率などは、</div>
+<div>　　　　　　　　　　　　年間設定ですが一か月単位で滑らかに　　</div>
+<div>　　　　　　　　　　　　変動していく仕様になっています。</div>
+<div>　　　　　近年から、５年～１０年を複利計算していくと・・・衝撃の結果が・・・</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>為替レート設定について</div>
+<div>&nbsp;</div>
+<div>　　　　そのまま今現在のシュミレーションしたい今現在のレート</div>
+<div>&nbsp;</div>
+<div>　　　　・・・ここからは予測が入ります！</div>
+<div>&nbsp;</div>
+<div>　　　　最小レート (円)　※下限　最大レート (円)　※上限　月次変動幅 (円・標準偏差)　任意　　　　　　　　入力為替相場が上記のレート内でランダムウォークさせる事ができます</div>
+<div>　　　　　　　　　（シュミレーション事に変動）</div>
+<div>　＊ランダムウォークは最高値、最低値設定可能！（上昇確率、下降確率も微調整可能）</div>
+<div>　　　　　</div>
+<div>　ランダムウォークではなく、緩やかに変動も選べます（最高値、最低値設定可能！）</div>
+<div>&nbsp;</div>
+<div>　　　　ともに、設定年数で最終レートに収まる（目標レート）設定です。</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>　　　　</div>
+<div>　　　　</div>
+<div>　　　　　　<b style="font-weight:bold;"><span style="font-size:1.96em;">ふう・・・・・凄くないですか！！！！</span></b></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　各証券会社にあるような</span></b></div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　</span></b></div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　シュミレーションを圧倒！！</span></b></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　ロスカットレートを気にしているなら</span></b></div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　今なら強気！</span></b></div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　今なら、弱気相場！</span></b></div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　を掴めます！</span></b></div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　今現在のロット数なら何か月</span></b></div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　再投資しなければならないか、</span></b></div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　証拠金維持率がどのくらいに回復するか。</span></b></div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　あくまでももシュミレーションの</span></b></div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　域ですので</span></b><b style="font-weight:bold;"><span style="font-size:1.96em;">これが実際の動きに完全マッチ</span></b></div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　しませんが・・・</span></b></div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　微調整する事により繊細な</span></b></div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　現実とニアな相場観</span></b></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　を掴む事が出来ます。・・・・・・</span></b></div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　多分</span></b><b style="font-weight:bold;"><span style="font-size:1.96em;">・・・・はぁはぁ・・・</span></b></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div><b style="font-weight:bold;"><span style="font-size:1.96em;">　　早く見せろと・・・・という声が・・</span></b></div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>
+<p>&nbsp;</p>
+<div class="ogpCard_root">　　　　　　　　
+<article class="ogpCard_wrap" contenteditable="false" style="display:inline-block;max-width:100%"><a class="ogpCard_link" data-ogp-card-log="" href="https://magical-froyo-33a914.netlify.app/simulator.html" rel="noopener noreferrer" style="display:flex;justify-content:space-between;overflow:hidden;box-sizing:border-box;width:620px;max-width:100%;height:120px;border:1px solid #e2e2e2;border-radius:4px;background-color:#fff;text-decoration:none" target="_blank"><span class="ogpCard_content" style="display:flex;flex-direction:column;overflow:hidden;width:100%;padding:16px"><span class="ogpCard_title" style="-webkit-box-orient:vertical;display:-webkit-box;-webkit-line-clamp:2;max-height:48px;line-height:1.4;font-size:16px;color:#333;text-align:left;font-weight:bold;overflow:hidden">FXスワップ運用シミュレーター（国内維持率・実効レバ対応版）</span><span class="ogpCard_url" style="display:flex;align-items:center;margin-top:auto"><span class="ogpCard_iconWrap" style="position:relative;width:20px;height:20px;flex-shrink:0"><img alt="リンク" class="ogpCard_icon" height="20" loading="lazy" src="https://c.stat100.ameba.jp/ameblo/symbols/v3.20.0/svg/gray/editor_link.svg" style="position:absolute;top:0;bottom:0;right:0;left:0;height:100%;max-height:100%" width="20"></span><span class="ogpCard_urlText" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#757575;font-size:12px;text-align:left">magical-froyo-33a914.netlify.app</span></span></span></a></article>
+</div>
+
+<div class="ogpCard_root">&nbsp;</div>
+
+<div class="ogpCard_root">
+<p>&nbsp;</p>
+
+<div class="ogpCard_root">　　　　　こちらです。</div>
+
+<div class="ogpCard_root">&nbsp;</div>
+
+<div class="ogpCard_root">&nbsp;</div>
+
+<div class="ogpCard_root">　　　　皆様のご意見や、ここをこうして欲しいなどありましたら・・・・</div>
+
+<div class="ogpCard_root">&nbsp;</div>
+
+<div class="ogpCard_root">&nbsp;</div>
+
+<div class="ogpCard_root">　　　
+<p>⚠️ 投資に関する注意事項 ⚠️</p>
+
+<p>本記事は情報提供を目的としたものであり、特定の金融商品や投資手法を推奨するものではありません。</p>
+
+<p>FX取引にはレバレッジによるリスクがあり、投資元本を超える損失が発生する可能性があります。</p>
+
+<p>トルコリラなどの新興国通貨は、先進国通貨と比べて値動きが大きく、急激な下落が起こることがあります。</p>
+
+<p>シミュレーターの結果はあくまで仮定に基づく試算であり、将来の運用成果を保証するものではありません。</p>
+
+<p>投資の最終判断はご自身の責任において行ってください。</p>
+
+<p>当ブログの情報により生じたいかなる損害についても、筆者は一切の責任を負いかねます。</p>
+
+<p>まずは少額から、無理のない範囲で始めることをおすすめします。<a href="https://ameblo.jp/rational-lab/image-12970279047-15794878913.html" class="detailOn userImageLink" id="i15794878913" data-image-id="15794878913"><img alt="" height="170" src="https://stat.ameba.jp/user_images/20260620/20/rational-lab/36/e3/p/o1774072015794878913.png?caw=800" width="420" class="PhotoSwipeImage" data-entry-id="12970279047" data-image-id="15794878913" data-image-order="2" data-amb-layout="fill-width" loading="lazy"></a></p></div>
+
+<p>&nbsp;</p></div>
+
+<div class="ogpCard_root">&nbsp;</div>
+
+<p>&nbsp;</p></div>
+
+<div>&nbsp;</div>
+
+<div>&nbsp;</div>
+
+<div>&nbsp;</div>
+
+<div>&nbsp;</div>
+
+<div>&nbsp;</div>
+
+<div>&nbsp;</div></div><div><div class="LazyLoad skin-mod-bg-color" style="height: 1px;"></div></div><div><div class="LazyLoad skin-mod-bg-color" style="height: 250px;"></div></div><div><div class="LazyLoad skin-mod-bg-color" style="height: 250px;"></div></div><div><div class="LazyLoad skin-mod-bg-color" style="height: 470px;"></div></div><div><div class="LazyLoad skin-mod-bg-color" style="height: 50px;"></div></div><div><div class="LazyLoad skin-mod-bg-color" style="height: 20px;"></div></div><div class="skinArticleFooter"><div><div class="LazyLoad skin-mod-bg-color" style="height: 25px;"></div></div><div><div class="LazyLoad skin-mod-bg-color" style="height: 155px;"></div></div></div><div><div class="LazyLoad skin-mod-bg-color" style="height: 1px;"></div></div><div><div class="LazyLoad skin-mod-bg-color" style="height: 1px;"></div></div></div></div></div></div></div>
+</article>
+</body>
+</html>

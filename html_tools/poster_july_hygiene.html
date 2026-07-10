@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 297mm;
+    height: 210mm;
+    font-family: 'Meiryo', 'メイリオ', 'Yu Gothic', '游ゴシック', sans-serif;
+    background: #f0f8ff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ヘッダー */
+  .header {
+    background: linear-gradient(135deg, #1a5276, #2980b9);
+    color: white;
+    text-align: center;
+    padding: 10mm 8mm 6mm;
+  }
+
+  .header .month-label {
+    font-size: 13pt;
+    letter-spacing: 6px;
+    opacity: 0.85;
+    margin-bottom: 2mm;
+  }
+
+  .header .title {
+    font-size: 30pt;
+    font-weight: bold;
+    letter-spacing: 8px;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+  }
+
+  .header .subtitle {
+    font-size: 14pt;
+    margin-top: 2mm;
+    opacity: 0.9;
+    letter-spacing: 3px;
+  }
+
+  /* メインコンテンツ */
+  .content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5mm;
+    padding: 5mm 8mm;
+  }
+
+  .card {
+    background: white;
+    border-radius: 4mm;
+    padding: 5mm 6mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    border-top: 5px solid #2980b9;
+  }
+
+  .card.alert {
+    border-top-color: #e74c3c;
+    background: #fff5f5;
+  }
+
+  .card.goal {
+    border-top-color: #27ae60;
+    background: #f0fff4;
+  }
+
+  .card-icon {
+    font-size: 20pt;
+    margin-bottom: 2mm;
+  }
+
+  .card-label {
+    font-size: 8pt;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 2mm;
+  }
+
+  .card.alert .card-label { color: #c0392b; }
+  .card.goal .card-label  { color: #1e8449; }
+  .card .card-label       { color: #1a5276; }
+
+  .card-main {
+    font-size: 13pt;
+    font-weight: bold;
+    line-height: 1.5;
+    color: #1c1c1c;
+  }
+
+  .card-sub {
+    font-size: 9pt;
+    color: #555;
+    margin-top: 2mm;
+    line-height: 1.6;
+  }
+
+  /* フッター */
+  .footer {
+    background: #1a5276;
+    color: white;
+    text-align: center;
+    padding: 3mm;
+    font-size: 11pt;
+    font-weight: bold;
+    letter-spacing: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="month-label">2026年 ７月</div>
+  <div class="title">７月の取り組み</div>
+  <div class="subtitle">衛生管理・見える化プロジェクト</div>
+</div>
+
+<div class="content">
+
+  <div class="card">
+    <div class="card-icon">🧴</div>
+    <div class="card-label">【取り組み①】衛生管理</div>
+    <div class="card-main">殺菌ダスタの<br>運用を定着させる</div>
+    <div class="card-sub">正しい手順での殺菌ダスタ使用を徹底し、全スタッフへの周知・習慣化を図る。</div>
+  </div>
+
+  <div class="card">
+    <div class="card-icon">👤</div>
+    <div class="card-label">【取り組み②】実施者管理</div>
+    <div class="card-main">バイジングシステムで<br>実施者を明確化</div>
+    <div class="card-sub">バイジングシステムへの入力を徹底し、誰が・いつ・何を行ったかを記録・管理する。</div>
+  </div>
+
+  <div class="card goal">
+    <div class="card-icon">✅</div>
+    <div class="card-label">【目標】作業の見える化</div>
+    <div class="card-main">実施状況を<br>リアルタイムで把握</div>
+    <div class="card-sub">チェックリスト・記録表を活用し、実施・未実施を誰でも一目で確認できる仕組みを構築する。</div>
+  </div>
+
+  <div class="card alert" style="grid-column: 1 / 3;">
+    <div class="card-icon">⚠️</div>
+    <div class="card-label">【現状の課題】</div>
+    <div class="card-main">清掃管理が未実施　—　机上の空論で終わっている</div>
+    <div class="card-sub">ルールや手順は存在するにもかかわらず、実際の現場では行われていない状況が続いています。今月より「言われたからやる」ではなく「仕組みで動く」体制へ切り替えます。</div>
+  </div>
+
+  <div class="card goal">
+    <div class="card-icon">🎯</div>
+    <div class="card-label">【今月のゴール】</div>
+    <div class="card-main">衛生管理を<br>確実に実施する</div>
+    <div class="card-sub">記録・管理・確認の三本柱で、衛生管理を現場に根付かせる。</div>
+  </div>
+
+</div>
+
+<div class="footer">
+  ▶ 全員で取り組む衛生管理 ― まず「見える化」から始めよう
+</div>
+
+</body>
+</html>
