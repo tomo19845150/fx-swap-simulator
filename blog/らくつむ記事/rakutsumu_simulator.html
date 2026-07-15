@@ -1,0 +1,1407 @@
+<title>らくつむ 未来シミュレーター</title>
+<style>
+  :root {
+    --bg: #f3f1ea;
+    --bg-panel: #ffffff;
+    --bg-sunken: #ebe7db;
+    --ink: #22261f;
+    --ink-dim: #5c6154;
+    --ink-faint: #8a8f7e;
+    --line: #dcd7c6;
+    --accent: #1e5c4a;
+    --accent-ink: #eef7f1;
+    --accent-soft: #dcece3;
+    --gold: #a97328;
+    --gold-soft: #f3e6d2;
+    --good: #1e7a4c;
+    --good-soft: #dff0e4;
+    --warn: #a9660f;
+    --warn-soft: #f7e7cf;
+    --bad: #b3402f;
+    --bad-soft: #fae1db;
+    --info: #35688a;
+    --plum: #7c4a86;
+    --teal: #1f7d72;
+    --shadow: 0 1px 2px rgba(34,38,31,0.06), 0 8px 24px -12px rgba(34,38,31,0.18);
+    --radius: 10px;
+    --neon-green: #39ff14;
+    --magenta: #a83e78;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161813;
+      --bg-panel: #1e2119;
+      --bg-sunken: #262a1f;
+      --ink: #ece9dd;
+      --ink-dim: #b3af9f;
+      --ink-faint: #78775f;
+      --line: #34372a;
+      --accent: #5fbf9a;
+      --accent-ink: #0c1a14;
+      --accent-soft: #1c3129;
+      --gold: #dba85a;
+      --gold-soft: #372a17;
+      --good: #5fbf8a;
+      --good-soft: #17301f;
+      --warn: #e0a752;
+      --warn-soft: #3a2c14;
+      --bad: #e18172;
+      --bad-soft: #3a2019;
+      --info: #7fb3e0;
+      --plum: #c99fda;
+      --teal: #5fc4b8;
+      --magenta: #d98fc0;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px -16px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161813; --bg-panel: #1e2119; --bg-sunken: #262a1f;
+    --ink: #ece9dd; --ink-dim: #b3af9f; --ink-faint: #78775f; --line: #34372a;
+    --accent: #5fbf9a; --accent-ink: #0c1a14; --accent-soft: #1c3129;
+    --gold: #dba85a; --gold-soft: #372a17;
+    --good: #5fbf8a; --good-soft: #17301f;
+    --warn: #e0a752; --warn-soft: #3a2c14;
+    --bad: #e18172; --bad-soft: #3a2019;
+    --info: #7fb3e0; --plum: #c99fda; --teal: #5fc4b8; --magenta: #d98fc0;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px -16px rgba(0,0,0,0.6);
+  }
+  :root[data-theme="light"] {
+    --bg: #f3f1ea; --bg-panel: #ffffff; --bg-sunken: #ebe7db;
+    --ink: #22261f; --ink-dim: #5c6154; --ink-faint: #8a8f7e; --line: #dcd7c6;
+    --accent: #1e5c4a; --accent-ink: #eef7f1; --accent-soft: #dcece3;
+    --gold: #a97328; --gold-soft: #f3e6d2;
+    --good: #1e7a4c; --good-soft: #dff0e4;
+    --warn: #a9660f; --warn-soft: #f7e7cf;
+    --bad: #b3402f; --bad-soft: #fae1db;
+    --info: #35688a; --plum: #7c4a86; --teal: #1f7d72; --magenta: #a83e78;
+    --shadow: 0 1px 2px rgba(34,38,31,0.06), 0 8px 24px -12px rgba(34,38,31,0.18);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { max-width: 100%; overflow-x: hidden; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, "Yu Gothic Medium", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Segoe UI", system-ui, sans-serif;
+    line-height: 1.6;
+    padding: 32px 20px 80px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  header { margin-bottom: 28px; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: 0.12em; font-weight: 700;
+    color: var(--gold); text-transform: uppercase; margin: 0 0 8px;
+  }
+  h1 {
+    font-size: clamp(24px, 3.2vw, 32px);
+    margin: 0 0 6px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .lede { color: var(--ink-dim); font-size: 14.5px; margin: 0; max-width: 62ch; }
+
+  .card {
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .panel { padding: 22px; margin-bottom: 20px; }
+  .panel h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ink-faint); margin: 0 0 16px; font-weight: 700;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px 16px;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 12.5px; font-weight: 600; color: var(--ink-dim);
+    line-height: 1.35; min-height: 34px;
+    display: flex; align-items: flex-end;
+  }
+  .field .unit { font-size: 11px; color: var(--ink-faint); font-weight: 400; }
+  .field input, .field select {
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+    padding: 9px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--line);
+    background: var(--bg-sunken);
+    color: var(--ink);
+    font-size: 14.5px;
+  }
+  .field input:focus, .field select:focus, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  .field select {
+    cursor: pointer;
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    padding-right: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2339ff14' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    background-size: 10px 6px;
+  }
+
+  .pos-head-row {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+  }
+  .pos-head-row .field { min-width: 160px; }
+  .pos-table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+  table.pos-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.pos-table th {
+    background: var(--bg-sunken); color: var(--ink-faint);
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+    text-align: center; padding: 8px 6px; border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  table.pos-table td {
+    padding: 6px; border-bottom: 1px solid var(--line); text-align: center;
+    background: var(--bg-panel);
+  }
+  table.pos-table tr.pos-row-hidden { display: none; }
+  table.pos-table tr:last-child td { border-bottom: none; }
+  table.pos-table input, table.pos-table select {
+    font: inherit; font-variant-numeric: tabular-nums;
+    width: 100%; min-width: 64px;
+    padding: 6px 6px; border-radius: 6px; border: 1px solid var(--line);
+    background: var(--bg-sunken); color: var(--ink); font-size: 12.5px;
+    text-align: right;
+  }
+  table.pos-table select {
+    text-align: left;
+    cursor: pointer;
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    padding-right: 22px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 9 5'%3E%3Cpath d='M1 1l3.5 3 3.5-3' stroke='%2339ff14' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    background-size: 9px 5px;
+  }
+  table.pos-table input.pair-input { text-align: left; min-width: 96px; margin-top: 4px; }
+  table.pos-table input.pair-input.hidden { display: none; }
+  table.pos-table input[type="checkbox"] {
+    width: auto; min-width: 0; padding: 0; border: none; background: none;
+    accent-color: var(--accent); cursor: pointer; transform: scale(1.2);
+  }
+  table.pos-table input:focus, table.pos-table select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .pos-swatch { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+  .scenario-pair {
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; margin-bottom: 12px;
+  }
+  .scenario-pair:last-child { margin-bottom: 0; }
+  .scenario-pair-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 8px;
+  }
+  .scenario-pair-head .name { font-weight: 700; font-size: 14px; }
+  .scenario-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .scenario-btn {
+    padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line);
+    background: var(--bg-sunken); color: var(--ink-dim);
+    font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all 0.12s ease;
+  }
+  .scenario-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .scenario-btn.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .scenario-values { font-size: 12px; color: var(--ink-dim); margin: 2px 0 6px; font-weight: 600; }
+  .scenario-note { font-size: 12px; color: var(--ink-faint); line-height: 1.6; margin: 0; }
+  .scenario-sources { font-size: 11px; color: var(--ink-faint); margin-top: 6px; }
+  .scenario-sources a { color: var(--info); }
+
+  .run-row { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
+  button.run {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+  }
+  button.run:hover { filter: brightness(1.08); }
+  .run-note { font-size: 12px; color: var(--ink-faint); }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .stat {
+    padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .stat .label { font-size: 12px; color: var(--ink-faint); font-weight: 600; }
+  .stat .value {
+    font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .stat .sub { font-size: 12px; color: var(--ink-dim); }
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11.5px; font-weight: 700; padding: 3px 9px;
+    border-radius: 999px; width: fit-content;
+  }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .pill.bad { background: var(--bad-soft); color: var(--bad); }
+  .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .chart-panel { padding: 20px 22px 12px; }
+  .chart-panel.collapsed { padding-bottom: 20px; }
+  .chart-panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 4px;
+  }
+  .chart-panel-head h2 { margin: 0; }
+  .chart-visibility {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 600; color: var(--ink-dim); cursor: pointer; user-select: none;
+    flex-shrink: 0;
+  }
+  .switch { position: relative; width: 34px; height: 19px; flex-shrink: 0; }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .switch .track {
+    position: absolute; inset: 0; background: var(--line); border-radius: 999px;
+    transition: background 0.15s ease;
+  }
+  .switch .track::before {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 15px; height: 15px;
+    background: var(--bg-panel); border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    transition: transform 0.15s ease;
+  }
+  .switch input:checked ~ .track { background: var(--accent); }
+  .switch input:checked ~ .track::before { transform: translateX(15px); }
+  .switch input:focus-visible ~ .track { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .chart-body.hidden { display: none; }
+  .chart-sub { font-size: 12px; color: var(--ink-faint); margin: 0 0 12px; }
+  .chart-toggles { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 14px; }
+  .chart-toggles .toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12.5px; font-weight: 600; color: var(--ink-dim);
+    cursor: pointer; user-select: none;
+  }
+  .chart-toggles input[type="checkbox"] { margin: 0; cursor: pointer; accent-color: var(--accent); }
+  .chart-toggles .swatch { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+  .chart-toggles .toggle:has(input:not(:checked)) { color: var(--ink-faint); opacity: 0.55; }
+  canvas#growthChart { width: 100%; height: 280px; display: block; }
+  canvas#marginRatioChart { width: 100%; height: 170px; display: block; }
+  .margin-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0 0; font-size: 12px; color: var(--ink-dim); }
+  .margin-legend .item { display: inline-flex; align-items: center; gap: 6px; }
+  .margin-legend .line { width: 16px; height: 0; border-top: 2px dashed currentColor; display: inline-block; }
+  .chart-slider-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 10px; padding-top: 4px;
+  }
+  .chart-slider-row.hidden { display: none; }
+  .chart-slider-row input[type="range"] {
+    flex: 1; accent-color: var(--accent); cursor: pointer; height: 18px;
+  }
+  .chart-slider-label {
+    font-size: 11.5px; color: var(--ink-faint); white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+
+  .table-panel { padding: 0; overflow: hidden; }
+  .table-head-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 22px 4px;
+  }
+  .table-head-row h2 { margin: 0; }
+  .table-scroll { overflow-x: auto; max-height: 520px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  thead th {
+    position: sticky; top: 0; z-index: 2;
+    background: var(--bg-sunken);
+    color: var(--ink-dim);
+    font-weight: 700; font-size: 11.5px; letter-spacing: 0.02em;
+    text-align: right; padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  thead th:first-child { text-align: center; }
+  tbody td {
+    text-align: right; padding: 9px 14px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+  }
+  tbody td:first-child { text-align: center; color: var(--ink-dim); font-weight: 600; }
+  tbody tr:hover td { background: var(--bg-sunken); }
+  td.asset { font-weight: 700; color: var(--accent); }
+  td.swap { color: var(--gold); font-weight: 600; }
+  .maint-tag, .lev-tag {
+    display: inline-block; padding: 2px 7px; border-radius: 6px; font-weight: 700; font-size: 12px;
+  }
+
+  .note {
+    font-size: 12px; color: var(--ink-faint); line-height: 1.7;
+    padding: 16px 4px 0;
+  }
+  .note strong { color: var(--ink-dim); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">FX スワップ再投資 &middot; 外為どっとコム らくつむ</p>
+    <h1>らくつむ 未来シミュレーター</h1>
+    <p class="lede">現在の「らくつむ」設定（口座資金・保有残高・積立額・レバレッジなど）を入力すると、公式の買付・スワップ振替ルールに沿って将来の資産合計・維持率・実効レバレッジを月次で試算します。通貨ペアやレバレッジ違いのポジションを最大6つまで同時保有として登録できます。</p>
+  </header>
+
+  <section class="card panel">
+    <h2>口座全体の設定</h2>
+    <div class="grid">
+      <div class="field">
+        <label for="initialCapital">初期の口座資金 <span class="unit">円</span></label>
+        <input type="number" id="initialCapital" value="589000" step="10000">
+      </div>
+      <div class="field">
+        <label for="months">シミュレーション期間 <span class="unit">ヶ月</span></label>
+        <input type="number" id="months" value="120" step="12">
+      </div>
+      <div class="field">
+        <label for="positionCount">ポジション数 <span class="unit">同一通貨ペアの異レバレッジも可</span></label>
+        <select id="positionCount">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="card panel">
+    <h2>ポジションごとの積立設定</h2>
+    <div class="pos-table-scroll">
+      <table class="pos-table">
+        <thead>
+          <tr>
+            <th>通貨ペア</th>
+            <th>レバレッジ</th>
+            <th>スワップ設定</th>
+            <th>初期保有残高<br><span style="font-weight:400;">(通貨)</span></th>
+            <th>買付金額<br><span style="font-weight:400;">(円)</span></th>
+            <th>買付頻度</th>
+            <th>振替/再投資<br>閾値(円)</th>
+            <th>想定レート<br><span style="font-weight:400;">(円)</span></th>
+            <th>初期SW<br><span style="font-weight:400;">円/1万/日</span></th>
+            <th>SW年間<br>減少率(%)</th>
+            <th>レート下落率<br>年率(%)</th>
+            <th>振替開始月<br><span style="font-weight:400;">0=切替なし</span></th>
+            <th>出金する</th>
+            <th>出金開始月</th>
+            <th>出金額/月<br><span style="font-weight:400;">(円)</span></th>
+          </tr>
+        </thead>
+        <tbody id="posRows"></tbody>
+      </table>
+    </div>
+    <div class="run-row">
+      <button class="run" onclick="runSimulation()">シミュレーション実行</button>
+      <span class="run-note">同じ通貨ペアをレバレッジ違いで複数行に分けて登録すれば、同時保有ポジションとして合算されます</span>
+    </div>
+  </section>
+
+  <section class="card chart-panel" id="scenarioPanel">
+    <div class="chart-panel-head">
+      <h2>通貨ペア別 将来シナリオ（一括適用）</h2>
+      <label class="chart-visibility">
+        表示する
+        <span class="switch">
+          <input type="checkbox" id="scenarioVisibilityToggle" checked>
+          <span class="track"></span>
+        </span>
+      </label>
+    </div>
+    <div class="chart-body" id="scenarioBody">
+      <p class="chart-sub" style="margin-bottom:16px;">過去の推移・金利見通しなどの公開情報から想定した「SW年間減少率」「レート下落率」の目安です。ホライズンを選んで適用すると、そのポジションに設定されている通貨ペアと同じ行すべてに一括反映されます。あくまで試算用の仮定であり、将来を保証するものではありません。</p>
+      <div id="scenarioRows"></div>
+    </div>
+  </section>
+
+  <section class="stats" id="statsRow"></section>
+
+  <section class="card table-panel">
+    <div class="table-head-row">
+      <h2>ポジション別サマリー（期間終了時点）</h2>
+      <label class="chart-visibility">
+        表示する
+        <span class="switch">
+          <input type="checkbox" id="posSummaryVisibilityToggle" checked>
+          <span class="track"></span>
+        </span>
+      </label>
+    </div>
+    <div class="chart-body" id="posSummaryBody">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>通貨ペア</th>
+              <th>レバ</th>
+              <th>設定</th>
+              <th>保有通貨量</th>
+              <th>LOT数</th>
+              <th>保有評価額 (円)</th>
+              <th>積立累計 (円)</th>
+              <th>累計スワップ (円)</th>
+              <th>含み損益 (円)</th>
+              <th>累計出金額 (円)</th>
+              <th>全決済した場合の受取額<br><span style="font-weight:400;">＝清算価値 (円)</span></th>
+            </tr>
+          </thead>
+          <tbody id="posSummary"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card chart-panel" id="chartPanel">
+    <div class="chart-panel-head">
+      <h2>資産推移</h2>
+      <label class="chart-visibility">
+        グラフを表示
+        <span class="switch">
+          <input type="checkbox" id="chartVisibilityToggle" checked>
+          <span class="track"></span>
+        </span>
+      </label>
+    </div>
+    <div class="chart-body" id="chartBody">
+      <p class="chart-sub">表示するデータを切り替えて比較できます。数値ラベルは資産系の項目は5ヶ月おき、スワップ系の項目（1日/1ヶ月/年間スワップ）は全ての棒に表示します。期間が24ヶ月を超える場合は下のスライダーで表示範囲を移動できます。</p>
+      <div class="chart-toggles" id="chartToggles">
+        <label class="toggle" data-series="asset">
+          <input type="checkbox" value="asset" checked>
+          <span class="swatch" style="background: var(--accent);"></span>資産合計
+        </label>
+        <label class="toggle" data-series="principal">
+          <input type="checkbox" value="principal" checked>
+          <span class="swatch" style="background: var(--gold);"></span>積立元本
+        </label>
+        <label class="toggle" data-series="swap">
+          <input type="checkbox" value="swap">
+          <span class="swatch" style="background: var(--good);"></span>累計スワップ
+        </label>
+        <label class="toggle" data-series="holding">
+          <input type="checkbox" value="holding">
+          <span class="swatch" style="background: var(--bad);"></span>保有通貨評価額
+        </label>
+        <label class="toggle" data-series="balance">
+          <input type="checkbox" value="balance">
+          <span class="swatch" style="background: var(--magenta);"></span>保有通貨量
+        </label>
+        <label class="toggle" data-series="lotCount">
+          <input type="checkbox" value="lotCount">
+          <span class="swatch" style="background: var(--neon-green);"></span>保有ロット数（1万通貨=1LOT）
+        </label>
+        <label class="toggle" data-series="settlement">
+          <input type="checkbox" value="settlement">
+          <span class="swatch" style="background: var(--warn);"></span>全決済した場合の金額
+        </label>
+        <label class="toggle" data-series="unrealizedPL">
+          <input type="checkbox" value="unrealizedPL">
+          <span class="swatch" style="background: linear-gradient(90deg, var(--good) 50%, var(--bad) 50%);"></span>含み損益
+        </label>
+        <label class="toggle" data-series="swapDaily">
+          <input type="checkbox" value="swapDaily">
+          <span class="swatch" style="background: var(--info);"></span>1日のスワップ
+        </label>
+        <label class="toggle" data-series="swapMonthly">
+          <input type="checkbox" value="swapMonthly">
+          <span class="swatch" style="background: var(--plum);"></span>1ヶ月のスワップ
+        </label>
+        <label class="toggle" data-series="swapYearly">
+          <input type="checkbox" value="swapYearly">
+          <span class="swatch" style="background: var(--teal);"></span>年間スワップ（直近12ヶ月実績）
+        </label>
+        <label class="toggle" data-series="withdrawal">
+          <input type="checkbox" value="withdrawal">
+          <span class="swatch" style="background: var(--ink-dim);"></span>累計出金額
+        </label>
+      </div>
+      <canvas id="growthChart"></canvas>
+      <div class="chart-slider-row hidden" id="chartSliderRow">
+        <span class="chart-slider-label">表示範囲</span>
+        <input type="range" id="chartSlider" min="0" max="0" value="0" step="1">
+        <span class="chart-slider-label" id="chartSliderLabel"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card chart-panel" id="marginRatioPanel">
+    <div class="chart-panel-head">
+      <h2>実効有効比率の推移（含み損益込み・ロスカット判定）</h2>
+      <label class="chart-visibility">
+        グラフを表示
+        <span class="switch">
+          <input type="checkbox" id="marginRatioVisibilityToggle" checked>
+          <span class="track"></span>
+        </span>
+      </label>
+    </div>
+    <div class="chart-body" id="marginRatioBody">
+      <p class="chart-sub">含み損益を反映した実際の有効評価額（＝全決済した場合の金額）を、実際のレバレッジ基準の必要証拠金で割った比率です。表示範囲は上のグラフのスライダーと連動します。</p>
+      <canvas id="marginRatioChart"></canvas>
+      <div class="margin-legend">
+        <span class="item" style="color: var(--good);"><span class="line"></span>100%以上＝安全</span>
+        <span class="item" style="color: var(--warn);"><span class="line"></span>100%未満＝買付停止ライン</span>
+        <span class="item" style="color: var(--bad);"><span class="line"></span>30%未満＝強制ロスカットライン</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card table-panel">
+    <div class="table-head-row"><h2>月次シミュレーション結果</h2></div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>経過月</th>
+            <th>資産合計 (円)</th>
+            <th>全決済金額 (円)</th>
+            <th>維持率</th>
+            <th>実効レバ</th>
+            <th>保有通貨評価額 (円)</th>
+            <th>積立累計 (円)</th>
+            <th>SW/日 (円)</th>
+            <th>SW/月 (円)</th>
+            <th>SW/年 実績 (円)</th>
+            <th>SW/年ペース (円)</th>
+            <th>累計出金額 (円)</th>
+            <th>保有通貨量<br><span style="font-weight:400;">(通貨)</span></th>
+            <th>保有ロット数<br><span style="font-weight:400;">(1万通貨=1LOT)</span></th>
+            <th>実効有効比率<br><span style="font-weight:400;">(含み損益込み)</span></th>
+          </tr>
+        </thead>
+        <tbody id="results"></tbody>
+      </table>
+    </div>
+    <p class="note">
+      ※1ヶ月＝30日、1年＝365日として計算。スワップ年間減少率は月率（年率÷12）に分割して毎日適用。<br>
+      <strong>ポジション</strong> は通貨ペア・レバレッジ・買付/スワップ設定の組み合わせごとに独立したものとして扱います。同一通貨ペアをレバレッジ違いで複数登録すれば、同時保有として合算します（各ポジションは自分自身の残高・レートに対してのみスワップと買付が発生し、ポジション間の資金移動はありません）。<br>
+      <strong>買付</strong> は各ポジションで選択した頻度（毎日/毎週/毎月）ごとに買付金額×レバレッジ分を約定するものとして試算。<br>
+      <strong>スワップ設定（貯める／自動振替／再投資）</strong> は実際のらくつむの3つの設定に対応しています。<strong>自動振替・再投資</strong> は毎日発生したスワップをいったんポジションごとにプールし、累計が設定した閾値に達した時点でまとめて実行（公式仕様どおり、毎日連続で複利がかかるわけではありません）。再投資時は積立と同じレバレッジが適用され、買付通貨量が1に満たない場合は実行を見送ります。自動振替は口座内で現金化され、資産合計にそのまま計上されます。<strong>貯める</strong> を選んだ場合、発生したスワップは口座資金（資産合計）には一切計上されず、ポジションの評価益として蓄積されるだけで、「全決済した場合の金額＝清算価値」にのみ反映されます（実際のポジション決済時に初めて受け取れる、という公式仕様どおりの試算です）。振替開始月に達すると、それ以降はどの設定でも自動振替（新たに発生する分のみ）に切り替わります。そのため「貯める」設定中に積み上がっていた分は、振替開始月に達しても遡って現金化されず、清算価値側の評価益として残り続けます。<br>
+      <strong>資産合計</strong> ＝ 初期の口座資金 ＋ 全ポジションの累計積立額 ＋ 全ポジションの実現スワップ（自動振替・再投資で口座資金に計上された分のみ。「貯める」設定分の未実現スワップは含みません）－ 累計出金額。
+      <strong>レート下落率（年率%）</strong> を設定すると、日々の買付・保有評価をそのペースで下落するレートで計算します（下落した分だけ同じ円で多くの通貨を買える一方、保有通貨評価額はその分目減りするため、資産合計自体は変わりません）。0%なら通常どおりレート一定として試算します。
+      <strong>保有通貨評価額</strong> は各ポジションの保有通貨量×そのポジションのその時点のレートを円換算して合算した値です（通貨単位が異なるため通貨量そのものは合算していません）。
+      <strong>維持率</strong> は国内FXの必要証拠金基準（上限レバレッジ25倍、通貨ペアによる差は考慮せず一律で概算）に対する資産合計の割合。らくつむ自体のレバレッジは1〜3倍に固定されるため、通常は高い水準で推移します。ただしこの維持率は為替変動による含み損益を含めていないため、実際のロスカット判定には使えません。<br>
+      <strong>実効有効比率（含み損益込み）</strong> は、外為どっとコムの公式ルール（有効比率＝有効評価額÷必要保証金×100%、100%未満で買付停止、30%未満で強制ロスカット）に沿って試算した指標です。有効評価額＝全決済した場合の金額（資産合計＋含み損益）、必要保証金＝各ポジションの買付平均単価×保有量÷そのポジション自身のレバレッジ（1〜3倍）を全ポジション合計したものです。レート下落率シナリオを設定している場合、この比率がどこまで悪化するかで実際のロスカットリスクの目安が分かります。専用グラフ（実効有効比率の推移）で100%ライン（買付停止）・30%ライン（強制ロスカット）と合わせて視覚的に確認できます。
+      <strong>実効レバ</strong> は保有通貨評価額の合計が資産合計の何倍かを示す実効的なレバレッジ。<br>
+      <strong>通貨ペアのプルダウン</strong>（トルコリラ/円・メキシコペソ/円・南アフリカランド/円）を選ぶと、2026年7月時点の参考レート・スワップポイントを自動入力します（比較サイト・公表情報からの目安値で、日々変動するため必ず最新の値に置き換えてください）。それ以外の通貨ペアは「その他（自由入力）」を選んで手入力できます。<br>
+      <strong>通貨ペア別 将来シナリオ</strong> の「2年後/5年後/10年後」ボタンは、各国の金利見通し・過去の為替推移といった公開情報をもとにした試算用の仮定値です。同じ通貨ペア名の行すべてに一括反映されますが、あくまで一つの仮定にすぎず、将来の実際のレート・スワップを保証するものではありません。<br>
+      <strong>SW/年 実績</strong> はその月を含む直近12ヶ月分のSW/月を合計した実績値（シミュレーション開始から12ヶ月未満はその時点までの合計）。<strong>SW/年ペース</strong> はその月末時点の日次スワップが1年間続いた場合の参考値で、どちらも将来のスワップ変動を保証するものではありません。<br>
+      <strong>振替開始月</strong> に0より大きい月数を設定すると、その月から積立フェーズを終えます。具体的には (1) 新たに発生するスワップは再投資されず自動振替（口座内で現金化。銀行口座等への出金ではありません）扱いになり、(2) 毎月の積立（買付）も停止します。それより前に積み上がった通貨ポジション自体を自動で売却・現金化するものではありません。0のままなら切替は行わず積立・再投資を継続します。<br>
+      <strong>出金する</strong> は実際に口座から出金する（別の用途に使う）動作を試算に加えるかどうかのチェックです。オンにすると、<strong>出金開始月</strong> に達した以降、毎月末に <strong>出金額/月</strong> の金額を口座から取り崩します。出金は振替開始月とは独立して設定できるため、「再投資は継続しながら一部だけ出金する」といった組み合わせも試せます。出金額は保有通貨には影響せず、資産合計・全決済した場合の金額から単純に差し引かれるだけの試算です（その時点で自動振替されている現金残高の範囲かどうかは考慮していないため、月々のスワップ収入より出金額が大きい場合は資産合計が減少に転じます。逆にスワップ収入の方が大きい間は、出金してもなお現金として積み上がり続けるため資産合計は増加を続けます）。<strong>累計出金額</strong> は出金開始月以降の出金額/月を毎月積み上げた合計で、期間終了時点の値を上部カードにも表示しています。<br>
+      <strong>全決済した場合の金額（＝清算価値）</strong> は、その時点で保有している通貨をすべて時価（レート下落シナリオ適用後のレート）で売却し、かつ「貯める」設定で蓄積している未実現スワップも受け取ったと仮定した場合の受取額です。＝資産合計 ＋ 含み損益。<strong>含み損益</strong> は、保有通貨評価額からその通貨を買い付けた際の円換算コスト（買付金額×レバレッジ、スワップ再投資分を含む）を差し引いた為替評価損益に、「貯める」設定で未実現のまま蓄積しているスワップ評価益を加えた金額です。レート下落率0%かつ全ポジションが「貯める」以外の設定なら常に0円になります（＝資産合計と全決済金額が一致）。レートが下落するほど、保有中の通貨を売る際の円換算額が目減りするため為替評価損益はマイナスに振れやすくなる一方、「貯める」設定のスワップ評価益はレートに関係なくプラスのまま積み上がります。<br>
+      <strong>ポジション別サマリーの「全決済した場合の受取額＝清算価値」</strong> は各ポジション単独の積立累計＋累計スワップ＋含み損益で、初期の口座資金（全ポジション共通・口座全体の設定で入力）を含みません。そのため全ポジション分を合計しても、上部カードの「全決済した場合の受取額」（初期の口座資金を含む口座全体の金額）とは一致しません。<br>
+      <strong>保有通貨量</strong> は全ポジションの保有通貨量（通貨単位そのもの）を単純合算した値、<strong>保有ロット数</strong> はそれを1万通貨＝1LOTで換算した値です（どちらも通貨ペアが異なるポジションを複数持っている場合は単純合算になり参考値になります。全ポジション同一通貨ペアの場合はそのまま実数として使えます）。グラフの縦軸は円建て系列と共通のため、他の円建て系列と同時表示するとスケールが小さく見えにくくなることがあります。<br>
+      評価損益（為替変動による含み損益）・税金・スプレッド等の手数料は考慮していない概算値です。投資判断は自己責任で、必ず公式シミュレーターと取引説明書もあわせてご確認ください。
+    </p>
+  </section>
+</div>
+
+<script>
+  function formatNumber(num) {
+    return Math.floor(num).toLocaleString('ja-JP');
+  }
+
+  function maintClass(rate) {
+    if (rate === null) return '';
+    if (rate < 100) return 'bad';
+    if (rate < 300) return 'warn';
+    return 'good';
+  }
+
+  // 実際のらくつむの有効比率ルール: 30%未満=強制ロスカット、100%未満=買付停止
+  function realMarginClass(rate) {
+    if (rate === null) return '';
+    if (rate < 30) return 'bad';
+    if (rate < 100) return 'warn';
+    return 'good';
+  }
+
+  function readCSSVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  let lastRows = [];
+  const MAX_POSITIONS = 6;
+
+  // 2026年7月時点の参考値（外為どっとコム公表値・比較サイト実績ベース、日々変動するため目安）
+  const PAIR_PRESETS = {
+    'トルコリラ/円':     { rate: 3.44, swapPer10k: 25 },
+    'メキシコペソ/円':   { rate: 9.25, swapPer10k: 14 },
+    '南アフリカランド/円': { rate: 9.90, swapPer10k: 13 }
+  };
+  const CUSTOM_PAIR = '__custom__';
+
+  // 過去推移・各国中銀の金利見通し等の公開情報から想定した目安（2026年7月時点、断定的な予測ではありません）
+  const SCENARIO_DATA = {
+    'トルコリラ/円': {
+      note: 'トルコと日本のインフレ率格差（2026年時点で約30〜40pt）が続く限り、購買力平価的に対円で継続的な下落が想定されます。過去10年で対円96%下落という実績を踏まえ、政策金利の段階的な引き下げ局面を加味してホライズンが長いほど下落率・スワップ減少率をやや緩やかに設定しています。',
+      horizons: {
+        2:  { swapDecay: 5,  rateDecline: 15 },
+        5:  { swapDecay: 8,  rateDecline: 12 },
+        10: { swapDecay: 10, rateDecline: 10 }
+      },
+      sources: [
+        { title: 'トルコリラの見通し｜OANDA証券', url: 'https://www.oanda.jp/lab-education/blog_column/try_outlook/' },
+        { title: 'トルコ・リラ/円の為替レートの推移｜世界経済のネタ帳', url: 'https://ecodb.net/exchange/try_jpy.html' }
+      ]
+    },
+    'メキシコペソ/円': {
+      note: 'メキシコ中銀は2025年12月以降、政策金利を7%台からさらに緩和する局面にあり、対円スワップは今後縮小しやすいと想定。為替はUSMCA再交渉や米関税リスクなど不透明要因があり方向感は割れていますが、金利差縮小分を保守的に見て緩やかな下落を仮定しています。',
+      horizons: {
+        2:  { swapDecay: 8,  rateDecline: 3 },
+        5:  { swapDecay: 10, rateDecline: 4 },
+        10: { swapDecay: 12, rateDecline: 5 }
+      },
+      sources: [
+        { title: 'メキシコの金利｜Trading Economics', url: 'https://jp.tradingeconomics.com/mexico/interest-rate' },
+        { title: 'メキシコ・ペソ/円の為替レートの推移｜世界経済のネタ帳', url: 'https://ecodb.net/exchange/mxn_jpy.html' }
+      ]
+    },
+    '南アフリカランド/円': {
+      note: '南アフリカ準備銀行はインフレ目標3%に向けて金利を相対的に高水準で維持する方針であり、スワップの減少ペースはトルコリラ・メキシコペソよりも緩やかと想定。為替は過去10年程度で9〜13円のレンジで推移してきた経緯があり、持続的な下落というよりは緩やかな調整を仮定しています。',
+      horizons: {
+        2:  { swapDecay: 3, rateDecline: 2 },
+        5:  { swapDecay: 5, rateDecline: 3 },
+        10: { swapDecay: 7, rateDecline: 4 }
+      },
+      sources: [
+        { title: '南ア政策金利の推移｜外為どっとコム', url: 'https://www.gaitame.com/markets/seisakukinri/south.html' },
+        { title: '南アフリカ・ランド/円の為替レートの推移｜世界経済のネタ帳', url: 'https://ecodb.net/exchange/zar_jpy.html' }
+      ]
+    }
+  };
+
+  const POSITION_DEFAULTS = [
+    { pair: 'トルコリラ/円', leverage: 3, mode: 'compound', initialBalance: 363169, buyAmount: 300, buyFreq: 1, threshold: 100, rate: 3.44, swapPer10k: 25, swapDecay: 2.0, rateDecline: 0, drawdownMonth: 0, withdrawEnabled: false, withdrawStartMonth: 0, withdrawAmount: 0 },
+    { pair: 'トルコリラ/円', leverage: 2, mode: 'compound', initialBalance: 5030,   buyAmount: 300, buyFreq: 1, threshold: 100, rate: 3.44, swapPer10k: 25, swapDecay: 2.0, rateDecline: 0, drawdownMonth: 0, withdrawEnabled: false, withdrawStartMonth: 0, withdrawAmount: 0 },
+    { pair: 'トルコリラ/円', leverage: 1, mode: 'compound', initialBalance: 2486,   buyAmount: 300, buyFreq: 1, threshold: 100, rate: 3.44, swapPer10k: 25, swapDecay: 2.0, rateDecline: 0, drawdownMonth: 0, withdrawEnabled: false, withdrawStartMonth: 0, withdrawAmount: 0 },
+    { pair: '',              leverage: 1, mode: 'compound', initialBalance: 0,       buyAmount: 0,   buyFreq: 1, threshold: 100, rate: 1,    swapPer10k: 0,  swapDecay: 0,   rateDecline: 0, drawdownMonth: 0, withdrawEnabled: false, withdrawStartMonth: 0, withdrawAmount: 0 },
+    { pair: '',              leverage: 1, mode: 'compound', initialBalance: 0,       buyAmount: 0,   buyFreq: 1, threshold: 100, rate: 1,    swapPer10k: 0,  swapDecay: 0,   rateDecline: 0, drawdownMonth: 0, withdrawEnabled: false, withdrawStartMonth: 0, withdrawAmount: 0 },
+    { pair: '',              leverage: 1, mode: 'compound', initialBalance: 0,       buyAmount: 0,   buyFreq: 1, threshold: 100, rate: 1,    swapPer10k: 0,  swapDecay: 0,   rateDecline: 0, drawdownMonth: 0, withdrawEnabled: false, withdrawStartMonth: 0, withdrawAmount: 0 }
+  ];
+
+  function leverageOptions(sel) {
+    return [1, 2, 3].map(v => `<option value="${v}"${v === sel ? ' selected' : ''}>${v}倍</option>`).join('');
+  }
+  function freqOptions(sel) {
+    return [[1, '毎日'], [7, '毎週'], [30, '毎月']]
+      .map(([v, l]) => `<option value="${v}"${v === sel ? ' selected' : ''}>${l}</option>`).join('');
+  }
+  function modeOptions(sel) {
+    return [['hold', '貯める'], ['simple', '自動振替'], ['compound', '再投資']]
+      .map(([v, l]) => `<option value="${v}"${v === sel ? ' selected' : ''}>${l}</option>`).join('');
+  }
+  function withdrawOptions(sel) {
+    const presets = [0, 3000, 5000, 10000, 20000, 30000, 50000, 70000, 100000, 150000, 200000];
+    if (!presets.includes(sel)) presets.push(sel);
+    presets.sort((a, b) => a - b);
+    return presets.map(v => `<option value="${v}"${v === sel ? ' selected' : ''}>${v === 0 ? '0（出金なし）' : v.toLocaleString('ja-JP') + '円'}</option>`).join('');
+  }
+  function pairOptions(sel) {
+    const known = Object.keys(PAIR_PRESETS);
+    const selValue = known.includes(sel) ? sel : CUSTOM_PAIR;
+    const opts = known.map(p => `<option value="${p}"${p === selValue ? ' selected' : ''}>${p}</option>`);
+    opts.push(`<option value="${CUSTOM_PAIR}"${selValue === CUSTOM_PAIR ? ' selected' : ''}>その他（自由入力）</option>`);
+    return opts.join('');
+  }
+
+  function onPairSelectChange(n) {
+    const select = document.getElementById(`pos${n}_pairSelect`);
+    const textInput = document.getElementById(`pos${n}_pair`);
+    if (select.value === CUSTOM_PAIR) {
+      textInput.classList.remove('hidden');
+      textInput.value = '';
+      textInput.focus();
+    } else {
+      textInput.classList.add('hidden');
+      textInput.value = select.value;
+      const preset = PAIR_PRESETS[select.value];
+      if (preset) {
+        document.getElementById(`pos${n}_rate`).value = preset.rate;
+        document.getElementById(`pos${n}_swapPer10k`).value = preset.swapPer10k;
+      }
+    }
+  }
+
+  function buildPositionRows() {
+    const tbody = document.getElementById('posRows');
+    tbody.innerHTML = POSITION_DEFAULTS.map((d, idx) => {
+      const n = idx + 1;
+      const isCustom = !PAIR_PRESETS[d.pair];
+      return `<tr id="posRow${n}" data-pos="${n}">
+        <td>
+          <select id="pos${n}_pairSelect" onchange="onPairSelectChange(${n})">${pairOptions(d.pair)}</select>
+          <input class="pair-input${isCustom ? '' : ' hidden'}" type="text" id="pos${n}_pair" value="${d.pair}" placeholder="例: 米ドル/円">
+        </td>
+        <td><select id="pos${n}_leverage">${leverageOptions(d.leverage)}</select></td>
+        <td><select id="pos${n}_mode">${modeOptions(d.mode)}</select></td>
+        <td><input type="number" id="pos${n}_initialBalance" value="${d.initialBalance}" step="10000"></td>
+        <td><input type="number" id="pos${n}_buyAmount" value="${d.buyAmount}" step="100"></td>
+        <td><select id="pos${n}_buyFreq">${freqOptions(d.buyFreq)}</select></td>
+        <td><input type="number" id="pos${n}_threshold" value="${d.threshold}" step="100" min="100" max="999999"></td>
+        <td><input type="number" id="pos${n}_rate" value="${d.rate}" step="0.01"></td>
+        <td><input type="number" id="pos${n}_swapPer10k" value="${d.swapPer10k}" step="1"></td>
+        <td><input type="number" id="pos${n}_swapDecay" value="${d.swapDecay}" step="0.1"></td>
+        <td><input type="number" id="pos${n}_rateDecline" value="${d.rateDecline}" step="0.5"></td>
+        <td><input type="number" id="pos${n}_drawdownMonth" value="${d.drawdownMonth}" step="1" min="0"></td>
+        <td><input type="checkbox" id="pos${n}_withdrawEnabled"${d.withdrawEnabled ? ' checked' : ''}></td>
+        <td><input type="number" id="pos${n}_withdrawStartMonth" value="${d.withdrawStartMonth}" step="1" min="0"></td>
+        <td><select id="pos${n}_withdrawAmount">${withdrawOptions(d.withdrawAmount)}</select></td>
+      </tr>`;
+    }).join('');
+    applyPositionCount();
+  }
+
+  function applyPositionCount() {
+    const count = parseInt(document.getElementById('positionCount').value) || 1;
+    for (let n = 1; n <= MAX_POSITIONS; n++) {
+      document.getElementById('posRow' + n).classList.toggle('pos-row-hidden', n > count);
+    }
+  }
+
+  function renderScenarioPanel() {
+    const wrap = document.getElementById('scenarioRows');
+    wrap.innerHTML = Object.entries(SCENARIO_DATA).map(([pair, data]) => {
+      const buttons = [2, 5, 10].map(h => {
+        const s = data.horizons[h];
+        return `<button type="button" class="scenario-btn" id="scenBtn_${pair}_${h}" onclick="applyScenario('${pair}', ${h})">${h}年後</button>`;
+      }).join('');
+      return `<div class="scenario-pair">
+        <div class="scenario-pair-head">
+          <span class="name">${pair}</span>
+          <div class="scenario-buttons">${buttons}</div>
+        </div>
+        <p class="scenario-values" id="scenValues_${pair.replace(/\//g, '')}">${[2, 5, 10].map(h => `${h}年後: SW減少率${data.horizons[h].swapDecay}%/年・レート下落率${data.horizons[h].rateDecline}%/年`).join(' 　 ')}</p>
+        <p class="scenario-note">${data.note}</p>
+        <p class="scenario-sources">出典: ${data.sources.map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.title}</a>`).join(' / ')}</p>
+      </div>`;
+    }).join('');
+  }
+
+  function applyScenario(pair, horizonYears) {
+    const scenario = SCENARIO_DATA[pair] && SCENARIO_DATA[pair].horizons[horizonYears];
+    if (!scenario) return;
+    let appliedCount = 0;
+    for (let n = 1; n <= MAX_POSITIONS; n++) {
+      const pairInput = document.getElementById(`pos${n}_pair`);
+      if (pairInput && pairInput.value === pair) {
+        document.getElementById(`pos${n}_swapDecay`).value = scenario.swapDecay;
+        document.getElementById(`pos${n}_rateDecline`).value = scenario.rateDecline;
+        appliedCount++;
+      }
+    }
+    [2, 5, 10].forEach(h => {
+      const btn = document.getElementById(`scenBtn_${pair}_${h}`);
+      if (btn) btn.classList.toggle('active', h === horizonYears);
+    });
+    if (appliedCount === 0) {
+      alert(`「${pair}」に設定されているポジション行がありません。通貨ペアのプルダウンで「${pair}」を選んでから適用してください。`);
+    }
+  }
+
+  function readPositionConfig(n) {
+    return {
+      pair: document.getElementById(`pos${n}_pair`).value.trim() || `ポジション${n}`,
+      leverage: parseFloat(document.getElementById(`pos${n}_leverage`).value) || 1,
+      mode: document.getElementById(`pos${n}_mode`).value,
+      initialBalance: parseFloat(document.getElementById(`pos${n}_initialBalance`).value) || 0,
+      buyAmount: parseFloat(document.getElementById(`pos${n}_buyAmount`).value) || 0,
+      buyFreqDays: parseInt(document.getElementById(`pos${n}_buyFreq`).value) || 1,
+      threshold: Math.min(999999, Math.max(100, parseFloat(document.getElementById(`pos${n}_threshold`).value) || 1000)),
+      rate: parseFloat(document.getElementById(`pos${n}_rate`).value) || 1,
+      swapPer10k: parseFloat(document.getElementById(`pos${n}_swapPer10k`).value) || 0,
+      swapDecayAnn: (parseFloat(document.getElementById(`pos${n}_swapDecay`).value) || 0) / 100,
+      rateDeclineAnn: (parseFloat(document.getElementById(`pos${n}_rateDecline`).value) || 0) / 100,
+      drawdownMonth: Math.max(0, parseInt(document.getElementById(`pos${n}_drawdownMonth`).value) || 0),
+      withdrawEnabled: document.getElementById(`pos${n}_withdrawEnabled`).checked,
+      withdrawStartMonth: Math.max(0, parseInt(document.getElementById(`pos${n}_withdrawStartMonth`).value) || 0),
+      withdrawAmount: parseFloat(document.getElementById(`pos${n}_withdrawAmount`).value) || 0
+    };
+  }
+
+  // 1ポジション分を日次で試算し、月末スナップショットの配列を返す
+  function simulatePosition(cfg, months) {
+    const swapDecayDay = cfg.swapDecayAnn / 365;
+    let balance = cfg.initialBalance;
+    let totalPrincipal = 0;
+    let cumulativeSwap = 0;
+    let realizedSwap = 0; // 「自動振替」「再投資」で口座資金・買付に反映済みのスワップ（「貯める」分は含めない）
+    let swapPool = 0;
+    let notionalCost = cfg.initialBalance * cfg.rate; // 保有中の通貨を取得した時点の円換算コスト（含み損益の算出用）
+    let cumulativeWithdrawal = 0;
+    let dayIndex = 0;
+    const monthly = [];
+
+    function rateAt(day) {
+      return cfg.rate * Math.pow(1 - cfg.rateDeclineAnn, day / 365);
+    }
+
+    for (let m = 1; m <= months; m++) {
+      let monthlySwapTotal = 0;
+      // 振替開始月に達したら、その月以降は再投資設定でも自動振替として扱い、積立（買付）も停止する
+      const inDrawdownPhase = cfg.drawdownMonth > 0 && m >= cfg.drawdownMonth;
+      const effectiveMode = inDrawdownPhase ? 'simple' : cfg.mode;
+      // 出金は振替開始月とは独立して発生させる（再投資を続けながらの出金も可）
+      const inWithdrawPhase = cfg.withdrawEnabled && cfg.withdrawStartMonth > 0 && m >= cfg.withdrawStartMonth;
+
+      for (let d = 0; d < 30; d++) {
+        const currentRate = rateAt(dayIndex);
+        const currentSwapPerUnit = (cfg.swapPer10k / 10000) * Math.pow(1 - swapDecayDay, dayIndex);
+
+        const dailySwap = balance * currentSwapPerUnit;
+        monthlySwapTotal += dailySwap;
+        cumulativeSwap += dailySwap;
+        // 「貯める」はポジション決済まで評価益のまま口座資金に反映されないため、実現スワップには加えない
+        if (effectiveMode !== 'hold') {
+          realizedSwap += dailySwap;
+          swapPool += dailySwap;
+        }
+
+        if (effectiveMode !== 'hold' && swapPool >= cfg.threshold) {
+          if (effectiveMode === 'compound') {
+            const notional = swapPool * cfg.leverage;
+            const bought = notional / currentRate;
+            if (bought >= 1) {
+              balance += bought;
+              notionalCost += notional;
+              swapPool = 0;
+            }
+          } else {
+            swapPool = 0;
+          }
+        }
+
+        if (!inDrawdownPhase && dayIndex % cfg.buyFreqDays === 0) {
+          totalPrincipal += cfg.buyAmount;
+          const notional = cfg.buyAmount * cfg.leverage;
+          const bought = notional / currentRate;
+          if (bought >= 1) {
+            balance += bought;
+            notionalCost += notional;
+          }
+        }
+
+        dayIndex++;
+      }
+
+      // 出金開始月に達したら、月末に指定額を口座から取り崩す
+      if (inWithdrawPhase) {
+        cumulativeWithdrawal += cfg.withdrawAmount;
+      }
+
+      const eomRate = rateAt(dayIndex - 1);
+      const eomDailySwap = balance * (cfg.swapPer10k / 10000) * Math.pow(1 - swapDecayDay, dayIndex - 1);
+      const holdingValue = balance * eomRate;
+      const storedSwap = cumulativeSwap - realizedSwap; // 「貯める」で未実現のまま蓄積している評価スワップ
+      const unrealizedPL = (holdingValue - notionalCost) + storedSwap;
+      monthly.push({
+        m, balance, totalPrincipal, cumulativeSwap, realizedSwap, eomDailySwap, monthlySwapTotal, holdingValue, notionalCost, unrealizedPL, cumulativeWithdrawal
+      });
+    }
+    return monthly;
+  }
+
+  function runSimulation() {
+    const initialCapital = parseFloat(document.getElementById('initialCapital').value) || 0;
+    const months = Math.max(1, parseInt(document.getElementById('months').value) || 12);
+    const count = parseInt(document.getElementById('positionCount').value) || 1;
+
+    const positions = [];
+    for (let n = 1; n <= count; n++) {
+      const cfg = readPositionConfig(n);
+      positions.push({ cfg, monthly: simulatePosition(cfg, months) });
+    }
+
+    const rows = [];
+    for (let i = 0; i < months; i++) {
+      let totalPrincipal = 0, cumulativeSwap = 0, realizedSwap = 0, holdingValue = 0, eomDailySwap = 0, monthlySwapTotal = 0, notionalCost = 0, totalWithdrawal = 0, totalBalance = 0, realRequiredMargin = 0;
+      positions.forEach(p => {
+        const snap = p.monthly[i];
+        totalPrincipal += snap.totalPrincipal;
+        cumulativeSwap += snap.cumulativeSwap;
+        realizedSwap += snap.realizedSwap;
+        holdingValue += snap.holdingValue;
+        eomDailySwap += snap.eomDailySwap;
+        monthlySwapTotal += snap.monthlySwapTotal;
+        notionalCost += snap.notionalCost;
+        totalWithdrawal += snap.cumulativeWithdrawal;
+        totalBalance += snap.balance;
+        realRequiredMargin += snap.notionalCost / p.cfg.leverage;
+      });
+      const yearlySwapPace = eomDailySwap * 365;
+      const totalAsset = initialCapital + totalPrincipal + realizedSwap - totalWithdrawal;
+      const requiredMargin = holdingValue / 25;
+      const maintenanceRate = requiredMargin > 0 ? (totalAsset / requiredMargin) * 100 : null;
+      const effectiveLev = totalAsset > 0 ? holdingValue / totalAsset : null;
+      const storedSwap = cumulativeSwap - realizedSwap; // 「貯める」で未実現のまま蓄積している評価スワップ（全ポジション合計）
+      const unrealizedPL = (holdingValue - notionalCost) + storedSwap;
+      const settlementValue = totalAsset + unrealizedPL;
+      const lotCount = totalBalance / 10000; // 1LOT=1万通貨換算（通貨ペアが異なる場合は単純合算のため参考値）
+      // 実効有効比率＝有効評価額（含み損益込み＝全決済した場合の金額）÷ 実際のレバレッジ基準の必要証拠金（買付平均単価×数量÷レバレッジ）
+      const realMarginRatio = realRequiredMargin > 0 ? (settlementValue / realRequiredMargin) * 100 : null;
+
+      rows.push({
+        m: i + 1, totalAsset, maintenanceRate, effectiveLev,
+        totalPrincipal, eomDailySwap, monthlySwapTotal, yearlySwapPace,
+        cumulativeSwap, holdingValue, unrealizedPL, settlementValue, totalWithdrawal, lotCount, totalBalance,
+        realRequiredMargin, realMarginRatio
+      });
+    }
+
+    // 年間スワップ(実績) = 直近12ヶ月分のSW/月の合計（ローリング）
+    for (let i = 0; i < rows.length; i++) {
+      const start = Math.max(0, i - 11);
+      let sum = 0;
+      for (let k = start; k <= i; k++) sum += rows[k].monthlySwapTotal;
+      rows[i].yearlySwapActual = sum;
+    }
+
+    lastRows = rows;
+    renderStats(rows, initialCapital);
+    renderPositionSummary(positions);
+    renderTable(rows);
+    updateChartSlider(true);
+    renderChart(getChartWindowRows());
+    renderMarginRatioChart(getChartWindowRows());
+  }
+
+  function renderStats(rows, initialCapital) {
+    const last = rows[rows.length - 1];
+    const mClass = maintClass(last.maintenanceRate);
+    const mLabel = mClass === 'good' ? '安全' : (mClass === 'warn' ? '要注意' : '危険水準');
+
+    const statsRow = document.getElementById('statsRow');
+    statsRow.innerHTML = `
+      <div class="card stat">
+        <span class="label">${rows.length}ヶ月後の資産合計</span>
+        <span class="value">¥${formatNumber(last.totalAsset)}</span>
+        <span class="sub">積立元本 ¥${formatNumber(last.totalPrincipal)} ＋ 累計スワップ ¥${formatNumber(last.cumulativeSwap)}${last.totalWithdrawal > 0 ? ` － 累計出金額 ¥${formatNumber(last.totalWithdrawal)}` : ''}</span>
+      </div>
+      <div class="card stat">
+        <span class="label">維持率</span>
+        <span class="value">${last.maintenanceRate === null ? '-' : formatNumber(last.maintenanceRate) + '%'}</span>
+        <span class="pill ${mClass}"><span class="dot"></span>${mLabel}</span>
+      </div>
+      <div class="card stat">
+        <span class="label">実効有効比率（含み損益込み）</span>
+        <span class="value">${last.realMarginRatio === null ? '-' : formatNumber(last.realMarginRatio) + '%'}</span>
+        <span class="pill ${realMarginClass(last.realMarginRatio)}"><span class="dot"></span>${realMarginClass(last.realMarginRatio) === 'good' ? '安全' : (realMarginClass(last.realMarginRatio) === 'warn' ? '買付停止水準' : 'ロスカット水準')}</span>
+      </div>
+      <div class="card stat">
+        <span class="label">実効レバレッジ</span>
+        <span class="value">${last.effectiveLev === null ? '-' : last.effectiveLev.toFixed(1) + '倍'}</span>
+        <span class="sub">保有通貨評価額 ¥${formatNumber(last.holdingValue)}（全ポジション合計）</span>
+      </div>
+      <div class="card stat">
+        <span class="label">直近スワップ収益ペース</span>
+        <span class="value">¥${formatNumber(last.yearlySwapPace)}<span style="font-size:13px; font-weight:600; color:var(--ink-faint);">/年</span></span>
+        <span class="sub">月間 ¥${formatNumber(last.monthlySwapTotal)} ・ 日次 ¥${formatNumber(last.eomDailySwap)}</span>
+      </div>
+      <div class="card stat">
+        <span class="label">今すぐ全決済した場合の受取額</span>
+        <span class="value">¥${formatNumber(last.settlementValue)}</span>
+        <span class="pill ${last.unrealizedPL >= 0 ? 'good' : 'bad'}"><span class="dot"></span>含み損益 ${last.unrealizedPL >= 0 ? '+' : ''}¥${formatNumber(last.unrealizedPL)}</span>
+      </div>
+      <div class="card stat">
+        <span class="label">期間終了時点の累計出金額</span>
+        <span class="value">¥${formatNumber(last.totalWithdrawal)}</span>
+        <span class="sub">出金する・出金開始月・出金額/月を設定したポジションの合計（資産合計からは既に差し引き済み）</span>
+      </div>
+    `;
+  }
+
+  function renderPositionSummary(positions) {
+    const tbody = document.getElementById('posSummary');
+    tbody.innerHTML = positions.map(p => {
+      const last = p.monthly[p.monthly.length - 1];
+      const modeLabels = { compound: '再投資', simple: '自動振替', hold: '貯める' };
+      let modeLabel = modeLabels[p.cfg.mode] || p.cfg.mode;
+      if (p.cfg.drawdownMonth > 0 && p.cfg.mode !== 'simple') {
+        modeLabel += `→${p.cfg.drawdownMonth}ヶ月目から自動振替`;
+      }
+      if (p.cfg.withdrawEnabled && p.cfg.withdrawStartMonth > 0) {
+        modeLabel += `／${p.cfg.withdrawStartMonth}ヶ月目から¥${formatNumber(p.cfg.withdrawAmount)}/月 出金`;
+      }
+      const positionSettlement = last.totalPrincipal + last.realizedSwap - last.cumulativeWithdrawal + last.unrealizedPL;
+      return `<tr>
+        <td style="text-align:left;">${p.cfg.pair}</td>
+        <td>${p.cfg.leverage}倍</td>
+        <td>${modeLabel}</td>
+        <td>${formatNumber(last.balance)}</td>
+        <td>${(last.balance / 10000).toFixed(2)}</td>
+        <td>${formatNumber(last.holdingValue)}</td>
+        <td>${formatNumber(last.totalPrincipal)}</td>
+        <td class="swap">${formatNumber(last.cumulativeSwap)}</td>
+        <td style="color: var(--${last.unrealizedPL >= 0 ? 'good' : 'bad'}); font-weight:600;">${last.unrealizedPL >= 0 ? '+' : ''}${formatNumber(last.unrealizedPL)}</td>
+        <td>${formatNumber(last.cumulativeWithdrawal)}</td>
+        <td style="font-weight:700;">${formatNumber(positionSettlement)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderTable(rows) {
+    const tbody = document.getElementById('results');
+    tbody.innerHTML = rows.map(r => {
+      const mClass = maintClass(r.maintenanceRate);
+      const maintStr = r.maintenanceRate === null ? '-' : formatNumber(r.maintenanceRate) + '%';
+      const levStr = r.effectiveLev === null ? '-' : r.effectiveLev.toFixed(1) + '倍';
+      return `<tr>
+        <td>${r.m}ヶ月</td>
+        <td class="asset">${formatNumber(r.totalAsset)}</td>
+        <td style="color: var(--${r.unrealizedPL >= 0 ? 'good' : 'bad'}); font-weight:700;">${formatNumber(r.settlementValue)}</td>
+        <td><span class="maint-tag" style="background:var(--${mClass}-soft); color:var(--${mClass});">${maintStr}</span></td>
+        <td>${levStr}</td>
+        <td>${formatNumber(r.holdingValue)}</td>
+        <td>${formatNumber(r.totalPrincipal)}</td>
+        <td class="swap">${formatNumber(r.eomDailySwap)}</td>
+        <td class="swap">${formatNumber(r.monthlySwapTotal)}</td>
+        <td class="swap">${formatNumber(r.yearlySwapActual)}</td>
+        <td>${formatNumber(r.yearlySwapPace)}</td>
+        <td>${formatNumber(r.totalWithdrawal)}</td>
+        <td>${formatNumber(r.totalBalance)}</td>
+        <td>${r.lotCount.toFixed(2)}</td>
+        <td><span class="maint-tag" style="background:var(--${realMarginClass(r.realMarginRatio)}-soft); color:var(--${realMarginClass(r.realMarginRatio)});">${r.realMarginRatio === null ? '-' : formatNumber(r.realMarginRatio) + '%'}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function compactYen(num) {
+    const sign = num < 0 ? '-' : '';
+    const abs = Math.abs(num);
+    if (abs >= 1e8) return sign + (abs / 1e8).toFixed(abs >= 1e9 ? 0 : 1) + '億';
+    if (abs >= 1e4) return sign + Math.round(abs / 1e4) + '万';
+    return sign + Math.round(abs).toLocaleString('ja-JP');
+  }
+
+  const SERIES_DEFS = {
+    asset:              { label: '資産合計',       color: '--accent', get: r => r.totalAsset },
+    principal:          { label: '積立元本',       color: '--gold',   get: r => r.totalPrincipal },
+    swap:               { label: '累計スワップ',   color: '--good',   get: r => r.cumulativeSwap },
+    holding:            { label: '保有通貨評価額', color: '--bad',    get: r => r.holdingValue },
+    settlement:         { label: '全決済した場合の金額', color: '--warn', get: r => r.settlementValue },
+    unrealizedPL:       { label: '含み損益',       color: '--good',   get: r => r.unrealizedPL, diverging: true },
+    swapDaily:          { label: '1日のスワップ',  color: '--info',   get: r => r.eomDailySwap, alwaysLabel: true },
+    swapMonthly:        { label: '1ヶ月のスワップ', color: '--plum',  get: r => r.monthlySwapTotal, alwaysLabel: true },
+    swapYearly:         { label: '年間スワップ(実績)', color: '--teal', get: r => r.yearlySwapActual, alwaysLabel: true },
+    withdrawal:         { label: '累計出金額',     color: '--ink-dim', get: r => r.totalWithdrawal },
+    balance:            { label: '保有通貨量',     color: '--magenta', get: r => r.totalBalance, alwaysLabel: true },
+    lotCount:           { label: '保有ロット数',   color: '--neon-green', get: r => r.lotCount, alwaysLabel: true, format: v => v.toFixed(2) + ' LOT' }
+  };
+
+  function getActiveSeries() {
+    const boxes = document.querySelectorAll('#chartToggles input[type="checkbox"]:checked');
+    return Array.from(boxes).map(b => ({ key: b.value, ...SERIES_DEFS[b.value] }));
+  }
+
+  const CHART_WINDOW = 24; // 一度に表示する最大月数（これを超えるとスライダーで範囲移動）
+
+  function updateChartSlider(resetToStart) {
+    const slider = document.getElementById('chartSlider');
+    const row = document.getElementById('chartSliderRow');
+    const total = lastRows.length;
+    const windowSize = Math.min(total, CHART_WINDOW);
+    const maxStart = Math.max(0, total - windowSize);
+
+    row.classList.toggle('hidden', maxStart === 0);
+    slider.min = 0;
+    slider.max = maxStart;
+    slider.step = 1;
+    if (resetToStart || parseInt(slider.value) > maxStart) {
+      slider.value = 0;
+    }
+    updateChartSliderLabel();
+  }
+
+  function updateChartSliderLabel() {
+    const slider = document.getElementById('chartSlider');
+    const total = lastRows.length;
+    const windowSize = Math.min(total, CHART_WINDOW);
+    const start = parseInt(slider.value) || 0;
+    const end = Math.min(total, start + windowSize);
+    document.getElementById('chartSliderLabel').textContent = `${start + 1}〜${end}ヶ月 / 全${total}ヶ月`;
+  }
+
+  function getChartWindowRows() {
+    const slider = document.getElementById('chartSlider');
+    const total = lastRows.length;
+    const windowSize = Math.min(total, CHART_WINDOW);
+    const start = parseInt(slider.value) || 0;
+    return lastRows.slice(start, start + windowSize);
+  }
+
+  function renderChart(rows) {
+    const canvas = document.getElementById('growthChart');
+    const dpr = window.devicePixelRatio || 1;
+    const cssW = canvas.clientWidth || canvas.parentElement.clientWidth;
+    const cssH = 280;
+    canvas.width = cssW * dpr;
+    canvas.height = cssH * dpr;
+    canvas.style.height = cssH + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    const active = getActiveSeries();
+    const padL = 64, padR = 16, padT = 28, padB = 28;
+    const plotW = cssW - padL - padR;
+    const plotH = cssH - padT - padB;
+
+    const ink = readCSSVar('--ink-dim');
+    const faint = readCSSVar('--ink-faint');
+    const line = readCSSVar('--line');
+
+    if (active.length === 0) {
+      ctx.fillStyle = faint;
+      ctx.font = '13px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('表示するデータを上のチェックボックスで選んでください', cssW / 2, cssH / 2);
+      return;
+    }
+
+    const goodColor = readCSSVar('--good');
+    const badColor = readCSSVar('--bad');
+    const seriesColors = active.map(s => s.diverging ? null : readCSSVar(s.color));
+
+    const allValues = rows.flatMap(r => active.map(s => s.get(r)));
+    const rawMax = Math.max(0, ...allValues);
+    const rawMin = Math.min(0, ...allValues);
+    const range = (rawMax - rawMin) || 1;
+    const pad = range * 0.12;
+    const maxV = rawMax + pad;
+    const minV = rawMin - (rawMin < 0 ? pad : 0);
+
+    function xAt(i) { return padL + (plotW * (i / rows.length)); }
+    function yAt(v) { return padT + plotH - (plotH * ((v - minV) / (maxV - minV))); }
+    const yZero = yAt(0);
+    const slotW = plotW / rows.length;
+
+    // gridlines + y labels
+    ctx.strokeStyle = line;
+    ctx.lineWidth = 1;
+    ctx.font = '11px -apple-system, sans-serif';
+    ctx.fillStyle = faint;
+    const gridLines = 4;
+    for (let i = 0; i <= gridLines; i++) {
+      const v = minV + (maxV - minV) * (i / gridLines);
+      const y = yAt(v);
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(padL + plotW, y);
+      ctx.stroke();
+      ctx.textAlign = 'right';
+      ctx.fillText('¥' + compactYen(v), padL - 8, y + 3);
+    }
+    if (minV < 0) {
+      ctx.strokeStyle = ink;
+      ctx.lineWidth = 1.25;
+      ctx.beginPath();
+      ctx.moveTo(padL, yZero);
+      ctx.lineTo(padL + plotW, yZero);
+      ctx.stroke();
+    }
+
+    // bars, grouped per month
+    const groupPad = slotW * 0.18;
+    const innerW = slotW - groupPad * 2;
+    const barW = Math.max(1, (innerW / active.length) * 0.82);
+    const barGap = (innerW / active.length) * 0.18;
+
+    const labelInterval = rows.length <= 12 ? 1 : (rows.length <= 30 ? 3 : 5);
+
+    rows.forEach((r, i) => {
+      const groupX = xAt(i) + groupPad;
+      const showLabelSparse = (i % labelInterval === 0) || i === rows.length - 1;
+
+      active.forEach((s, j) => {
+        const v = s.get(r);
+        const barColor = s.diverging ? (v >= 0 ? goodColor : badColor) : seriesColors[j];
+        const x = groupX + j * (barW + barGap);
+        const yTop = Math.min(yAt(v), yZero);
+        const h = Math.abs(yAt(v) - yZero);
+        ctx.fillStyle = barColor;
+        ctx.fillRect(x, yTop, barW, h);
+
+        const labelThis = showLabelSparse || s.alwaysLabel;
+        if (labelThis) {
+          const dense = active.length > 1 || s.alwaysLabel;
+          ctx.save();
+          ctx.fillStyle = barColor;
+          ctx.font = '9px -apple-system, sans-serif';
+          const labelY = v >= 0 ? yTop - 4 : yTop + h + 11;
+          ctx.translate(x + barW / 2, labelY);
+          ctx.rotate(dense ? -Math.PI / 4 : 0);
+          ctx.textAlign = dense ? 'left' : 'center';
+          ctx.fillText(s.format ? s.format(v) : (s.alwaysLabel ? formatNumber(v) : compactYen(v)), 0, 0);
+          ctx.restore();
+        }
+      });
+
+      if (showLabelSparse) {
+        ctx.fillStyle = ink;
+        ctx.font = '10px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(r.m + 'ヶ月', xAt(i) + slotW / 2, cssH - 8);
+      }
+    });
+
+    // legend
+    ctx.textAlign = 'left';
+    ctx.font = '11px -apple-system, sans-serif';
+    let lx = padL;
+    active.forEach((s, j) => {
+      ctx.fillStyle = s.diverging ? goodColor : seriesColors[j];
+      ctx.fillRect(lx, padT - 20, 8, 8);
+      ctx.fillStyle = ink;
+      ctx.fillText(s.label, lx + 12, padT - 12);
+      lx += ctx.measureText(s.label).width + 30;
+    });
+  }
+
+  function renderMarginRatioChart(rows) {
+    const canvas = document.getElementById('marginRatioChart');
+    const dpr = window.devicePixelRatio || 1;
+    const cssW = canvas.clientWidth || canvas.parentElement.clientWidth;
+    const cssH = 170;
+    canvas.width = cssW * dpr;
+    canvas.height = cssH * dpr;
+    canvas.style.height = cssH + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    const padL = 56, padR = 16, padT = 14, padB = 26;
+    const plotW = cssW - padL - padR;
+    const plotH = cssH - padT - padB;
+
+    const ink = readCSSVar('--ink-dim');
+    const faint = readCSSVar('--ink-faint');
+    const line = readCSSVar('--line');
+    const goodColor = readCSSVar('--good');
+    const warnColor = readCSSVar('--warn');
+    const badColor = readCSSVar('--bad');
+    const badSoft = readCSSVar('--bad-soft');
+
+    const values = rows.map(r => r.realMarginRatio);
+    const known = values.filter(v => v !== null);
+    const maxV = Math.max(100, ...known, 0) * 1.15 || 200;
+    const minV = 0;
+
+    function xAt(i) { return rows.length <= 1 ? padL + plotW / 2 : padL + (plotW * (i / (rows.length - 1))); }
+    function yAt(v) { return padT + plotH - (plotH * ((v - minV) / (maxV - minV))); }
+
+    // 30%未満の危険ゾーンを塗りつぶし
+    ctx.fillStyle = badSoft;
+    ctx.fillRect(padL, yAt(30), plotW, Math.max(0, yAt(minV) - yAt(30)));
+
+    // gridlines
+    ctx.strokeStyle = line;
+    ctx.lineWidth = 1;
+    ctx.font = '11px -apple-system, sans-serif';
+    ctx.fillStyle = faint;
+    ctx.textAlign = 'right';
+    const gridLines = 4;
+    for (let i = 0; i <= gridLines; i++) {
+      const v = minV + (maxV - minV) * (i / gridLines);
+      const y = yAt(v);
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(padL + plotW, y);
+      ctx.stroke();
+      ctx.fillText(Math.round(v) + '%', padL - 8, y + 3);
+    }
+
+    // 閾値の破線（100%＝買付停止、30%＝ロスカット）
+    [[100, warnColor], [30, badColor]].forEach(([threshold, color]) => {
+      if (threshold > maxV) return;
+      const y = yAt(threshold);
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(padL + plotW, y);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    // 実効有効比率の折れ線（区間ごとにゾーン別の色）
+    for (let i = 1; i < rows.length; i++) {
+      const v0 = values[i - 1], v1 = values[i];
+      if (v0 === null || v1 === null) continue;
+      ctx.strokeStyle = realMarginClass(v1) === 'bad' ? badColor : (realMarginClass(v1) === 'warn' ? warnColor : goodColor);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(xAt(i - 1), yAt(v0));
+      ctx.lineTo(xAt(i), yAt(v1));
+      ctx.stroke();
+    }
+
+    // x軸ラベル（月）
+    const labelInterval = rows.length <= 12 ? 1 : (rows.length <= 30 ? 3 : 5);
+    ctx.fillStyle = ink;
+    ctx.font = '10px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    rows.forEach((r, i) => {
+      if (i % labelInterval === 0 || i === rows.length - 1) {
+        ctx.fillText(r.m + 'ヶ月', xAt(i), cssH - 8);
+      }
+    });
+  }
+
+  document.getElementById('chartToggles').addEventListener('change', () => {
+    if (lastRows.length) renderChart(getChartWindowRows());
+  });
+  document.getElementById('chartVisibilityToggle').addEventListener('change', (e) => {
+    const chartBody = document.getElementById('chartBody');
+    chartBody.classList.toggle('hidden', !e.target.checked);
+    document.getElementById('chartPanel').classList.toggle('collapsed', !e.target.checked);
+    if (e.target.checked && lastRows.length) renderChart(getChartWindowRows());
+  });
+  document.getElementById('marginRatioVisibilityToggle').addEventListener('change', (e) => {
+    const body = document.getElementById('marginRatioBody');
+    body.classList.toggle('hidden', !e.target.checked);
+    document.getElementById('marginRatioPanel').classList.toggle('collapsed', !e.target.checked);
+    if (e.target.checked && lastRows.length) renderMarginRatioChart(getChartWindowRows());
+  });
+  document.getElementById('posSummaryVisibilityToggle').addEventListener('change', (e) => {
+    document.getElementById('posSummaryBody').classList.toggle('hidden', !e.target.checked);
+  });
+  document.getElementById('scenarioVisibilityToggle').addEventListener('change', (e) => {
+    document.getElementById('scenarioBody').classList.toggle('hidden', !e.target.checked);
+    document.getElementById('scenarioPanel').classList.toggle('collapsed', !e.target.checked);
+  });
+  document.getElementById('chartSlider').addEventListener('input', () => {
+    updateChartSliderLabel();
+    if (lastRows.length) { renderChart(getChartWindowRows()); renderMarginRatioChart(getChartWindowRows()); }
+  });
+  document.getElementById('positionCount').addEventListener('change', applyPositionCount);
+  window.addEventListener('resize', () => { if (lastRows.length) { renderChart(getChartWindowRows()); renderMarginRatioChart(getChartWindowRows()); } });
+  window.onload = () => {
+    buildPositionRows();
+    renderScenarioPanel();
+    runSimulation();
+  };
+</script>

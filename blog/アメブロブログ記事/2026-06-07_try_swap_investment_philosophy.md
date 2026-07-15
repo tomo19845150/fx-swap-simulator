@@ -9,6 +9,8 @@ account: rational-lab
 url: "https://ameblo.jp/rational-lab/entry-12968805056.html"
 entry_id: "12968805056"
 likes: 1
+pv_30d: 21
+pv_checked: 2026-07-12
 ---
 
 # トルコリラスワップ投資についての考え方

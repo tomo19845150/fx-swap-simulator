@@ -10,6 +10,8 @@ account: rational-lab
 url: "https://ameblo.jp/rational-lab/entry-12968562671.html"
 entry_id: "12968562671"
 likes: 0
+pv_30d: 9
+pv_checked: 2026-07-12
 ---
 
 # トルコリラ複利モデルの実験｜長期でどう増えるのか

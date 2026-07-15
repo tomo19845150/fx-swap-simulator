@@ -9,6 +9,8 @@ account: rational-lab
 url: "https://ameblo.jp/rational-lab/entry-12969203100.html"
 entry_id: "12969203100"
 likes: 0
+pv_30d: 27
+pv_checked: 2026-07-12
 ---
 
 # FX会社を使った一般的なトルコリラ円複利運用

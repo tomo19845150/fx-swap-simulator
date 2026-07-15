@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FXスワップ再投資シミュレーター（改良版）</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size: 24px; text-align: center; color: #2c3e50; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input { padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #3498db; color: #fff; border: none; padding: 12px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; }
+        button:hover { background-color: #2980b9; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: right; }
+        th { background-color: #2c3e50; color: #fff; text-align: center; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .note { font-size: 12px; color: #7f8c8d; margin-top: 10px; }
+        .radio-group { display: flex; gap: 20px; align-items: center; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>FXスワップ再投資シミュレーター（改良版）</h1>
+    
+    <div class="input-grid">
+        <div class="input-group">
+            <label>初期保有残高 (TRY)</label>
+            <input type="number" id="initialBalance" value="0" step="100">
+        </div>
+        <div class="input-group">
+            <label>1日の積立額 (円)</label>
+            <input type="number" id="dailyInvest" value="300" step="100">
+        </div>
+        <div class="input-group">
+            <label>想定為替レート (円/TRY)</label>
+            <input type="number" id="rate" value="3.47" step="0.01">
+        </div>
+        <div class="input-group">
+            <label>初期スワップ (1万通貨あたり/円)</label>
+            <input type="number" id="swapPer10k" value="25" step="1">
+        </div>
+        <div class="input-group">
+            <label>スワップ年間減少率 (%)</label>
+            <input type="number" id="swapDecay" value="2" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>レバレッジ (倍)</label>
+            <input type="number" id="leverage" value="1" step="1">
+        </div>
+    </div>
+
+    <div class="radio-group">
+        <label><input type="radio" name="mode" value="compound" checked> 複利</label>
+        <label><input type="radio" name="mode" value="simple"> 単利</label>
+    </div>
+
+    <button onclick="calculate()">計算する</button>
+
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>月数</th>
+                    <th>TRY残高</th>
+                    <th>LOT数</th>
+                    <th>元本累計 (円)</th>
+                    <th>月間スワップ (円)</th>
+                    <th>累計スワップ (円)</th>
+                    <th>TRY評価額 (円)</th>
+                    <th>総資産 (円)</th>
+                </tr>
+            </thead>
+            <tbody id="results"></tbody>
+        </table>
+    </div>
+
+    <p class="note">※1ヶ月＝365/12日で計算。スワップは日次で減衰。TRY評価額＝残高×レート。</p>
+</div>
+
+<script>
+function formatNumber(num) {
+    return Math.floor(num).toLocaleString();
+}
+
+function calculate() {
+    const initialBalance = parseFloat(document.getElementById('initialBalance').value);
+    const dailyInvest = parseFloat(document.getElementById('dailyInvest').value);
+    const rate = parseFloat(document.getElementById('rate').value);
+    const swapPer10k = parseFloat(document.getElementById('swapPer10k').value);
+    const swapDecayYear = parseFloat(document.getElementById('swapDecay').value) / 100;
+    const leverage = parseFloat(document.getElementById('leverage').value);
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+
+    const daysPerMonth = 365 / 12;
+    const totalMonths = 15 * 12;
+
+    let balance = initialBalance;
+    let totalPrincipal = 0;
+    let cumulativeSwap = 0;
+
+    const tbody = document.getElementById('results');
+    tbody.innerHTML = '';
+
+    let dayCount = 0;
+
+    for (let m = 1; m <= totalMonths; m++) {
+        let monthlySwap = 0;
+
+        for (let d = 0; d < daysPerMonth; d++) {
+            const decayFactor = Math.pow(1 - swapDecayYear / 365, dayCount);
+            const currentSwapPer10k = swapPer10k * decayFactor;
+            const currentSwapPerUnit = currentSwapPer10k / 10000;
+
+            const dailySwap = balance * currentSwapPerUnit;
+            monthlySwap += dailySwap;
+            cumulativeSwap += dailySwap;
+
+            totalPrincipal += dailyInvest;
+
+            const buyingPower = (dailyInvest + (mode === "compound" ? dailySwap : 0)) * leverage;
+            const boughtCurrency = buyingPower / rate;
+
+            balance += boughtCurrency;
+
+            dayCount++;
+        }
+
+        const lotCount = (balance / 10000).toFixed(2);
+        const tryValue = balance * rate;
+        const totalAsset = totalPrincipal + cumulativeSwap + tryValue;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="text-align:center;">${m}</td>
+            <td>${formatNumber(balance)}</td>
+            <td>${lotCount}</td>
+            <td>${formatNumber(totalPrincipal)}</td>
+            <td>${formatNumber(monthlySwap)}</td>
+            <td>${formatNumber(cumulativeSwap)}</td>
+            <td>${formatNumber(tryValue)}</td>
+            <td style="font-weight:bold; color:#27ae60;">${formatNumber(totalAsset)}</td>
+        `;
+        tbody.appendChild(tr);
+    }
+}
+</script>
+
+</body>
+</html>

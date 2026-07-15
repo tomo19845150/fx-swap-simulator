@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FXスワップ運用シミュレーター（国内維持率・実効レバレッジ対応版）</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size: 22px; text-align: center; color: #2c3e50; margin-bottom: 20px; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select { padding: 10px; font-size: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        select { background-color: #fff; cursor: pointer; }
+        button { background-color: #3498db; color: #fff; border: none; padding: 15px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; margin-bottom: 20px; }
+        button:hover { background-color: #2980b9; }
+        .table-wrapper { overflow-x: auto; max-height: 600px; border: 1px solid #ddd; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+        thead { position: sticky; top: 0; background-color: #2c3e50; color: #fff; z-index: 10; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: right; }
+        th { text-align: center; font-weight: normal; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        .note { font-size: 12px; color: #7f8c8d; margin-top: 15px; line-height: 1.5; }
+        
+        /* 列のスタイル設定 */
+        .asset-header { background-color: #27ae60 !important; font-weight: bold !important; }
+        .asset-val { font-weight: bold; color: #27ae60; background-color: #f4faf6; }
+        .maintenance-header { background-color: #e67e22 !important; font-weight: bold !important; }
+        .maintenance-val { font-weight: bold; color: #d35400; background-color: #fffaf5; text-align: right; }
+        .leverage-header { background-color: #3498db !important; font-weight: bold !important; }
+        .leverage-val { font-weight: bold; color: #2980b9; background-color: #f4f9fd; text-align: right; }
+        .highlight-col { font-weight: bold; color: #e74c3c; background-color: #fdf5f5; }
+        .month-col { text-align: center; background-color: #ecf0f1; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>FXスワップ運用シミュレーター</h1>
+    
+    <div class="input-grid">
+        <div class="input-group">
+            <label>運用方法</label>
+            <select id="reinvestMode">
+                <option value="compound">複利（スワップを再投資）</option>
+                <option value="simple">単利（スワップを貯める）</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>初期の口座資金 (円)</label>
+            <input type="number" id="initialCapital" value="100000" step="10000">
+        </div>
+        <div class="input-group">
+            <label>初期保有残高 (通貨)</label>
+            <input type="number" id="initialBalance" value="2100000" step="10000">
+        </div>
+        <div class="input-group">
+            <label>1日の積立額 (円)</label>
+            <input type="number" id="dailyInvest" value="300" step="100">
+        </div>
+        <div class="input-group">
+            <label>想定為替レート (円)</label>
+            <input type="number" id="rate" value="3.47" step="0.01">
+        </div>
+        <div class="input-group">
+            <label>初期スワップ (1万通貨/日)</label>
+            <input type="number" id="swapPer10k" value="25" step="1">
+        </div>
+        <div class="input-group">
+            <label>スワップ年間減少率 (%)</label>
+            <input type="number" id="swapDecay" value="2.0" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>再投資レバレッジ (倍)</label>
+            <input type="number" id="reinvestLeverage" value="8" step="1">
+        </div>
+        <div class="input-group">
+            <label>期間 (月数)</label>
+            <input type="number" id="months" value="60" step="12">
+        </div>
+    </div>
+
+    <button onclick="calculate()">シミュレーション実行</button>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>経過月</th>
+                    <th class="asset-header">口座清算価値(円)</th>
+                    <th class="maintenance-header">維持率</th>
+                    <th class="leverage-header">実効レバレッジ</th>
+                    <th>保有通貨量</th>
+                    <th>LOT数</th>
+                    <th>積立累計</th>
+                    <th>SW/日</th>
+                    <th>SW/月</th>
+                    <th>SW/年</th>
+                </tr>
+            </thead>
+            <tbody id="results">
+                </tbody>
+        </table>
+    </div>
+    
+    <div class="note">
+        ※1ヶ月＝30日、1年＝365日として計算しています。<br>
+        ※スワップ年間減少率は月単位（年率÷12）に分割して毎月適用しています。<br>
+        * <strong>口座清算価値</strong> ＝ 初期の口座資金 ＋ 累計積立額 ＋ 累計獲得スワップ です。<br>
+        * <strong>維持率</strong> は国内FXのレバレッジ上限（25倍）に基づく必要証拠金から算出しています。<br>
+        * <strong>実効レバレッジ</strong> は実際の取引額（保有通貨量×レート）が口座清算価値の何倍にあたるかを示します。<br>
+        ※為替変動による評価損益、税金、スプレッド等の手数料は考慮していません。
+    </div>
+</div>
+
+<script>
+    function formatNumber(num) {
+        return Math.floor(num).toLocaleString();
+    }
+
+    function calculate() {
+        const reinvestMode = document.getElementById('reinvestMode').value;
+        const initialCapital = parseFloat(document.getElementById('initialCapital').value) || 0;
+        const initialBalance = parseFloat(document.getElementById('initialBalance').value) || 0;
+        const dailyInvest = parseFloat(document.getElementById('dailyInvest').value) || 0;
+        const rate = parseFloat(document.getElementById('rate').value) || 1;
+        const swapPer10k = parseFloat(document.getElementById('swapPer10k').value) || 0;
+        const swapDecayAnn = parseFloat(document.getElementById('swapDecay').value) / 100 || 0;
+        const reinvestLeverage = Math.max(0.1, parseFloat(document.getElementById('reinvestLeverage').value) || 1);
+        const months = parseInt(document.getElementById('months').value) || 12;
+
+        const swapDecayMonth = swapDecayAnn / 12;
+
+        let balance = initialBalance;
+        let totalPrincipal = 0;
+        let cumulativeSwap = 0;
+
+        const tbody = document.getElementById('results');
+        tbody.innerHTML = '';
+
+        for (let m = 1; m <= months; m++) {
+            const currentSwapPer10k = swapPer10k * Math.pow(1 - swapDecayMonth, m - 1);
+            const currentSwapPerUnit = currentSwapPer10k / 10000;
+            
+            let monthlySwapTotal = 0;
+
+            for (let d = 0; d < 30; d++) {
+                const dailySwap = balance * currentSwapPerUnit;
+                monthlySwapTotal += dailySwap;
+                cumulativeSwap += dailySwap;
+                totalPrincipal += dailyInvest;
+
+                let buyingPower = 0;
+                if (reinvestMode === 'compound') {
+                    buyingPower = (dailyInvest + dailySwap) * reinvestLeverage;
+                } else {
+                    buyingPower = dailyInvest * reinvestLeverage;
+                }
+                
+                const boughtCurrency = buyingPower / rate;
+                balance += boughtCurrency;
+            }
+
+            const lotCount = (balance / 10000).toFixed(2);
+            const eomDailySwap = balance * currentSwapPerUnit;
+            const yearlySwapPace = eomDailySwap * 365;
+            
+            // 口座清算価値 (有効証拠金)
+            const totalAsset = initialCapital + totalPrincipal + cumulativeSwap;
+            
+            // 維持率の計算 (国内ルール: 最大レバレッジ25倍固定で必要証拠金を算出)
+            const requiredMargin = (balance * rate) / 25;
+            
+            let maintenanceRateStr = '-';
+            if (requiredMargin > 0) {
+                const maintenanceRate = (totalAsset / requiredMargin) * 100;
+                maintenanceRateStr = formatNumber(maintenanceRate) + '%';
+            }
+            
+            // 実効レバレッジの計算
+            let effectiveLev = '-';
+            if (totalAsset > 0) {
+                effectiveLev = ((balance * rate) / totalAsset).toFixed(1) + '倍';
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="month-col">${m}ヶ月</td>
+                <td class="asset-val">${formatNumber(totalAsset)}</td>
+                <td class="maintenance-val">${maintenanceRateStr}</td>
+                <td class="leverage-val">${effectiveLev}</td>
+                <td>${formatNumber(balance)}</td>
+                <td>${lotCount}</td>
+                <td>${formatNumber(totalPrincipal)}</td>
+                <td class="highlight-col">${formatNumber(eomDailySwap)}</td>
+                <td>${formatNumber(monthlySwapTotal)}</td>
+                <td>${formatNumber(yearlySwapPace)}</td>
+            `;
+            tbody.appendChild(tr);
+        }
+    }
+
+    window.onload = calculate;
+</script>
+
+</body>
+</html>

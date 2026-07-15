@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FXスワップ再投資シミュレーター（月単位・50年対応）</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; }
+        .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size: 24px; text-align: center; color: #2c3e50; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input { padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #3498db; color: #fff; border: none; padding: 12px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; }
+        button:hover { background-color: #2980b9; }
+        
+        /* 長期データ表示用のスクロール・見出し固定設定 */
+        .table-container { max-height: 550px; overflow-y: auto; margin-top: 20px; border: 1px solid #ddd; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: right; }
+        /* 見出しを上部に固定 */
+        th { background-color: #2c3e50; color: #fff; text-align: center; position: sticky; top: 0; z-index: 1; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .note { font-size: 12px; color: #7f8c8d; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>FXスワップ再投資シミュレーター（月単位推移）</h1>
+    
+    <div class="input-grid">
+        <div class="input-group">
+            <label>1日の積立額 (円)</label>
+            <input type="number" id="dailyInvest" value="300" step="100">
+        </div>
+        <div class="input-group">
+            <label>想定為替レート</label>
+            <input type="number" id="rate" value="3.47" step="0.01">
+        </div>
+        <div class="input-group">
+            <label>初期スワップ (1万通貨あたり/円)</label>
+            <input type="number" id="swapPer10k" value="25" step="1">
+        </div>
+        <div class="input-group">
+            <label>スワップ年間減少率 (%)</label>
+            <input type="number" id="swapDecay" value="2" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>レバレッジ (倍)</label>
+            <input type="number" id="leverage" value="1" step="1">
+        </div>
+        <div class="input-group">
+            <label>シミュレーション年数</label>
+            <input type="number" id="years" value="50" step="1">
+        </div>
+    </div>
+
+    <button onclick="calculate()">計算する</button>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>経過月数</th>
+                    <th>残高 (通貨)</th>
+                    <th>LOT数 (1万通貨)</th>
+                    <th>投資元本 (円)</th>
+                    <th>1日のスワップ (円)</th>
+                    <th>1か月のスワップ (円)</th>
+                    <th>年間スワップ (円)</th>
+                    <th>資産評価額 (円)</th>
+                </tr>
+            </thead>
+            <tbody id="results">
+                </tbody>
+        </table>
+    </div>
+    
+    <p class="note">※1ヶ月を30日として月単位で計算・表示しています。スワップ年間減少率は12ヶ月（1年）ごとに適用されます。資産評価額は「投資元本＋累計獲得スワップ」とし、為替変動による損益は考慮していません。税金や手数料等も除外したシミュレーション値です。</p>
+</div>
+
+<script>
+    function formatNumber(num) {
+        return Math.floor(num).toLocaleString();
+    }
+
+    function calculate() {
+        const dailyInvest = parseFloat(document.getElementById('dailyInvest').value);
+        const rate = parseFloat(document.getElementById('rate').value);
+        const swapPer10k = parseFloat(document.getElementById('swapPer10k').value);
+        const swapDecay = parseFloat(document.getElementById('swapDecay').value) / 100;
+        const leverage = parseFloat(document.getElementById('leverage').value);
+        const years = parseInt(document.getElementById('years').value);
+
+        let balance = 0;
+        let totalPrincipal = 0;
+        let cumulativeSwap = 0;
+
+        const tbody = document.getElementById('results');
+        tbody.innerHTML = '';
+
+        // 全体のループ月数を計算（50年の場合は600ヶ月）
+        const totalMonths = years * 12;
+
+        for (let m = 1; m <= totalMonths; m++) {
+            // 何年目かを判定（12ヶ月ごとにスワップ額を減少させるため）
+            const currentYear = Math.ceil(m / 12);
+            const currentSwapPer10k = swapPer10k * Math.pow(1 - swapDecay, currentYear - 1);
+            const currentSwapPerUnit = currentSwapPer10k / 10000;
+            
+            let monthlySwap = 0;
+
+            // 1ヶ月を30日として毎日の複利・積立計算を処理
+            for (let d = 0; d < 30; d++) {
+                const dailySwap = balance * currentSwapPerUnit;
+                monthlySwap += dailySwap;
+                cumulativeSwap += dailySwap;
+
+                totalPrincipal += dailyInvest;
+
+                // 投資元本とスワップにレバレッジをかけて買付力を計算
+                const buyingPower = (dailyInvest + dailySwap) * leverage;
+                const boughtCurrency = buyingPower / rate;
+                
+                balance += boughtCurrency;
+            }
+
+            const lotCount = (balance / 10000).toFixed(2);
+            const eoyDailySwap = balance * currentSwapPerUnit;
+            const yearlySwapEst = monthlySwap * 12; // 当月の獲得ペースを基準にした年間換算
+            const assetValue = totalPrincipal + cumulativeSwap;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="text-align:center; font-weight:bold;">${m}ヶ月目<br><span style="font-size: 11px; color: #7f8c8d; font-weight:normal;">(${currentYear}年目)</span></td>
+                <td>${formatNumber(balance)}</td>
+                <td>${lotCount}</td>
+                <td>${formatNumber(totalPrincipal)}</td>
+                <td>${formatNumber(eoyDailySwap)}</td>
+                <td>${formatNumber(monthlySwap)}</td>
+                <td>${formatNumber(yearlySwapEst)}</td>
+                <td style="font-weight:bold; color:#27ae60;">${formatNumber(assetValue)}</td>
+            `;
+            tbody.appendChild(tr);
+        }
+    }
+
+    // 初期表示時に1回計算を実行する
+    window.onload = calculate;
+</script>
+
+</body>
+</html>

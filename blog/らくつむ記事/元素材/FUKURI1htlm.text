@@ -1,0 +1,110 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from ipywidgets import interact, widgets
+
+# シミュレーション関数
+def run_fx_simulation(initial_capital, monthly_deposit, leverage, swap_0, swap_decay, fx_0, fx_decay):
+    compound = True
+    initial_lot = 10
+    years = 15
+    days = years * 365
+    daily_deposit = monthly_deposit / 30
+
+    maintenance_rules = [
+        (150, 1), (175, 1), (200, 1), (225, 1), (250, 1), (275, 1), (300, 1),
+        (325, 1), (350, 1), (375, 1), (400, 1), (450, 2), (500, 2), (600, 3),
+        (700, 3), (800, 5)
+    ]
+
+    capital = initial_capital
+    lot = initial_lot
+    swap_stock = 0.0
+    principal_total = 0.0
+    fx_rate = fx_0
+    fx_decay_day = (fx_decay / 100) / 365
+    records = []
+
+    for d in range(days):
+        year_index = d // 365
+        swap_per_10k_day = swap_0 * ((1 - (swap_decay / 100)) ** year_index)
+        
+        if d > 0:
+            fx_rate *= (1 + fx_decay_day)
+
+        capital += daily_deposit
+        principal_total += daily_deposit
+        swap_day = lot * swap_per_10k_day
+
+        if compound:
+            capital += swap_day
+            swap_stock += swap_day
+        else:
+            swap_stock += swap_day
+
+        margin_need = lot * 10000 * fx_rate / leverage
+        maintenance_rate = (capital / margin_need) * 100
+
+        for threshold, add_lot in sorted(maintenance_rules):
+            while maintenance_rate >= threshold:
+                lot += add_lot
+                margin_need = lot * 10000 * fx_rate / leverage
+                maintenance_rate = (capital / margin_need) * 100
+
+        records.append([d, fx_rate, capital, lot, swap_day, swap_stock, principal_total, maintenance_rate, swap_per_10k_day])
+
+    df = pd.DataFrame(records, columns=["day", "fx_rate", "capital", "lot", "swap_day", "swap_stock", "principal_total", "maintenance_rate", "swap_unit"])
+    df["month"] = df["day"] // 30
+    
+    monthly = df.groupby("month").agg({
+        "capital": "last", "lot": "last", "principal_total": "last", 
+        "swap_stock": "last", "swap_day": "mean", "maintenance_rate": "last"
+    }).reset_index()
+    
+    monthly["swap_month"] = df.groupby("month")["swap_day"].sum().values
+    monthly["nav"] = monthly["capital"] + monthly["swap_stock"]
+
+    # 結果の表示
+    final = monthly.iloc[-1]
+    print(f"=== 15年後の最終結果 ===")
+    print(f"■ 最終運用資金 (Capital): {final['capital']:,.0f} 円")
+    print(f"■ 最終ロット数 (Lot Size): {final['lot']:,.0f} ロット")
+    print(f"■ 自腹の累計積立額 (Principal): {final['principal_total']:,.0f} 円")
+    print(f"■ 最後の月の月間スワップ収入: {final['swap_month']:,.0f} 円\n")
+
+    # グラフの描画
+    fig, axs = plt.subplots(2, 1, figsize=(10, 8))
+    
+    # グラフ1: 資金推移
+    axs[0].plot(monthly['month'], monthly['capital'], label='運用資金 (Capital)', color='blue')
+    axs[0].plot(monthly['month'], monthly['principal_total'] + initial_capital, label='累計元本 (Principal)', color='orange', linestyle='--')
+    axs[0].set_title('資金と元本の成長推移 (15年間)')
+    axs[0].set_xlabel('経過月数')
+    axs[0].set_ylabel('円')
+    axs[0].legend()
+    axs[0].grid(True)
+    axs[0].yaxis.set_major_formatter(plt.matplotlib.ticker.StrMethodFormatter('{x:,.0f}'))
+
+    # グラフ2: ロット数と維持率
+    ax2 = axs[1].twinx()
+    axs[1].plot(monthly['month'], monthly['lot'], label='ロット数 (Lot)', color='green')
+    ax2.plot(monthly['month'], monthly['maintenance_rate'], label='維持率 (Maintenance %)', color='red', alpha=0.4)
+    axs[1].set_title('ロット数と証拠金維持率の推移')
+    axs[1].set_xlabel('経過月数')
+    axs[1].set_ylabel('ロット数', color='green')
+    ax2.set_ylabel('維持率 (%)', color='red')
+    axs[1].grid(True)
+    
+    plt.tight_layout()
+    plt.show()
+
+# インタラクティブUIの設定
+interact(run_fx_simulation,
+         initial_capital=widgets.IntSlider(min=100000, max=5000000, step=100000, value=1000000, description='初期資金(円)'),
+         monthly_deposit=widgets.IntSlider(min=0, max=200000, step=5000, value=30000, description='毎月積立(円)'),
+         leverage=widgets.IntSlider(min=1, max=25, step=1, value=10, description='レバ'),
+         swap_0=widgets.IntSlider(min=10, max=200, step=5, value=50, description='初期スワップ'),
+         swap_decay=widgets.FloatSlider(min=0.0, max=20.0, step=0.5, value=5.0, description='スワップ低下率%'),
+         fx_0=widgets.FloatSlider(min=5.0, max=150.0, step=0.5, value=18.0, description='初期為替レート'),
+         fx_decay=widgets.FloatSlider(min=-10.0, max=10.0, step=0.5, value=-2.0, description='為替変動率%')
+);

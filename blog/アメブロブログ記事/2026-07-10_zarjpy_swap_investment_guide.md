@@ -1,5 +1,5 @@
 ---
-status: 下書き
+status: 公開済み
 tags:
   - 南アフリカランド
   - ZARJPY
@@ -7,6 +7,8 @@ tags:
   - 高金利通貨
 date: 2026-07-10
 account: rational-lab
+url: "https://ameblo.jp/rational-lab/entry-12972329501.html"
+entry_id: "12972329501"
 ---
 
 【2026年最新版】南アフリカランド円の長期スワップ運用ガイド——「安定志向の高金利通貨」を過去・現在・未来データで徹底解説

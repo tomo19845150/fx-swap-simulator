@@ -8,6 +8,8 @@ account: rational-lab
 url: "https://ameblo.jp/rational-lab/entry-12971061120.html"
 entry_id: "12971061120"
 likes: 2
+pv_30d: 18
+pv_checked: 2026-07-12
 ---
 
 # 高金利通貨のスワップ運用の合理的観測！高金利通貨の特徴をAIで比較

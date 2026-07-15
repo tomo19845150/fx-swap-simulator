@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FXスワップ運用シミュレーター Pro（通貨プリセット・AI予測対応版）</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; }
+        .container { max-width: 1500px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size: 28px; text-align: center; color: #fff; background-color: #2980b9; padding: 16px 20px; border-radius: 6px; margin-bottom: 20px; letter-spacing: 2px; }
+        h1 small { display: block; font-size: 13px; font-weight: normal; letter-spacing: normal; margin-top: 6px; opacity: 0.9; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .input-group { display: flex; flex-direction: column; }
+        .input-group > label { min-height: 2.6em; line-height: 1.3; display: block; }
+        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select { padding: 10px; font-size: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        select { background-color: #fff; cursor: pointer; }
+        button { background-color: #3498db; color: #fff; border: none; padding: 15px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; margin-bottom: 20px; }
+        button:hover { background-color: #2980b9; }
+        .table-wrapper { overflow-x: auto; max-height: 600px; border: 1px solid #ddd; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+        thead { position: sticky; top: 0; background-color: #2c3e50; color: #fff; z-index: 10; }
+        th, td { border: 1px solid #ddd; padding: 5px 4px; text-align: center; }
+        th { text-align: center; font-weight: normal; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover td { background-color: #d6eaf8 !important; cursor: default; }
+        .dsw-val { font-weight: bold; color: #e74c3c; }
+        .note { font-size: 12px; color: #7f8c8d; margin-top: 15px; line-height: 1.8; }
+
+        .asset-header { background-color: #27ae60 !important; font-weight: bold !important; }
+        .asset-val { font-weight: bold; color: #333; background-color: #f4faf6; }
+        .maintenance-header { background-color: #e67e22 !important; font-weight: bold !important; }
+        .maintenance-val { font-weight: bold; color: #d35400; background-color: #fffaf5; text-align: center; }
+        .maintenance-safe { font-weight: bold; color: #000; background-color: #fffaf5; text-align: center; }
+        .maintenance-blue { font-weight: bold; color: #2980b9; background-color: #fffaf5; text-align: center; }
+        .leverage-header { background-color: #3498db !important; font-weight: bold !important; }
+        .losscut-header { background-color: #c0392b !important; font-weight: bold !important; }
+        .leverage-val { font-weight: bold; color: #2980b9; background-color: #f4f9fd; text-align: center; }
+        .highlight-col { font-weight: bold; color: #e74c3c; background-color: #fdf5f5; }
+        .margin-warn  { font-weight: bold; color: #fff; background-color: #e74c3c; }
+        .loss-cut-hit    { font-weight: bold; color: #fff; background-color: #c0392b; letter-spacing: 1px; }
+        .capital-zero    { font-weight: bold; color: #fff; background-color: #e74c3c; }
+        .lev-danger { font-weight: bold; color: #fff; background-color: #e74c3c; }
+        .lev-pink   { font-weight: bold; color: #c0392b; background-color: #ffd6e0; }
+        .month-col { text-align: center; background-color: #ecf0f1; font-weight: bold; }
+        .fx-profit { font-weight: bold; color: #2980b9; background-color: #f4faf6; }
+        .fx-loss   { font-weight: bold; color: #e74c3c; background-color: #fdf5f5; }
+        .fx-zero   { font-weight: bold; color: #888;    background-color: #f9f9f9; }
+        .real-asset-val { font-weight: bold; color: #333; background-color: #eaf4fb; }
+
+        .rate-section { background-color: #f0f4ff; border: 1px solid #b0c4de; border-radius: 6px; padding: 15px; margin-bottom: 20px; }
+        .rate-section h3, .swap-section h3, .ai-section h3, .log-section h3 { font-size: 14px; color: #2c3e50; margin: 0 0 12px 0; }
+        #rateChart { width: 100%; height: 130px; border: 1px solid #ccc; border-radius: 4px; background: #fff; display: block; margin-top: 12px; }
+
+        .swap-section { background-color: #fff7ec; border: 1px solid #e2c08d; border-radius: 6px; padding: 15px; margin-bottom: 20px; }
+        .horizon-section { background-color: #eef6fb; border: 1px solid #a9cce3; border-radius: 6px; padding: 15px; margin-bottom: 20px; }
+        .horizon-section h3 { font-size: 14px; color: #2c3e50; margin: 0 0 12px 0; }
+        .horizon-section table { font-size: 13px; }
+        .horizon-section th { background: #2980b9; color: #fff; }
+        .horizon-section .apply-horizon-btn { background-color: #2980b9; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; width: auto; margin: 0; }
+        .horizon-section .apply-horizon-btn:hover { background-color: #1f6391; }
+
+        .preset-section { background-color: #eafaf1; border: 1px solid #82c99a; border-radius: 6px; padding: 15px; margin-bottom: 20px; }
+        .preset-section .input-grid { margin-bottom: 0; }
+
+        .chart-section { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 20px; display: none; }
+        .chart-section h3 { font-size: 14px; color: #2c3e50; margin: 0 0 10px 0; }
+        #capitalChart { width: 100%; height: 260px; display: block; }
+        .chart-series-picker { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: #444; }
+        .chart-series-picker label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+        .btn-toggle { background-color: #27ae60; color: #fff; border: none; padding: 15px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; margin-bottom: 10px; }
+        .btn-toggle:hover { background-color: #219a52; }
+        .btn-toggle.off { background-color: #95a5a6; }
+        .btn-toggle.off:hover { background-color: #7f8c8d; }
+
+        /* AI予測パネル */
+        .ai-section { background-color: #f5f0ff; border: 1px solid #b39ddb; border-radius: 6px; padding: 15px; margin-bottom: 20px; }
+        .ai-badge { display: inline-block; background: #7e57c2; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 12px; margin-bottom: 10px; letter-spacing: 1px; }
+        .ai-probs { display: flex; gap: 10px; margin: 12px 0; }
+        .ai-prob-box { flex: 1; text-align: center; padding: 12px 8px; border-radius: 6px; }
+        .ai-prob-up { background: #e8f6ef; border: 1px solid #27ae60; }
+        .ai-prob-neutral { background: #f4f4f4; border: 1px solid #bbb; }
+        .ai-prob-down { background: #fdeceb; border: 1px solid #e74c3c; }
+        .ai-prob-label { font-size: 12px; color: #555; margin-bottom: 4px; }
+        .ai-prob-val { font-size: 22px; font-weight: bold; }
+        .ai-prob-up .ai-prob-val { color: #27ae60; }
+        .ai-prob-neutral .ai-prob-val { color: #777; }
+        .ai-prob-down .ai-prob-val { color: #e74c3c; }
+        .ai-reason { font-size: 13px; line-height: 1.8; color: #444; background: #fff; border-radius: 4px; padding: 12px; border: 1px solid #ddd; margin-bottom: 10px; }
+        .ai-disclaimer { font-size: 11px; color: #8e44ad; background: #fff; border: 1px dashed #b39ddb; border-radius: 4px; padding: 8px 10px; margin-bottom: 10px; }
+        .ai-apply-btn { background-color: #7e57c2; }
+        .ai-apply-btn:hover { background-color: #6a44b0; }
+
+        /* 予測ログ */
+        .log-section { background-color: #fafafa; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 20px; }
+        .log-section table { font-size: 12px; }
+        .log-section th { background: #34495e; color: #fff; }
+        .log-pending { color: #999; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>FXスワップ運用シミュレーター Pro
+        <small>合理的生活と投資の実験室（Blogger版）— 通貨プリセット切替・AI予測参考パネル搭載</small>
+    </h1>
+
+    <!-- 通貨プリセット -->
+    <div class="preset-section">
+        <h3>通貨ペアを選択（初期値・AI予測パネルが自動で切り替わります）</h3>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>通貨ペア</label>
+                <select id="currencyPreset" onchange="applyPreset()">
+                    <option value="usdjpy">米ドル／円（USD/JPY）</option>
+                    <option value="gbpjpy">英ポンド／円（GBP/JPY）</option>
+                    <option value="audjpy">豪ドル／円（AUD/JPY）</option>
+                    <option value="tryjpy">トルコリラ／円（TRY/JPY）</option>
+                    <option value="mxnjpy">メキシコペソ／円（MXN/JPY）</option>
+                    <option value="zarjpy">南アフリカランド／円（ZAR/JPY）</option>
+                    <option value="hufjpy">ハンガリーフォリント／円（HUF/JPY）</option>
+                    <option value="chftry">スイスフラン／トルコリラ（CHF/TRY）</option>
+                    <option value="chfmxn">スイスフラン／メキシコペソ（CHF/MXN）</option>
+                    <option value="chfzar">スイスフラン／南アフリカランド（CHF/ZAR）</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-grid">
+        <div class="input-group">
+            <label>運用方法</label>
+            <select id="reinvestMode" onchange="document.getElementById('reinvestLevGroup').style.display = this.value === 'compound' ? '' : 'none'">
+                <option value="compound">複利（スワップを再投資）</option>
+                <option value="simple">単利（スワップを貯める）</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>ポジション方向（シミュレーションで使う方向）</label>
+            <select id="positionSide" onchange="updatePositionSideUI()">
+                <option value="buy">買い</option>
+                <option value="sell">売り</option>
+            </select>
+            <span style="font-size:11px;color:#888;margin-top:3px" id="positionSideAiNote"></span>
+        </div>
+        <div class="input-group">
+            <label>初期の口座資金 (円)</label>
+            <input type="number" id="initialCapital" value="1000000" step="10000" onchange="applyRecommendedLots()">
+        </div>
+        <div class="input-group">
+            <label>初期ロット数</label>
+            <input type="number" id="lots" value="100" step="0.01" min="0.01">
+            <span style="font-size:11px;color:#888;margin-top:3px" id="lotsAiNote"></span>
+        </div>
+        <div class="input-group" id="reinvestLevGroup">
+            <label>再投資レバレッジ (倍) ※複利時</label>
+            <input type="number" id="reinvestLev" value="8" step="0.1" min="0" oninput="updateLeverageRiskBadge()">
+            <span style="font-size:11px;color:#888;margin-top:3px" id="reinvestLevAiNote">0 = ロット数固定（再投資なし）</span>
+            <div id="leverageRiskBadge" style="margin-top:5px; font-size:12px; font-weight:bold; padding:5px 8px; border-radius:4px; display:inline-block;"></div>
+        </div>
+        <div class="input-group" style="grid-column: 1 / -1;" id="leverageDisclaimerGroup">
+            <div style="font-size:12px; color:#555; background:#f4f4f4; border:1px solid #ddd; border-radius:4px; padding:8px 10px; margin-bottom:6px;">
+                🔰 上記はAIが判断した推奨値であり、絶対的なルールではありません。証拠金維持率の監視・追加入金・早めの決済判断など、ご自身でロスカット管理を徹底できる方であれば、推奨値より高いレバレッジで運用すること自体は問題ありません。
+            </div>
+            <div style="font-size:12px; color:#a94442; background:#fdf3f2; border:1px dashed #e2a29b; border-radius:4px; padding:8px 10px;">
+                ⚠️ ただし、地政学リスク等による急激な為替変動（窓開け・フラッシュクラッシュ）が起きると、システムのロスカット処理が間に合わず証拠金を超える損失が発生する可能性があります（ゼロカット制度に対応していない国内FX会社では、超過分の追加証拠金＝追証が発生するリスクがあります）。レバレッジを上げるほどこのリスクは大きくなります。
+            </div>
+        </div>
+        <div class="input-group">
+            <label>1ロットの通貨単位</label>
+            <input type="number" id="unitsPerLot" value="10000" step="1000" onchange="applyRecommendedLots()">
+        </div>
+        <div class="input-group">
+            <label>買いスワップ (円/ロット/日・0.1単位)</label>
+            <input type="number" id="swapPerLot" value="21.0" step="0.1" oninput="updatePositionSideUI()">
+        </div>
+        <div class="input-group">
+            <label>売りスワップ (概算予測値・円/ロット/日・0.1単位)</label>
+            <input type="number" id="sellSwapDisplay" value="-21.0" step="0.1" oninput="updatePositionSideUI()">
+        </div>
+        <div class="input-group" style="grid-column: 1 / -1;">
+            <span style="font-size:13px;font-weight:bold;color:#2c3e50;" id="activeSwapNote"></span>
+        </div>
+        <div class="input-group" style="grid-column: 1 / -1;">
+            <span style="font-size:11px;color:#888;" id="swapSourceLabel"></span>
+        </div>
+        <div class="input-group" style="grid-column: 1 / -1;">
+            <div style="font-size:12px; color:#a94442; background:#fdf3f2; border:1px dashed #e2a29b; border-radius:4px; padding:8px 10px;">
+                ⚠️ 買い・売りスワップはいずれも概算の参考値です。実際にFX会社各社が提示する数値とは乖離する場合があります。取引・投資判断の前には、必ず各FX会社の公式サイト・取引アプリ等でご自身にて最新の数値をご確認ください。<br>
+                💡 実際に該当通貨ペアで取引をされている方は、この参考値ではなく、ご自身の口座で表示されている実際のスワップポイントを入力されることを強くおすすめします。
+            </div>
+        </div>
+        <div class="input-group">
+            <label>レバレッジ 最大(倍)</label>
+            <input type="number" id="marginRate" value="25" step="1" min="1">
+        </div>
+        <div class="input-group">
+            <label>シミュレーション期間 (ヶ月)</label>
+            <input type="number" id="months" value="24" step="1" min="1" max="120">
+        </div>
+    </div>
+
+    <!-- スワップポイント変動設定 -->
+    <div class="swap-section">
+        <h3>スワップポイント変動設定（年率・0.1単位で調整可）</h3>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>スワップ上昇確率 (%)</label>
+                <input type="number" id="swapUpProb" value="20" step="0.1" min="0" max="100" oninput="document.getElementById('swapDownProbDisplay').textContent = (100 - parseFloat(this.value || 0)).toFixed(1)">
+            </div>
+            <div class="input-group">
+                <label>スワップ下落確率 (%・自動計算)</label>
+                <div style="padding:10px;font-size:15px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;box-sizing:border-box;">
+                    <span id="swapDownProbDisplay">80.0</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>スワップ上昇時の年率変化 (%)</label>
+                <input type="number" id="swapUpRate" value="3.0" step="0.1" min="0">
+            </div>
+            <div class="input-group">
+                <label>スワップ下落時の年率変化 (%)</label>
+                <input type="number" id="swapDownRate" value="12.0" step="0.1" min="0">
+            </div>
+        </div>
+        <p class="note" style="margin-top:10px;">※ 上昇確率と下落確率を織り込んだ期待変化率で、スワップポイントが指数的に年々変動する前提で計算します（金利差縮小・拡大の両シナリオを反映可能）。</p>
+    </div>
+
+    <!-- 為替レート範囲設定 -->
+    <div class="rate-section">
+        <h3>為替レート設定</h3>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>初期レート (円/通貨)</label>
+                <input type="number" id="initialRate" value="3.47" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>最小レート (円)　※下限</label>
+                <input type="number" id="minRate" value="3.1" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>最大レート (円)　※上限</label>
+                <input type="number" id="maxRate" value="3.5" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>変動モード</label>
+                <select id="rateMode" onchange="updateRateModeUI()">
+                    <option value="random">ランダムウォーク</option>
+                    <option value="gradual">ゆるやか変動</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>最終目標レート (円)</label>
+                <input type="number" id="targetRate" value="3.2" step="0.01">
+                <span style="font-size:11px;color:#888;margin-top:3px">期間終了時に収束するレート</span>
+            </div>
+            <div class="input-group" id="upProbGroup">
+                <label>上昇確率 (%・0.1単位)</label>
+                <input type="number" id="upProb" value="20.0" step="0.1" min="0" max="100" oninput="document.getElementById('downProbDisplay').textContent = (100 - parseFloat(this.value || 0)).toFixed(1)">
+            </div>
+            <div class="input-group" id="downProbGroup">
+                <label>下降確率 (%・自動計算)</label>
+                <div style="padding:10px;font-size:15px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;box-sizing:border-box;">
+                    <span id="downProbDisplay">80.0</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>上昇時の月次変動幅 (%・0.1単位)</label>
+                <input type="number" id="upMovePct" value="1.2" step="0.1" min="0.1">
+            </div>
+            <div class="input-group">
+                <label>下落時の月次変動幅 (%・0.1単位)</label>
+                <input type="number" id="downMovePct" value="1.8" step="0.1" min="0.1">
+            </div>
+        </div>
+        <canvas id="rateChart"></canvas>
+    </div>
+
+    <!-- 期間別 参考値プレビュー -->
+    <div class="horizon-section">
+        <h3>期間別 参考値プレビュー（現在の設定から自動算出）</h3>
+        <div class="table-wrapper">
+            <table id="horizonTable">
+                <thead>
+                    <tr>
+                        <th>期間</th>
+                        <th>参考初期レート (円)</th>
+                        <th>参考最小レート (円)</th>
+                        <th>参考最大レート (円)</th>
+                        <th>参考最終目標レート (円)</th>
+                        <th>参考スワップ (円/ロット/日)</th>
+                        <th>累積スワップ変化率</th>
+                        <th>反映</th>
+                    </tr>
+                </thead>
+                <tbody id="horizonTableBody"></tbody>
+            </table>
+        </div>
+        <p class="note">※ 12ヶ月分はAI予測パネルの見通しをそのまま使用。24ヶ月超は現在のレート想定・スワップ変化率・ボラティリティ（期間の平方根に比例してレンジが拡大する一般的な考え方）を単純に延長した参考値であり、期間が長くなるほど不確実性は高まります（投資助言ではありません）。「反映」ボタンを押すと「初期レート」「最小レート」「最大レート」「最終目標レート」「シミュレーション期間」欄がすべてその期間の参考値に切り替わります — その後も自由に数値を編集できます。これらの参考値はAIがその時点の情報を元に判断したものであり、毎月または更新のタイミングごとにAIが再判断して値を見直します（更新頻度は状況により前後します）。</p>
+        <button onclick="renderHorizonTable()" style="background-color:#95a5a6;">スワップ欄の現在値で参考値を再計算</button>
+    </div>
+
+    <!-- AI予測パネル -->
+    <div class="ai-section" id="aiSection">
+        <span class="ai-badge">AI予測（参考情報）</span>
+        <h3 id="aiTitle">トルコリラ／円 — 今後1年の見通し</h3>
+        <div class="ai-probs">
+            <div class="ai-prob-box ai-prob-up">
+                <div class="ai-prob-label">上昇確率</div>
+                <div class="ai-prob-val" id="aiUpVal">20%</div>
+            </div>
+            <div class="ai-prob-box ai-prob-neutral">
+                <div class="ai-prob-label">中立</div>
+                <div class="ai-prob-val" id="aiNeutralVal">30%</div>
+            </div>
+            <div class="ai-prob-box ai-prob-down">
+                <div class="ai-prob-label">下落確率</div>
+                <div class="ai-prob-val" id="aiDownVal">50%</div>
+            </div>
+        </div>
+        <div class="ai-reason" id="aiReason"></div>
+        <div class="ai-disclaimer">
+            ※ この予測はAIが過去のレート推移・現時点のファンダメンタルズ（金利政策・インフレ動向・地政学リスク等）をもとに判断した参考情報です。将来の相場・成果を保証するものではなく、投資判断は自己責任でお願いします。信じるか信じないかも含め、判断は読者ご自身に委ねられます。<br><br>
+            ※ 参考値・スワップ水準・AI予測は、原則として月1回〜数か月に一度の頻度で見直し・更新を予定しています。ただし、大幅な地政学リスクの発生や金融政策・ファンダメンタルズの急変があった場合は、更新のタイミングや頻度が予定通りにならないことがあります（毎月必ず更新されることを保証するものではありません）。
+        </div>
+        <button class="ai-apply-btn" onclick="applyAiPrediction()">この予測値をシミュレーターに反映する</button>
+    </div>
+
+    <button onclick="simulate()">シミュレーション実行</button>
+    <button class="btn-toggle off" id="chartToggleBtn" onclick="toggleCapitalChart()">📈 推移グラフ　OFF</button>
+
+    <div class="chart-section" id="chartSection">
+        <h3>推移グラフ（棒グラフ・複数指標を重ねて表示可）</h3>
+        <div class="chart-series-picker" id="chartSeriesPicker">
+            <label><input type="checkbox" value="capital" checked onchange="drawBarChart()"> 口座資産</label>
+            <label><input type="checkbox" value="effEquity" onchange="drawBarChart()"> 実質資産</label>
+            <label><input type="checkbox" value="rate" onchange="drawBarChart()"> 為替レート</label>
+            <label><input type="checkbox" value="marginRatio" onchange="drawBarChart()"> 維持率</label>
+            <label><input type="checkbox" value="leverage" onchange="drawBarChart()"> 実効レバレッジ</label>
+            <label><input type="checkbox" value="lots" onchange="drawBarChart()"> 保有ロット数</label>
+            <label><input type="checkbox" value="dsw" onchange="drawBarChart()"> 1DSW（1日スワップ）</label>
+            <label><input type="checkbox" value="ysw" onchange="drawBarChart()"> 1YSW（1年スワップ）</label>
+            <label><input type="checkbox" value="lossCutRate" onchange="drawBarChart()"> ロスカットレート</label>
+        </div>
+        <p class="note" style="margin-top:6px;">※ 各指標は単位が異なるため、それぞれの最大値を100%とした相対スケールで棒グラフを重ねて表示します（実際の数値は凡例に表示）。</p>
+        <div style="position:relative;">
+            <canvas id="capitalChart"></canvas>
+            <div id="chartTooltip" style="display:none; position:absolute; pointer-events:none; background:rgba(30,30,30,0.9); color:#fff; padding:6px 10px; border-radius:4px; font-size:11px; line-height:1.6; white-space:nowrap; z-index:10;"></div>
+        </div>
+        <div id="chartLegend" style="font-size:12px; margin-top:8px; line-height:1.8;"></div>
+    </div>
+
+    <div id="result"></div>
+    <p class="note" id="notes"></p>
+
+    <!-- 予測ログ -->
+    <div class="log-section">
+        <h3>AI予測ログ（毎月更新・答え合わせ）</h3>
+        <div class="table-wrapper">
+            <table id="predictionLog">
+                <thead>
+                    <tr>
+                        <th>更新月</th>
+                        <th>通貨ペア</th>
+                        <th>上昇/中立/下落 予測</th>
+                        <th>根拠（要約）</th>
+                        <th>実際の結果</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2026-07</td>
+                        <td>TRY/JPY</td>
+                        <td>20% / 30% / 50%</td>
+                        <td>高インフレ持続・早期利下げ観測・日銀利上げ観測による金利差縮小</td>
+                        <td class="log-pending">来月更新予定</td>
+                    </tr>
+                    <tr>
+                        <td>2026-07</td>
+                        <td>MXN/JPY</td>
+                        <td>35% / 40% / 25%</td>
+                        <td>金利差下支え vs USMCA見直しリスク、レンジ想定</td>
+                        <td class="log-pending">来月更新予定</td>
+                    </tr>
+                    <tr>
+                        <td>2026-07</td>
+                        <td>ZAR/JPY</td>
+                        <td>30% / 40% / 30%</td>
+                        <td>SARB政策金利7.00%維持・構造リスク（電力・財政）と日銀利上げが拮抗、中立レンジ想定</td>
+                        <td class="log-pending">来月更新予定</td>
+                    </tr>
+                    <tr>
+                        <td>2026-07</td>
+                        <td>HUF/JPY</td>
+                        <td>30% / 45% / 25%</td>
+                        <td>MNB政策金利6.25%（EU最高水準）・利下げ観測もEU資金凍結解除期待で底堅さ優勢</td>
+                        <td class="log-pending">来月更新予定</td>
+                    </tr>
+                    <tr>
+                        <td>2026-07</td>
+                        <td>CHF/TRY</td>
+                        <td>40% / 45% / 15%</td>
+                        <td>SNB0.00%×トルコ37.00%の大金利差キャリー構造（買い-1,819.9円/売り+1,456.4円・1万通貨あたり）、トルコ早期利下げ観測でスワップ縮小リスクあり</td>
+                        <td class="log-pending">来月更新予定</td>
+                    </tr>
+                    <tr>
+                        <td>2026-07</td>
+                        <td>USD/JPY</td>
+                        <td>25% / 35% / 40%</td>
+                        <td>1986年以来の円安水準（162円台）到達後、為替介入警戒で急落する場面あり。日銀利上げ観測で金利差縮小方向</td>
+                        <td class="log-pending">来月更新予定</td>
+                    </tr>
+                    <tr>
+                        <td>2026-07</td>
+                        <td>GBP/JPY</td>
+                        <td>20% / 35% / 45%</td>
+                        <td>BOE3.75%（利下げ局面）×日銀利上げ観測で金利差縮小方向、スワップは縮小傾向を想定</td>
+                        <td class="log-pending">来月更新予定</td>
+                    </tr>
+                    <tr>
+                        <td>2026-07</td>
+                        <td>AUD/JPY</td>
+                        <td>35% / 40% / 25%</td>
+                        <td>RBA4.35%（インフレ高止まりで利上げ再開）×日銀利上げ観測、金利差は当面widerな見込み</td>
+                        <td class="log-pending">来月更新予定</td>
+                    </tr>
+                    <tr>
+                        <td>2026-07</td>
+                        <td>CHF/MXN</td>
+                        <td>40% / 45% / 15%</td>
+                        <td>SNB0.00%×メキシコ6.50%の金利差キャリー構造（買い-334.3円/売り+334.3円・概算）、USMCA見直しリスクあり</td>
+                        <td class="log-pending">来月更新予定</td>
+                    </tr>
+                    <tr>
+                        <td>2026-07</td>
+                        <td>CHF/ZAR</td>
+                        <td>40% / 45% / 15%</td>
+                        <td>SNB0.00%×南ア7.00%の金利差キャリー構造（買い-306.8円/売り+306.8円・概算）、電力・財政の構造リスクあり</td>
+                        <td class="log-pending">来月更新予定</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="note">※ 毎月の更新時に前月の予測と実際のレート推移を照合し、この表に答え合わせを追記していきます。</p>
+    </div>
+</div>
+
+<script>
+    let simHistory = { capital: [], effEquity: [], rate: [], marginRatio: [], leverage: [], lots: [], dsw: [], ysw: [], lossCutRate: [] };
+    let hoverIdx = -1;
+    let lastChartLayout = null;
+    const SERIES_META = {
+        capital:     { label: '口座資産',       color: '#27ae60', unit: '円' },
+        effEquity:   { label: '実質資産',       color: '#2980b9', unit: '円' },
+        rate:        { label: '為替レート',     color: '#e67e22', unit: '円' },
+        marginRatio: { label: '維持率',         color: '#8e44ad', unit: '%' },
+        leverage:    { label: '実効レバレッジ', color: '#c0392b', unit: '倍' },
+        lots:        { label: '保有ロット数',   color: '#16a085', unit: '' },
+        dsw:         { label: '1DSW（1日スワップ）', color: '#f39c12', unit: '円' },
+        ysw:         { label: '1YSW（1年スワップ）', color: '#d35400', unit: '円' },
+        lossCutRate: { label: 'ロスカットレート', color: '#7f0000', unit: '円' }
+    };
+
+    // 通貨プリセット定義（初期値 + AI予測パネルの内容）
+    const PRESETS = {
+        tryjpy: {
+            initialRate: 3.407, minRate: 3.10, maxRate: 3.50, targetRate: 3.20,
+            aiRecommendedLev: 3.0,
+            swapPerLot: 21.0, sellSwap: -21.0, favoredSide: '買い',
+            upProb: 20.0, upMovePct: 1.2, downMovePct: 1.8,
+            swapUpProb: 20.0, swapUpRate: 3.0, swapDownRate: 12.0,
+            swapSource: '36社平均（買い） ／ データ時点: 2026年7月10日（対象データは2026年6月分）／ 売りスワップは買いスワップからの概算値（各社差あり）',
+            aiTitle: 'トルコリラ／円 — 今後1年の見通し',
+            aiUp: 20, aiNeutral: 30, aiDown: 50,
+            aiReason: 'トルコ政策金利は37.00%（2026年6月会合で据え置き）と極めて高い水準を維持している一方、2026年6月消費者物価指数は前年比+32.11%と依然高インフレが続いています。トルコ財務相は早期利下げにリスクがあるとしつつも、市場では年内の利下げ観測がくすぶっており、実施されればスワップ縮小・リラ安圧力になりやすいと判断しています。加えて日銀は2026年後半（市場のメインシナリオは12月、早ければ9〜10月）に追加利上げに動くとの観測が強く、金利差縮小方向の圧力が続く見込みです。エルドアン政権の金融政策運営や地政学リスクも下振れ材料として残っており、総合的に下落確率をやや高めに見積もっています。'
+        },
+        mxnjpy: {
+            initialRate: 9.25, minRate: 9.00, maxRate: 9.45, targetRate: 9.30,
+            aiRecommendedLev: 5.0,
+            swapPerLot: 13.4, sellSwap: -13.4, favoredSide: '買い',
+            upProb: 35.0, upMovePct: 1.0, downMovePct: 1.1,
+            swapUpProb: 30.0, swapUpRate: 4.0, swapDownRate: 6.0,
+            swapSource: '36社平均（買い） ／ データ時点: 2026年7月10日更新（対象データは2026年6月分）／ 売りスワップは買いスワップからの概算値（各社差あり）',
+            aiTitle: 'メキシコペソ／円 — 今後1年の見通し',
+            aiUp: 35, aiNeutral: 40, aiDown: 25,
+            aiReason: 'メキシコ中央銀行は2026年6月25日の会合で政策金利6.50%への据え置きを全会一致で決定しており、対円金利差による下支えは当面続く見込みです。一方で2026年7月に見直し時期を迎えるUSMCA（米墨加協定）の交渉動向が通商リスクとして上値を抑える要因になっており、方向感が出にくいレンジ〜やや底堅い展開を想定しています。日銀の追加利上げ観測（2026年後半）は金利差縮小要因ですが、トルコリラのケースほど急激な差ではないため、下落確率はトルコリラ／円より低めに見積もっています。'
+        },
+        zarjpy: {
+            initialRate: 9.90, minRate: 9.60, maxRate: 10.20, targetRate: 9.80,
+            aiRecommendedLev: 4.0,
+            swapPerLot: 14.0, sellSwap: -14.0, favoredSide: '買い',
+            upProb: 30.0, upMovePct: 1.3, downMovePct: 1.5,
+            swapUpProb: 30.0, swapUpRate: 3.5, swapDownRate: 8.0,
+            swapSource: '35社平均（買い） ／ データ時点: 2026年7月10日更新（対象データは2026年6月分）／ 売りスワップは買いスワップからの概算値（各社差あり）',
+            aiTitle: '南アフリカランド／円 — 今後1年の見通し',
+            aiUp: 30, aiNeutral: 40, aiDown: 30,
+            aiReason: '南アフリカ準備銀行（SARB）は政策金利7.00%を維持（2026年5月時点）しており、トルコリラほど極端ではないものの対円金利差は引き続き大きい状態です。トルコやメキシコと比べてインフレは相対的に落ち着いていますが、電力供給問題（ロードシェディング）や財政赤字といった構造的な国内リスクは残存しています。日銀の追加利上げ観測（2026年後半）による金利差縮小圧力は他の高金利通貨と共通の逆風です。突出した上振れ・下振れ材料が少ないため、中立レンジをやや厚めに見積もっています。'
+        },
+        hufjpy: {
+            initialRate: 0.522, minRate: 0.505, maxRate: 0.540, targetRate: 0.515,
+            aiRecommendedLev: 6.0,
+            swapPerLot: 0.8, sellSwap: -0.8, favoredSide: '買い',
+            upProb: 30.0, upMovePct: 1.0, downMovePct: 1.0,
+            swapUpProb: 25.0, swapUpRate: 2.5, swapDownRate: 7.0,
+            swapSource: '15社平均（買い） ／ データ時点: 2026年7月10日 ／ 売りスワップは買いスワップからの概算値（一部業者は買い・売り同額の一本値）',
+            aiTitle: 'ハンガリーフォリント／円 — 今後1年の見通し',
+            aiUp: 30, aiNeutral: 45, aiDown: 25,
+            aiReason: 'ハンガリー国立銀行（MNB）の政策金利は6.25%（2026年6月時点）とEU加盟国の中でも最高水準です。市場では利下げ観測もありますが、EU資金凍結解除に向けた進展期待もあってフォリントは相対的に底堅く推移するとの見方が優勢です。他の高金利通貨に比べてボラティリティが低めな傾向があり、レンジ想定を中心に据えています。日銀の追加利上げは他通貨同様に金利差縮小要因ですが、フォリント自体の対円レート水準が低い（1フォリント＝0.5円前後）ため、円換算での変動インパクトは相対的に小さくなります。'
+        },
+        chftry: {
+            initialRate: 201.0, minRate: 190.0, maxRate: 212.0, targetRate: 198.0,
+            aiRecommendedLev: 2.0,
+            swapPerLot: -1819.9, sellSwap: 1456.4, favoredSide: '売り',
+            upProb: 40.0, upMovePct: 1.5, downMovePct: 1.5,
+            swapUpProb: 15.0, swapUpRate: 3.0, swapDownRate: 15.0,
+            swapSource: '5社平均（買い・売り） ／ データ時点: 2026年7月7日（1社のみ7月2日時点）／ 円換算1万通貨あたり（買いスワップは2026年6月の月間累計を日割り概算、売りスワップは各社公表の1日分実測値の平均）／ ※本シミュレーターの「為替レート」欄はCHF/JPY換算値を使用（実際のCHF/TRY建てレートとは別の値です）',
+            aiTitle: 'スイスフラン／トルコリラ（CHF/TRY） — 今後1年の見通し（他4通貨・旧CHF/JPYとも異なる構造）',
+            aiUp: 40, aiNeutral: 45, aiDown: 15,
+            aiReason: 'スイス国立銀行（SNB）は政策金利0.00%を3会合連続で維持（2026年6月時点）している一方、トルコ中央銀行の政策金利は37.00%（2026年6月据え置き）と、極めて大きな金利差が生まれています。この差を狙い「低金利のCHFを売り、高金利のTRYを買う」CHF/TRYは、国内FX会社5社が取り扱っています（2026年7月時点）。スワップ額が他4通貨ペアより桁違いに大きいのは、CHF自体の単位価値が高く、1ロット（1万通貨）あたりの想定元本がトルコリラ建てポジションよりずっと大きいためです。ただしトルコの高インフレ（2026年6月CPI+32.11%）を受けた早期利下げ観測がくすぶっており、実施されれば金利差縮小＝スワップ縮小に直結するリスクがあるため、スワップ下落方向をやや厚めに見積もっています。なお本シミュレーターの「為替レート」欄はCHF/JPY換算レートで資産評価する設計のため、実際のCHF/TRY建てレート変動そのもの（トルコリラ側の急落リスクなど）は反映されていない点にご留意ください。'
+        },
+        usdjpy: {
+            initialRate: 161.7, minRate: 155.0, maxRate: 163.5, targetRate: 158.0,
+            aiRecommendedLev: 4.0,
+            swapPerLot: 138.4, sellSwap: -163.8, favoredSide: '買い',
+            upProb: 30.0, upMovePct: 0.8, downMovePct: 0.9,
+            swapUpProb: 25.0, swapUpRate: 2.0, swapDownRate: 6.0,
+            swapSource: '13社平均（買い・売り） ／ データ時点: 2026年7月12日時点 ／ 円換算1万通貨あたり',
+            aiTitle: '米ドル／円 — 今後1年の見通し',
+            aiUp: 25, aiNeutral: 35, aiDown: 40,
+            aiReason: 'ドル円は2026年7月1日に162円台半ばと1986年以来の円安水準に達した後、政府・日銀による為替介入への警戒感から7月2〜3日には160.63円前後まで急落する場面がありました。日米金利差は依然大きくスワップは買い方に有利ですが、日銀の追加利上げ観測（2026年後半、メインシナリオは12月）が金利差縮小方向に作用するほか、行き過ぎた円安に対する当局の介入リスクも上値を抑える要因です。米国側もトランプ政権の政策運営を巡る不透明感があり、方向感を絞りにくいため下落方向をやや厚めに見積もっています。'
+        },
+        gbpjpy: {
+            initialRate: 216.8, minRate: 205.0, maxRate: 222.0, targetRate: 210.0,
+            aiRecommendedLev: 3.5,
+            swapPerLot: 173.8, sellSwap: -173.8, favoredSide: '買い',
+            upProb: 25.0, upMovePct: 1.0, downMovePct: 1.1,
+            swapUpProb: 20.0, swapUpRate: 2.0, swapDownRate: 8.0,
+            swapSource: '20社平均（買い） ／ データ時点: 2026年7月13日更新（対象データは2026年6月分）／ 売りスワップは買いスワップからの概算値（各社差あり）',
+            aiTitle: '英ポンド／円 — 今後1年の見通し',
+            aiUp: 20, aiNeutral: 35, aiDown: 45,
+            aiReason: 'イングランド銀行（BOE）は2026年6月18日会合で政策金利を3.75%に据え置きましたが、2023年8月の5.25%から段階的な利下げを続けてきた流れにあり、市場では年内さらに1回程度の追加利下げ観測も残っています。一方で日銀は2026年後半（メインシナリオは12月、早ければ9〜10月）に追加利上げに動くとの見方が強く、対円の金利差は縮小方向に向かいやすい構造です。ポンド円は2026年に入り212円台から217円前後まで上昇する場面もありましたが、金利差縮小とスワップ減少リスクを踏まえ、下落確率をやや高めに見積もっています。'
+        },
+        audjpy: {
+            initialRate: 112.3, minRate: 105.0, maxRate: 119.0, targetRate: 115.0,
+            aiRecommendedLev: 4.0,
+            swapPerLot: 111.65, sellSwap: -111.65, favoredSide: '買い',
+            upProb: 35.0, upMovePct: 1.0, downMovePct: 0.9,
+            swapUpProb: 40.0, swapUpRate: 4.0, swapDownRate: 6.0,
+            swapSource: '18社平均（買い） ／ データ時点: 2026年7月13日更新（対象データは2026年6月分）／ 売りスワップは買いスワップからの概算値（各社差あり）',
+            aiTitle: '豪ドル／円 — 今後1年の見通し',
+            aiUp: 35, aiNeutral: 40, aiDown: 25,
+            aiReason: 'オーストラリア準備銀行（RBA）は2026年に入りインフレ高止まり（2025年12月時点で消費者物価指数が前年比+3.8%、コアも+3.3%とRBAの目標を上回る水準）を受けて利上げに転じ、2026年6月時点の政策金利は4.35%となっています。市場では年内さらに1〜2回の追加利上げ観測もくすぶっており、日銀の利上げペースより速いペースで金利を引き上げる可能性があるため、対円の金利差はむしろ広がりやすい構造です。豪州経済は中国向け資源需要への感応度が高く、中国景気減速が下振れリスクとして残る点には留意が必要ですが、金利差の観点からは上昇・スワップ拡大方向をやや優勢と見積もっています。'
+        },
+        chfmxn: {
+            initialRate: 201.0, minRate: 190.0, maxRate: 212.0, targetRate: 198.0,
+            aiRecommendedLev: 2.0,
+            swapPerLot: -334.3, sellSwap: 334.3, favoredSide: '売り',
+            upProb: 40.0, upMovePct: 1.5, downMovePct: 1.5,
+            swapUpProb: 20.0, swapUpRate: 3.0, swapDownRate: 10.0,
+            swapSource: '4社平均（売りは実測値、買いは非公開のため売りスワップの符号反転概算値） ／ データ時点: 2026年7月3日（月間累計は2026年6月分）／ 円換算1万通貨あたり ／ ※本シミュレーターの「為替レート」欄はCHF/JPY換算値を使用（実際のCHF/MXN建てレートとは別の値です）',
+            aiTitle: 'スイスフラン／メキシコペソ（CHF/MXN） — 今後1年の見通し',
+            aiUp: 40, aiNeutral: 45, aiDown: 15,
+            aiReason: 'スイス国立銀行（SNB）は政策金利0.00%を維持している一方、メキシコ中央銀行は政策金利6.50%（2026年6月25日据え置き）と大きな金利差があり、CHF/MXNは「低金利のCHFを売り、高金利のMXNを買う」ことでスワップを狙う構造です。2026年7月に見直し時期を迎えるUSMCA（米墨加協定）の交渉動向が通商リスクとしてメキシコペソの上値・下値双方に影響しうる点には注意が必要です。CHF/TRYと同様、本シミュレーターの「為替レート」欄はCHF/JPY換算レートを使用しており、実際のCHF/MXN建てレート変動そのものは反映されていません。'
+        },
+        chfzar: {
+            initialRate: 201.0, minRate: 190.0, maxRate: 212.0, targetRate: 198.0,
+            aiRecommendedLev: 2.0,
+            swapPerLot: -306.8, sellSwap: 306.8, favoredSide: '売り',
+            upProb: 40.0, upMovePct: 1.5, downMovePct: 1.5,
+            swapUpProb: 25.0, swapUpRate: 3.0, swapDownRate: 9.0,
+            swapSource: '5社平均（売りは実測値、買いは非公開のため売りスワップの符号反転概算値） ／ データ時点: 2026年7月3日（月間累計は2026年6月分）／ 円換算1万通貨あたり ／ ※本シミュレーターの「為替レート」欄はCHF/JPY換算値を使用（実際のCHF/ZAR建てレートとは別の値です）',
+            aiTitle: 'スイスフラン／南アフリカランド（CHF/ZAR） — 今後1年の見通し',
+            aiUp: 40, aiNeutral: 45, aiDown: 15,
+            aiReason: 'スイス国立銀行（SNB）の政策金利0.00%に対し、南アフリカ準備銀行（SARB）は政策金利7.00%（2026年5月時点）と大きな金利差があり、CHF/ZARは「低金利のCHFを売り、高金利のZARを買う」ことでスワップを狙う構造です。電力供給問題（ロードシェディング）や財政赤字といった南アフリカの構造的リスクはZAR/JPY同様この通貨ペアにも影響します。CHF/TRY・CHF/MXNと同様、本シミュレーターの「為替レート」欄はCHF/JPY換算レートを使用しており、実際のCHF/ZAR建てレート変動そのものは反映されていません。'
+        }
+    };
+
+    function applyPreset() {
+        const key = document.getElementById('currencyPreset').value;
+        const p = PRESETS[key];
+        document.getElementById('initialRate').value = p.initialRate;
+        document.getElementById('minRate').value = p.minRate;
+        document.getElementById('maxRate').value = p.maxRate;
+        document.getElementById('targetRate').value = p.targetRate;
+        document.getElementById('swapPerLot').value = p.swapPerLot;
+        document.getElementById('sellSwapDisplay').value = p.sellSwap.toFixed(1);
+        document.getElementById('swapSourceLabel').textContent = p.swapSource + ' ／ 収益上有利なポジション: ' + p.favoredSide;
+        document.getElementById('positionSide').value = (p.favoredSide === '売り') ? 'sell' : 'buy';
+        updatePositionSideUI();
+        document.getElementById('upMovePct').value = p.upMovePct;
+        document.getElementById('downMovePct').value = p.downMovePct;
+        document.getElementById('swapUpRate').value = p.swapUpRate;
+        document.getElementById('swapDownRate').value = p.swapDownRate;
+
+        document.getElementById('aiTitle').textContent = p.aiTitle;
+        document.getElementById('aiUpVal').textContent = p.aiUp + '%';
+        document.getElementById('aiNeutralVal').textContent = p.aiNeutral + '%';
+        document.getElementById('aiDownVal').textContent = p.aiDown + '%';
+        document.getElementById('aiReason').textContent = p.aiReason;
+
+        document.getElementById('reinvestLev').value = p.aiRecommendedLev;
+        document.getElementById('reinvestLevAiNote').textContent = 'AI推奨値: ' + p.aiRecommendedLev + '倍（0 = ロット数固定・再投資なし）';
+        updateLeverageRiskBadge();
+
+        document.getElementById('initialCapital').value = 1000000;
+        applyRecommendedLots();
+
+        // AI予測欄はプリセット切替時点では未反映のまま。反映は明示的にボタンで行う。
+
+        renderHorizonTable();
+    }
+
+    // 初期ロット数を「初期資金 × AI推奨レバレッジ ÷ (1ロット通貨単位 × 初期レート)」で算出。
+    // 通貨ごとにレート水準が大きく異なる（例: CHF/TRYは約201円、TRY/JPYは約3.5円）ため、
+    // ロット数を固定値にすると通貨によって実効レバレッジが数十〜数百倍にズレてしまう問題への対処。
+    function applyRecommendedLots() {
+        const key = document.getElementById('currencyPreset').value;
+        const p = PRESETS[key];
+        const capital = parseFloat(document.getElementById('initialCapital').value) || 0;
+        const units   = parseFloat(document.getElementById('unitsPerLot').value) || 10000;
+        const rate    = p.initialRate;
+        const lots = Math.max(0.01, Math.floor((capital * p.aiRecommendedLev) / (units * rate) * 100) / 100);
+        document.getElementById('lots').value = lots;
+        document.getElementById('lotsAiNote').textContent =
+            `AI推奨レバレッジ（${p.aiRecommendedLev}倍）に基づく初期値。初期資金・通貨ペアを変更すると自動で再計算されます。`;
+    }
+
+    // 再投資レバレッジの危険度を色分け表示（AI推奨値との比率で連続的に緑→赤に変化させる）
+    function updateLeverageRiskBadge() {
+        const key = document.getElementById('currencyPreset').value;
+        const recommended = PRESETS[key].aiRecommendedLev;
+        const value = parseFloat(document.getElementById('reinvestLev').value) || 0;
+        const badge = document.getElementById('leverageRiskBadge');
+        const input = document.getElementById('reinvestLev');
+
+        if (value === 0) {
+            badge.textContent = '⚪ 再投資なし（ロット数固定）';
+            badge.style.background = '#eee';
+            badge.style.color = '#666';
+            input.style.borderColor = '#ccc';
+            return;
+        }
+
+        const ratio = value / recommended;
+        const excess = Math.max(0, ratio - 1);
+        const hue = Math.max(0, 120 - excess * 80); // 120=緑 → 0=赤（比率2.5倍で真っ赤）
+        const color = `hsl(${hue}, 70%, 40%)`;
+        const bg    = `hsl(${hue}, 70%, 94%)`;
+
+        let label;
+        if (ratio <= 1)        label = '🟢 AI推奨範囲内';
+        else if (ratio <= 1.5) label = '🟡 やや積極的（推奨の' + ratio.toFixed(1) + '倍）';
+        else if (ratio <= 2.5) label = '🟠 高リスク（推奨の' + ratio.toFixed(1) + '倍）';
+        else                   label = '🔴 危険水準（推奨の' + ratio.toFixed(1) + '倍）';
+
+        badge.textContent = label;
+        badge.style.background = bg;
+        badge.style.color = color;
+        input.style.borderColor = color;
+        input.style.borderWidth = '2px';
+    }
+
+    // ポジション方向（買い/売り）に応じて、シミュレーションで実際に使うスワップ値をハイライト表示
+    function updatePositionSideUI() {
+        const side = document.getElementById('positionSide').value;
+        const buySwap  = parseFloat(document.getElementById('swapPerLot').value) || 0;
+        const sellSwap = parseFloat(document.getElementById('sellSwapDisplay').value) || 0;
+        const note = document.getElementById('activeSwapNote');
+        const aiNote = document.getElementById('positionSideAiNote');
+
+        if (side === 'sell') {
+            note.textContent = `→ 現在「売り」でシミュレーションします。売りスワップ（${sellSwap.toFixed(1)}円/ロット/日）を使用し、損益は為替レート下落時にプラスになります。`;
+            aiNote.textContent = '「売り」＝レート下落で為替差益、レート上昇で為替差損';
+        } else {
+            note.textContent = `→ 現在「買い」でシミュレーションします。買いスワップ（${buySwap.toFixed(1)}円/ロット/日）を使用し、損益は為替レート上昇時にプラスになります。`;
+            aiNote.textContent = '「買い」＝レート上昇で為替差益、レート下落で為替差損';
+        }
+    }
+
+    // 期間別参考値: 12ヶ月はAI予測パネル（現在の初期/最小/最大/目標レート設定）をそのまま使用。
+    // 24ヶ月超は、1年時点のレンジ幅（初期レートからの上下差）をボラティリティのsqrt(年数)則で拡大し、
+    // 目標レートは1年間の変化率を線形延長した参考値（いずれも新しいレンジでクリップ）。
+    const HORIZON_MONTHS = [12, 24, 36, 60];
+    let horizonRefs = {}; // applyHorizon()から参照するため、直近の計算結果を保持
+
+    function renderHorizonTable() {
+        // レートのレンジ幅は「通貨プリセット本来の1年基準値」に固定アンカーする（DOM値を読むと、
+        // 一度「反映」した後の拡張済みレンジを次の計算のベースに誤って使ってしまうため）。
+        const key = document.getElementById('currencyPreset').value;
+        const preset = PRESETS[key];
+        const initialRate  = preset.initialRate;
+        const minRate1y    = preset.minRate;
+        const maxRate1y    = preset.maxRate;
+        const targetRate1y = preset.targetRate;
+        // スワップ関連は反映しても複利計算のみで累積的な歪みが出ないため、現在の入力値を都度反映する。
+        const swapPerLot  = parseFloat(document.getElementById('swapPerLot').value);
+        const swapUpProb  = parseFloat(document.getElementById('swapUpProb').value) / 100;
+        const swapUpRate  = parseFloat(document.getElementById('swapUpRate').value) / 100;
+        const swapDownRate = parseFloat(document.getElementById('swapDownRate').value) / 100;
+        const expectedAnnualSwapChange = (swapUpProb * swapUpRate) - ((1 - swapUpProb) * swapDownRate);
+
+        const oneYearDrift  = targetRate1y - initialRate; // 1年間の目標レート変化量（円）
+        const bandUp1y      = Math.max(0, maxRate1y - initialRate);   // 1年レンジの上方向の幅
+        const bandDown1y    = Math.max(0, initialRate - minRate1y);   // 1年レンジの下方向の幅
+
+        horizonRefs = {};
+        let rows = '';
+        HORIZON_MONTHS.forEach(months => {
+            const years = months / 12;
+            const volScale = Math.sqrt(years); // ボラティリティは期間の平方根に比例して拡大する一般的な考え方
+
+            const refMin = Math.max(0.001, initialRate - bandDown1y * volScale);
+            const refMax = initialRate + bandUp1y * volScale;
+            let refTarget = initialRate + oneYearDrift * years; // 線形延長
+            refTarget = Math.max(refMin, Math.min(refMax, refTarget));
+
+            const refSwap = swapPerLot * Math.pow(1 + expectedAnnualSwapChange, years);
+            const cumPct  = (refSwap / swapPerLot - 1) * 100;
+            const horizonLabel = months === 12 ? '12ヶ月（1年）' : months + 'ヶ月（' + years + '年）';
+
+            horizonRefs[months] = { initialRate, refMin, refMax, refTarget };
+
+            rows += `<tr>
+                <td>${horizonLabel}</td>
+                <td>${initialRate.toFixed(3)}円</td>
+                <td>${refMin.toFixed(3)}円</td>
+                <td>${refMax.toFixed(3)}円</td>
+                <td>${refTarget.toFixed(3)}円</td>
+                <td>${refSwap.toFixed(2)}円</td>
+                <td>${cumPct >= 0 ? '+' : ''}${cumPct.toFixed(1)}%</td>
+                <td><button class="apply-horizon-btn" onclick="applyHorizon(${months})">この参考値を反映</button></td>
+            </tr>`;
+        });
+        document.getElementById('horizonTableBody').innerHTML = rows;
+    }
+
+    function applyHorizon(months) {
+        const ref = horizonRefs[months];
+        if (!ref) return;
+        document.getElementById('months').value = months;
+        document.getElementById('initialRate').value = ref.initialRate.toFixed(3);
+        document.getElementById('minRate').value = ref.refMin.toFixed(3);
+        document.getElementById('maxRate').value = ref.refMax.toFixed(3);
+        document.getElementById('targetRate').value = ref.refTarget.toFixed(3);
+        alert(months + 'ヶ月の参考値を「初期レート」「最小レート」「最大レート」「最終目標レート」「シミュレーション期間」に反映しました。数値は自由に上書きできます。');
+        renderHorizonTable();
+    }
+
+    function applyAiPrediction() {
+        const key = document.getElementById('currencyPreset').value;
+        const p = PRESETS[key];
+        document.getElementById('upProb').value = p.aiUp.toFixed(1);
+        document.getElementById('downProbDisplay').textContent = (100 - p.aiUp).toFixed(1);
+        document.getElementById('swapUpProb').value = p.swapUpProb.toFixed(1);
+        document.getElementById('swapDownProbDisplay').textContent = (100 - p.swapUpProb).toFixed(1);
+        renderHorizonTable();
+        alert('AI予測の確率値をシミュレーターの「上昇確率」「スワップ上昇確率」欄に反映しました。');
+    }
+
+    function toggleCapitalChart() {
+        const section = document.getElementById('chartSection');
+        const btn     = document.getElementById('chartToggleBtn');
+        const isOff   = section.style.display === 'none' || section.style.display === '';
+        if (isOff) {
+            if (simHistory.capital.length === 0) { alert('先にシミュレーションを実行してください。'); return; }
+            section.style.display = 'block';
+            btn.textContent = '📈 推移グラフ　ON';
+            btn.classList.remove('off');
+            drawBarChart();
+        } else {
+            section.style.display = 'none';
+            btn.textContent = '📈 推移グラフ　OFF';
+            btn.classList.add('off');
+        }
+    }
+
+    // 複数指標を重ねて表示できる棒グラフ（各系列は自身の最大値を100%として正規化）
+    function drawBarChart() {
+        const canvas = document.getElementById('capitalChart');
+        const ctx    = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth || 900;
+        canvas.height = 260;
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const checked = [...document.querySelectorAll('#chartSeriesPicker input[type=checkbox]:checked')].map(cb => cb.value);
+        const legendEl = document.getElementById('chartLegend');
+        if (checked.length === 0) {
+            legendEl.innerHTML = '<span style="color:#999;">表示する指標を1つ以上選択してください。</span>';
+            lastChartLayout = null;
+            return;
+        }
+        if (simHistory.capital.length === 0) { lastChartLayout = null; return; }
+
+        const n = simHistory.capital.length;
+        const pad = { top: 20, bottom: 40, left: 15, right: 15 };
+        const innerW = w - pad.left - pad.right;
+        const innerH = h - pad.top - pad.bottom;
+
+        // 各系列を0〜1に正規化（最小値〜最大値。負値を含む系列は0基準線をずらす）
+        const normalized = {};
+        const ranges = {};
+        checked.forEach(key => {
+            const arr = simHistory[key];
+            const minV = Math.min(...arr, 0);
+            const maxV = Math.max(...arr, 0);
+            const span = (maxV - minV) || 1;
+            normalized[key] = arr.map(v => (v - minV) / span);
+            ranges[key] = { min: minV, max: maxV };
+        });
+
+        // グリッド線（横方向、正規化スケール0/25/50/75/100%）
+        ctx.strokeStyle = '#eee';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+            const y = pad.top + innerH - (innerH * i / 4);
+            ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
+        }
+
+        // X軸ラベル（月）
+        ctx.fillStyle = '#666';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'center';
+        const labelStep = Math.ceil(n / 12);
+
+        const groupW = innerW / n;
+        const barW = Math.max(1, (groupW * 0.8) / checked.length);
+        lastChartLayout = { pad, n, groupW, checked };
+
+        // ホバー中の月をハイライト（棒の下地に薄いグレーの帯を表示）
+        if (hoverIdx >= 0 && hoverIdx < n) {
+            ctx.fillStyle = 'rgba(0,0,0,0.06)';
+            ctx.fillRect(pad.left + hoverIdx * groupW, pad.top, groupW, innerH);
+        }
+
+        checked.forEach((key, seriesIdx) => {
+            const meta = SERIES_META[key];
+            ctx.fillStyle = meta.color;
+            for (let i = 0; i < n; i++) {
+                const barH = normalized[key][i] * innerH;
+                const x = pad.left + i * groupW + (groupW * 0.1) + seriesIdx * barW;
+                const y = pad.top + innerH - barH;
+                ctx.fillRect(x, y, barW, barH);
+            }
+        });
+
+        for (let i = 0; i < n; i += labelStep) {
+            const x = pad.left + i * groupW + groupW / 2;
+            ctx.fillStyle = '#666';
+            ctx.fillText(i + '月', x, h - pad.bottom + 14);
+        }
+        ctx.fillText((n - 1) + '月', pad.left + (n - 1) * groupW + groupW / 2, h - pad.bottom + 14);
+
+        ctx.strokeStyle = '#ccc';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(pad.left, pad.top, innerW, innerH);
+
+        // 凡例（実際の値レンジと最終値を系列ごとに表示）
+        legendEl.innerHTML = checked.map(key => {
+            const meta = SERIES_META[key];
+            const arr = simHistory[key];
+            const last = arr[arr.length - 1];
+            const r = ranges[key];
+            return `<span style="display:inline-block;width:10px;height:10px;background:${meta.color};margin-right:4px;border-radius:2px;"></span>` +
+                   `<b>${meta.label}</b>: 範囲 ${r.min.toLocaleString(undefined,{maximumFractionDigits:2})}〜${r.max.toLocaleString(undefined,{maximumFractionDigits:2})}${meta.unit} ／ 最終値 ${last.toLocaleString(undefined,{maximumFractionDigits:2})}${meta.unit}`;
+        }).join('<br>');
+    }
+
+    // グラフにカーソルを乗せた月の各系列の実数値をツールチップ表示
+    function handleChartHover(e) {
+        const tooltip = document.getElementById('chartTooltip');
+        if (!lastChartLayout) { tooltip.style.display = 'none'; return; }
+        const canvas = document.getElementById('capitalChart');
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const xCanvas = (e.clientX - rect.left) * scaleX;
+        const { pad, n, groupW, checked } = lastChartLayout;
+
+        if (xCanvas < pad.left || xCanvas > canvas.width - pad.right) {
+            tooltip.style.display = 'none';
+            if (hoverIdx !== -1) { hoverIdx = -1; drawBarChart(); }
+            return;
+        }
+
+        const idx = Math.max(0, Math.min(n - 1, Math.floor((xCanvas - pad.left) / groupW)));
+        if (idx !== hoverIdx) { hoverIdx = idx; drawBarChart(); }
+
+        const lines = checked.map(key => {
+            const meta = SERIES_META[key];
+            const v = simHistory[key][idx];
+            return `<span style="color:${meta.color}">●</span> ${meta.label}: ${v.toLocaleString(undefined,{maximumFractionDigits:2})}${meta.unit}`;
+        }).join('<br>');
+        tooltip.innerHTML = `<b>${idx}ヶ月目</b><br>${lines}`;
+        tooltip.style.display = 'block';
+
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const tipW = tooltip.offsetWidth;
+        tooltip.style.left = (mouseX + tipW + 16 > rect.width ? mouseX - tipW - 12 : mouseX + 12) + 'px';
+        tooltip.style.top = Math.max(0, mouseY - 10) + 'px';
+    }
+
+    function handleChartLeave() {
+        document.getElementById('chartTooltip').style.display = 'none';
+        if (hoverIdx !== -1) { hoverIdx = -1; drawBarChart(); }
+    }
+
+    document.getElementById('capitalChart').addEventListener('mousemove', handleChartHover);
+    document.getElementById('capitalChart').addEventListener('mouseleave', handleChartLeave);
+
+    function updateRateModeUI() {
+        const isRandom = document.getElementById('rateMode').value === 'random';
+        document.getElementById('upProbGroup').style.display   = isRandom ? '' : 'none';
+        document.getElementById('downProbGroup').style.display = isRandom ? '' : 'none';
+    }
+
+    function randomNormal(mean, std) {
+        let u = 0, v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return mean + std * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    }
+
+    // 為替レートのランダムウォーク生成（上昇/下落で非対称な変動幅に対応）
+    function generateRateWalk(initialRate, minRate, maxRate, upMovePct, downMovePct, numMonths, upProb, targetRate) {
+        const rates = [initialRate];
+        let current = initialRate;
+        for (let i = 0; i < numMonths; i++) {
+            const goingUp = Math.random() < upProb;
+            const stdPct = goingUp ? upMovePct : downMovePct;
+            const magnitude = Math.abs(randomNormal(0, current * stdPct / 100));
+            const change = goingUp ? magnitude : -magnitude;
+            current = Math.max(minRate, Math.min(maxRate, current + change));
+            rates.push(parseFloat(current.toFixed(3)));
+        }
+        const endDiff = targetRate - rates[numMonths];
+        for (let i = 1; i <= numMonths; i++) {
+            const adj = endDiff * (i / numMonths);
+            rates[i] = parseFloat(Math.max(minRate, Math.min(maxRate, rates[i] + adj)).toFixed(3));
+        }
+        rates[numMonths] = parseFloat(targetRate.toFixed(3));
+        return rates;
+    }
+
+    function generateGradualRate(initialRate, minRate, maxRate, upMovePct, downMovePct, numMonths, targetRate) {
+        const rates = [initialRate];
+        const avgPct = (upMovePct + downMovePct) / 2;
+        const noiseScale = initialRate * avgPct / 100 * 0.25;
+        for (let i = 1; i <= numMonths; i++) {
+            const trend = initialRate + (targetRate - initialRate) * (i / numMonths);
+            const noise = randomNormal(0, noiseScale);
+            rates.push(parseFloat(Math.max(minRate, Math.min(maxRate, trend + noise)).toFixed(3)));
+        }
+        rates[numMonths] = parseFloat(targetRate.toFixed(3));
+        return rates;
+    }
+
+    function drawRateChart(rates, minRate, maxRate) {
+        const canvas = document.getElementById('rateChart');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth || 800;
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const pad = { top: 15, bottom: 20, left: 38, right: 10 };
+        const innerW = w - pad.left - pad.right;
+        const innerH = h - pad.top - pad.bottom;
+
+        const dataMin = Math.min(minRate, ...rates);
+        const dataMax = Math.max(maxRate, ...rates);
+        const span = dataMax - dataMin || 1;
+
+        const toX = (i) => pad.left + (i / (rates.length - 1)) * innerW;
+        const toY = (r) => pad.top + (1 - (r - dataMin) / span) * innerH;
+
+        ctx.fillStyle = 'rgba(52, 152, 219, 0.08)';
+        ctx.fillRect(pad.left, toY(maxRate), innerW, toY(minRate) - toY(maxRate));
+
+        ctx.setLineDash([5, 4]);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#e74c3c';
+        ctx.beginPath(); ctx.moveTo(pad.left, toY(maxRate)); ctx.lineTo(w - pad.right, toY(maxRate)); ctx.stroke();
+        ctx.strokeStyle = '#3498db';
+        ctx.beginPath(); ctx.moveTo(pad.left, toY(minRate)); ctx.lineTo(w - pad.right, toY(minRate)); ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        rates.forEach((r, i) => i === 0 ? ctx.moveTo(toX(i), toY(r)) : ctx.lineTo(toX(i), toY(r)));
+        ctx.stroke();
+
+        ctx.fillStyle = '#555';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillText(maxRate.toFixed(1), pad.left - 2, toY(maxRate) + 4);
+        ctx.fillStyle = '#3498db';
+        ctx.fillText(minRate.toFixed(1), pad.left - 2, toY(minRate) + 4);
+
+        ctx.fillStyle = '#2c3e50';
+        ctx.textAlign = 'left';
+        ctx.fillText(rates[0].toFixed(2) + '円', toX(0) + 3, toY(rates[0]) - 4);
+        ctx.textAlign = 'right';
+        ctx.fillText(rates[rates.length - 1].toFixed(2) + '円', toX(rates.length - 1) - 3, toY(rates[rates.length - 1]) - 4);
+    }
+
+    function simulate() {
+        const reinvestMode   = document.getElementById('reinvestMode').value;
+        const initialCapital = parseFloat(document.getElementById('initialCapital').value);
+        const initialLots    = parseFloat(document.getElementById('lots').value);
+        const unitsPerLot    = parseFloat(document.getElementById('unitsPerLot').value);
+        const positionSide   = document.getElementById('positionSide').value;
+        const dir             = positionSide === 'sell' ? -1 : 1;
+        const swapPerLot     = positionSide === 'sell'
+            ? parseFloat(document.getElementById('sellSwapDisplay').value)
+            : parseFloat(document.getElementById('swapPerLot').value);
+        const marginRate     = 1 / parseFloat(document.getElementById('marginRate').value);
+        const numMonths      = parseInt(document.getElementById('months').value);
+        const initialRate    = parseFloat(document.getElementById('initialRate').value);
+        const minRate        = parseFloat(document.getElementById('minRate').value);
+        const maxRate        = parseFloat(document.getElementById('maxRate').value);
+        const upMovePct      = parseFloat(document.getElementById('upMovePct').value);
+        const downMovePct    = parseFloat(document.getElementById('downMovePct').value);
+        const reinvestLev    = parseFloat(document.getElementById('reinvestLev').value);
+        const upProb         = parseFloat(document.getElementById('upProb').value) / 100;
+        const rateMode       = document.getElementById('rateMode').value;
+        const targetRate     = parseFloat(document.getElementById('targetRate').value);
+
+        const swapUpProb   = parseFloat(document.getElementById('swapUpProb').value) / 100;
+        const swapUpRate   = parseFloat(document.getElementById('swapUpRate').value) / 100;
+        const swapDownRate = parseFloat(document.getElementById('swapDownRate').value) / 100;
+        // 期待年率変化（上昇確率×上昇率 − 下落確率×下落率）で指数的に変動させる
+        const expectedAnnualSwapChange = (swapUpProb * swapUpRate) - ((1 - swapUpProb) * swapDownRate);
+
+        const rates = rateMode === 'gradual'
+            ? generateGradualRate(initialRate, minRate, maxRate, upMovePct, downMovePct, numMonths, targetRate)
+            : generateRateWalk(initialRate, minRate, maxRate, upMovePct, downMovePct, numMonths, upProb, targetRate);
+        drawRateChart(rates, minRate, maxRate);
+
+        let capital          = initialCapital;
+        let currentLots      = initialLots;
+        let accumulatedSwap  = 0;
+        let avgEntryRate     = initialRate;
+        simHistory = { capital: [], effEquity: [], rate: [], marginRatio: [], leverage: [], lots: [], dsw: [], ysw: [], lossCutRate: [] };
+
+        let html = `<div class="table-wrapper"><table>
+            <thead>
+                <tr>
+                    <th class="month-col" rowspan="2" style="font-size:15px;background-color:#bdc3c7;">月</th>
+                    <th class="leverage-header" rowspan="2">為替レート<br>(円)</th>
+                    <th class="asset-header" colspan="7">資産・スワップ</th>
+                    <th class="maintenance-header" colspan="2">証拠金・維持率</th>
+                    <th class="leverage-header" rowspan="2">実効<br>レバレッジ</th>
+                    <th class="losscut-header" rowspan="2">ロスカット<br>レート</th>
+                </tr>
+                <tr>
+                    <th class="asset-header">口座資産 (円)</th>
+                    <th class="asset-header">為替損益 (円)</th>
+                    <th class="asset-header">実質資産 (円)</th>
+                    <th class="asset-header">保有ロット数</th>
+                    <th class="asset-header">1DSW（円）</th>
+                    <th class="asset-header">1MSW（円）</th>
+                    <th class="asset-header">1YSW（円）</th>
+                    <th class="maintenance-header">必要証拠金 (円)</th>
+                    <th class="maintenance-header">維持率 (%)</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        const fmt = (n, dec = 0) => parseFloat(n.toFixed(dec)).toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
+
+        const calcEffectiveEquity = (cap, currentRate, entryRate, lots) =>
+            cap + dir * (currentRate - entryRate) * lots * unitsPerLot;
+
+        // 買い: レート下落でロスカット（下側）／ 売り: レート上昇でロスカット（上側）
+        const calcLossCutRate = (rate, effEquity, lots) => {
+            if (dir === -1) {
+                const v = rate + effEquity / (lots * unitsPerLot);
+                return v / (1 + marginRate);
+            }
+            const v = rate - effEquity / (lots * unitsPerLot);
+            return v / (1 - marginRate);
+        };
+
+        const initPos       = currentLots * unitsPerLot * rates[0];
+        const initMargin    = initPos * marginRate;
+        const initEffEquity = calcEffectiveEquity(capital, rates[0], avgEntryRate, currentLots);
+        const initRatio     = (initEffEquity / initMargin) * 100;
+        const initLev       = initPos / (initEffEquity > 0 ? initEffEquity : 1);
+        const initDaily     = currentLots * swapPerLot;
+        const initLossCutRate = calcLossCutRate(rates[0], initEffEquity, currentLots);
+        const initNearLossCut = dir === -1 ? (initLossCutRate <= rates[0] * 1.1) : (initLossCutRate >= rates[0] * 0.9);
+        const initLossClass   = initNearLossCut ? 'highlight-col' : 'maintenance-val';
+
+        simHistory.capital.push(initialCapital);
+        simHistory.effEquity.push(initEffEquity);
+        simHistory.rate.push(rates[0]);
+        simHistory.marginRatio.push(initRatio);
+        simHistory.leverage.push(initLev);
+        simHistory.lots.push(currentLots);
+        simHistory.dsw.push(initDaily);
+        simHistory.ysw.push(initDaily * 365);
+        simHistory.lossCutRate.push(initLossCutRate > 0 ? initLossCutRate : 0);
+
+        const initFxPnL = Math.round(dir * (rates[0] - avgEntryRate) * currentLots * unitsPerLot);
+        const initFxClass = initFxPnL > 0 ? 'fx-profit' : initFxPnL < 0 ? 'fx-loss' : 'fx-zero';
+        const initFxSign  = initFxPnL > 0 ? '+' : '';
+
+        html += `<tr>
+            <td class="month-col">0</td>
+            <td class="leverage-val">${rates[0].toFixed(3)}</td>
+            <td class="asset-val">${Math.round(capital).toLocaleString()}</td>
+            <td class="${initFxClass}">${initFxSign}${initFxPnL.toLocaleString()}</td>
+            <td class="real-asset-val">${Math.round(initEffEquity).toLocaleString()}</td>
+            <td class="asset-val">${fmt(currentLots, 2)}</td>
+            <td class="dsw-val">${Math.round(initDaily).toLocaleString()}</td>
+            <td class="asset-val">-</td>
+            <td class="asset-val">${Math.round(initDaily * 365).toLocaleString()}</td>
+            <td class="maintenance-val">${Math.round(initMargin).toLocaleString()}</td>
+            <td class="maintenance-val">${fmt(initRatio, 1)}</td>
+            <td class="${initLev > 20 ? 'lev-danger' : initLev > 10 ? 'lev-pink' : 'leverage-val'}">${initLev.toFixed(2)}倍</td>
+            <td class="${initLossClass}">${initLossCutRate > 0 ? initLossCutRate.toFixed(3) : '危険'}</td>
+        </tr>`;
+
+        let lossCutTriggered = false;
+
+        for (let m = 1; m <= numMonths; m++) {
+            const rate            = rates[m];
+            const currentSwap     = swapPerLot * Math.pow(1 + expectedAnnualSwapChange, m / 12);
+            const monthlySwap     = currentLots * currentSwap * 30;
+
+            accumulatedSwap += monthlySwap;
+
+            if (!lossCutTriggered) {
+                capital += monthlySwap;
+
+                if (reinvestMode === 'compound' && reinvestLev > 0) {
+                    const newLots   = Math.floor((capital * reinvestLev) / (unitsPerLot * rate) * 100) / 100;
+                    const addedLots = Math.max(0, newLots - currentLots);
+                    if (addedLots > 0) {
+                        avgEntryRate = (avgEntryRate * currentLots + rate * addedLots) / newLots;
+                    }
+                    currentLots = Math.max(initialLots, newLots);
+                }
+            }
+
+            const currentDaily  = currentLots * currentSwap;
+            const yearlySwap    = currentDaily * 365;
+            const posValue      = currentLots * unitsPerLot * rate;
+            const reqMargin     = posValue * marginRate;
+            const effEquity     = calcEffectiveEquity(capital, rate, avgEntryRate, currentLots);
+            const maintRatio    = (effEquity / reqMargin) * 100;
+            const effLev        = posValue / (effEquity > 0 ? effEquity : 1);
+            const lossCutRate   = calcLossCutRate(rate, effEquity, currentLots);
+            const isLossCut     = maintRatio <= 50;
+            const isLevLossCut  = effLev >= 25;
+            const triggered     = isLossCut || isLevLossCut;
+
+            if (triggered && !lossCutTriggered) {
+                lossCutTriggered = true;
+                capital = 0;
+            }
+
+            const isMarginWarn = maintRatio < 100 && !isLossCut;
+            const marginClass  = (isLossCut || lossCutTriggered) ? 'loss-cut-hit'
+                               : isMarginWarn                    ? 'margin-warn'
+                               : maintRatio > 300                ? 'maintenance-safe'
+                               : maintRatio >= 250               ? 'maintenance-blue'
+                               :                                   'maintenance-val';
+            const levClass     = effLev > 20  ? 'lev-danger'
+                               : effLev > 10  ? 'lev-pink'
+                               :                'leverage-val';
+            const isNearLossCut = dir === -1 ? (lossCutRate <= rate * 1.1) : (lossCutRate >= rate * 0.9);
+            const lossClass    = (triggered || lossCutTriggered) ? 'loss-cut-hit'
+                               : isNearLossCut                   ? 'highlight-col'
+                               :                                   'maintenance-val';
+            const lossDisplay  = (triggered || lossCutTriggered) ? 'ロスカット'
+                               : lossCutRate > 0                 ? lossCutRate.toFixed(3)
+                               :                                   '危険';
+            const capitalClass   = lossCutTriggered ? 'capital-zero' : 'asset-val';
+            const capitalDisplay = lossCutTriggered ? '0' : Math.round(capital).toLocaleString();
+            const fxPnL          = Math.round(dir * (rate - avgEntryRate) * currentLots * unitsPerLot);
+            const fxClass        = lossCutTriggered ? 'capital-zero'
+                                 : fxPnL > 0 ? 'fx-profit'
+                                 : fxPnL < 0 ? 'fx-loss'
+                                 :              'fx-zero';
+            const fxSign         = fxPnL > 0 ? '+' : '';
+            const fxDisplay      = lossCutTriggered ? '0' : fxSign + fxPnL.toLocaleString();
+            const realAsset      = lossCutTriggered ? 0 : Math.round(effEquity);
+            const realAssetClass = lossCutTriggered ? 'capital-zero' : 'real-asset-val';
+
+            simHistory.capital.push(lossCutTriggered ? 0 : capital);
+            simHistory.effEquity.push(realAsset);
+            simHistory.rate.push(rate);
+            simHistory.marginRatio.push(maintRatio);
+            simHistory.leverage.push(effLev);
+            simHistory.lots.push(currentLots);
+            simHistory.dsw.push(lossCutTriggered ? 0 : currentDaily);
+            simHistory.ysw.push(lossCutTriggered ? 0 : yearlySwap);
+            simHistory.lossCutRate.push(lossCutTriggered ? 0 : (lossCutRate > 0 ? lossCutRate : 0));
+
+            html += `<tr>
+                <td class="month-col">${m}</td>
+                <td class="leverage-val">${rate.toFixed(3)}</td>
+                <td class="${capitalClass}">${capitalDisplay}</td>
+                <td class="${fxClass}">${fxDisplay}</td>
+                <td class="${realAssetClass}">${realAsset.toLocaleString()}</td>
+                <td class="asset-val">${fmt(currentLots, 2)}</td>
+                <td class="dsw-val">${Math.round(currentDaily).toLocaleString()}</td>
+                <td class="asset-val">${Math.round(currentLots * currentSwap * 30).toLocaleString()}</td>
+                <td class="asset-val">${Math.round(yearlySwap).toLocaleString()}</td>
+                <td class="${marginClass}">${Math.round(reqMargin).toLocaleString()}</td>
+                <td class="${marginClass}">${fmt(maintRatio, 1)}</td>
+                <td class="${levClass}">${effLev.toFixed(2)}倍</td>
+                <td class="${lossClass}">${lossDisplay}</td>
+            </tr>`;
+        }
+
+        html += '</tbody></table></div>';
+        document.getElementById('result').innerHTML = html;
+
+        const finalRate  = rates[numMonths];
+        const totalAsset = capital;
+        const totalReturn = ((totalAsset - initialCapital) / initialCapital * 100).toFixed(1);
+
+        document.getElementById('notes').innerHTML =
+            `※ 為替レートはランダムウォーク（正規分布ステップ、上昇/下落で変動幅を非対称に設定可能）でシミュレートされます。実行するたびに結果が変わります。<br>
+             ※ レート範囲: ${minRate}円〜${maxRate}円 ／ 上昇時変動幅: ±${upMovePct}%　下落時変動幅: ±${downMovePct}%<br>
+             ※ 維持率が100%を下回ると強制ロスカットのリスクがあります（赤色表示）。<br>
+             ※ 再投資レバレッジ: ${reinvestLev > 0 ? reinvestLev + '倍（複利時に毎月ロット数を自動調整）' : '設定なし（ロット数固定）'}<br>
+             ※ 終了時の為替レート: ${finalRate.toFixed(2)}円 ／ 総収益率: ${totalReturn}%<br>
+             ※ スワップ期待年率変化: ${(expectedAnnualSwapChange * 100).toFixed(2)}%（上昇確率${(swapUpProb*100).toFixed(1)}%×上昇率${(swapUpRate*100).toFixed(1)}% − 下落確率${((1-swapUpProb)*100).toFixed(1)}%×下落率${(swapDownRate*100).toFixed(1)}%で算出／終了時スワップ: ${(swapPerLot * Math.pow(1 + expectedAnnualSwapChange, numMonths / 12)).toFixed(2)}円/ロット/日）<br>
+             ※ 税金・手数料・スリッページは考慮していません。本シミュレーションはAI予測パネルを含め投資助言ではなく、将来の成果を保証するものではありません。`;
+
+        if (document.getElementById('chartSection').style.display === 'block') {
+            drawBarChart();
+        }
+    }
+
+    // 初期表示時にトルコリラ円プリセットを適用
+    applyPreset();
+</script>
+</body>
+</html>

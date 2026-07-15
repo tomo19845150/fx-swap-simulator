@@ -7,6 +7,8 @@ account: rational-lab
 url: "https://ameblo.jp/rational-lab/entry-12969875204.html"
 entry_id: "12969875204"
 likes: 4
+pv_30d: 22
+pv_checked: 2026-07-12
 ---
 
 # トルコリラ円を投資するFX業者の選び方

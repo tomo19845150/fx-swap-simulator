@@ -10,7 +10,9 @@ account: rational-lab
 data: "[[メキシコペソ円データ集]]"
 url: "https://ameblo.jp/rational-lab/entry-12971869938.html"
 entry_id: "12971869938"
-likes: 3
+likes: 4
+pv_30d: 18
+pv_checked: 2026-07-12
 ---
 
 【2026年最新版】メキシコペソ円の長期スワップ運用は「安全」に稼げるのか？過去・現在・未来データで徹底解説
