@@ -3,3 +3,4 @@ trash/
 .netlify/
 *.log
 *.gsheet
+.playwright-mcp/
