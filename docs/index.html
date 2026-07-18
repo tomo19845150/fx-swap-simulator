@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIRE資金逆算シミュレーター（インフレ・円安シナリオ対応）</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: #e0e0e0; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; background: #1c1c1c; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: 1px solid #2a2a2a; }
+        h1 { font-size: 26px; text-align: center; color: #fff; background-color: #128a70; padding: 16px 20px; border-radius: 6px; margin-bottom: 20px; letter-spacing: 1px; }
+        h1 small { display: block; font-size: 13px; font-weight: normal; letter-spacing: normal; margin-top: 6px; opacity: 0.9; }
+        h3 { font-size: 14px; color: #eaeaea; margin: 0 0 12px 0; }
+        h4 { font-size: 13px; color: #ccc; margin: 18px 0 8px 0; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 10px; }
+        .input-grid.compact { grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 10px; margin-bottom: 8px; }
+        .input-grid.compact .input-group > label { min-height: 2.6em; font-size: 12px; line-height: 1.3; display: flex; align-items: flex-end; }
+        .input-grid.compact input, .input-grid.compact select { padding: 8px; font-size: 14px; }
+        .input-group { display: flex; flex-direction: column; }
+        .input-group > label { min-height: 2.4em; line-height: 1.3; display: block; }
+        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #b0b0b0; }
+        input, select { padding: 10px; font-size: 15px; border: 1px solid #3a3a3a; border-radius: 4px; box-sizing: border-box; width: 100%; background-color: #262626; color: #f0f0f0; }
+        input:focus, select:focus { outline: none; border-color: #16a085; }
+        select { cursor: pointer; }
+        button { background-color: #16a085; color: #fff; border: none; padding: 15px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; margin-bottom: 20px; }
+        button:hover { background-color: #1abc9c; }
+        .preset-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+        .preset-btn { width: auto; background-color: #1a3a30; color: #4fd8b5; border: 1px solid #2f6e57; padding: 6px 12px; font-size: 12px; border-radius: 20px; margin-bottom: 0; font-weight: bold; }
+        .preset-btn:hover { background-color: #234f41; }
+        .preset-btn.active { background-color: #16a085; color: #fff; border-color: #1abc9c; }
+
+        .section { border-radius: 6px; padding: 15px; margin-bottom: 20px; border: 1px solid #333; background-color: #1a1a1a; }
+        .sec-profile { border-color: #2c4a5e; }
+        .sec-cost { border-color: #5e4c2c; }
+        .sec-scenario { border-color: #4a3a5e; }
+        .sec-nisa { border-color: #2c5e3a; }
+        .sec-inflation { border-top: 1px dashed #444; margin-top: 16px; padding-top: 16px; }
+
+        details.advanced { margin-bottom: 20px; }
+        details.advanced > summary { cursor: pointer; font-size: 18px; font-weight: bold; color: #f5d949; text-align: center; padding: 18px 15px; background: #3a3319; border: 2px solid #6e5e2f; border-radius: 6px; list-style: none; }
+        details.advanced > summary:hover { background: #4a4020; }
+        details.advanced > summary::-webkit-details-marker { display: none; }
+        details.advanced > summary::before { content: '▶ '; }
+        details.advanced[open] > summary::before { content: '▼ '; }
+        details.advanced[open] > summary { border-radius: 6px 6px 0 0; margin-bottom: 0; }
+        .advanced-body { border: 1px solid #333; border-top: none; border-radius: 0 0 6px 6px; padding: 15px; background: #171717; }
+
+        /* ヒーロー結果表示（白背景でドンと出す） */
+        .hero-result { display: none; background: #ffffff; color: #111; border-radius: 10px; padding: 28px 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 8px 28px rgba(0,0,0,0.5); }
+        .hero-label { font-size: 15px; color: #444; font-weight: bold; margin-bottom: 10px; }
+        .hero-amount { font-size: clamp(34px, 8vw, 60px); font-weight: 900; color: #0d6b52; line-height: 1.15; }
+        .hero-amount.surplus { color: #1a7a3f; }
+        .hero-note { font-size: 12.5px; color: #666; margin-top: 12px; line-height: 1.7; }
+        .hero-fill { margin-top: 18px; background: #eefaf5; border: 1px solid #b6e6d3; border-radius: 8px; padding: 14px; }
+        .hero-fill .hf-label { font-size: 12px; color: #0d6b52; font-weight: bold; margin-bottom: 4px; }
+        .hero-fill .hf-val { font-size: 24px; font-weight: bold; color: #0d6b52; }
+        .hero-fill .hf-sub { font-size: 12px; color: #555; margin-top: 4px; }
+        .hero-fill + .hero-fill { margin-top: 12px; }
+        .hero-fill .hf-side-controls { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; font-size: 13px; color: #444; }
+        .hero-fill .hf-side-controls label { font-size: 13px; font-weight: normal; margin-bottom: 0; color: #444; }
+        .hero-fill .hf-side-controls input { width: 70px; padding: 6px; text-align: center; font-size: 14px; }
+
+        .result-box { background: #1a1a1a; border: 2px solid #16a085; border-radius: 6px; padding: 20px; margin-bottom: 20px; display: none; }
+        .result-headline { font-size: 16px; font-weight: bold; color: #1abc9c; text-align: center; margin-bottom: 6px; }
+        .result-sub { font-size: 13px; color: #aaa; text-align: center; margin-bottom: 16px; }
+
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .result-card { background: #232323; border-radius: 6px; padding: 12px; text-align: center; border: 1px solid #333; display: flex; flex-direction: column; }
+        .result-card .rlabel { font-size: 12px; color: #999; margin-bottom: 4px; min-height: 2.6em; display: flex; align-items: center; justify-content: center; line-height: 1.3; }
+        .result-card .rval { font-size: 20px; font-weight: bold; color: #f0f0f0; margin-top: auto; }
+        .result-card.danger .rval { color: #ff6b5e; }
+        .result-card.safe .rval { color: #4fd8a0; }
+
+        .pension-box, .nisa-box { background: #1e2620; border: 1px solid #2f6e57; border-radius: 6px; padding: 8px 10px; margin-top: 6px; }
+        .pension-box .pb-row, .nisa-box .pb-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; padding: 1px 0; color: #ccc; }
+        .pension-box .pb-row-select, .nisa-box .pb-row-select { flex-wrap: nowrap; }
+        .pension-box .pb-row-select span, .nisa-box .pb-row-select span { flex: 1; min-width: 0; }
+        .pension-box .pb-row-select select, .nisa-box .pb-row-select select { flex: 0 0 128px; width: 128px; padding: 3px 4px; font-size: 12px; background-color: #262626; color: #4fd8b5; border: 1px solid #2f6e57; font-weight: bold; text-align: right; }
+        .pension-box .pb-row.highlight, .nisa-box .pb-row.highlight { font-size: 13.5px; font-weight: bold; color: #4fd8b5; border-top: 1px dashed #333; margin-top: 2px; padding-top: 4px; }
+        .pension-box .pb-row.pb-row-wrap, .nisa-box .pb-row.pb-row-wrap { flex-direction: column; align-items: flex-start; gap: 2px; }
+        .pension-box .pb-row.pb-row-wrap b, .nisa-box .pb-row.pb-row-wrap b { white-space: normal; line-height: 1.5; }
+        #paLivingCostRef { font-size: 14px; }
+        .pension-box .pb-row.pb-row-oneline, .nisa-box .pb-row.pb-row-oneline { display: block; margin-left: -10px; margin-right: -10px; }
+        .pension-box .pb-row.pb-row-oneline b, .nisa-box .pb-row.pb-row-oneline b { display: block; width: 100%; overflow-x: auto; white-space: nowrap; text-align: center; font-size: 13.5px; -webkit-overflow-scrolling: touch; }
+        .pension-box .pb-row.highlight.warn, .nisa-box .pb-row.highlight.warn { color: #e0b84a; }
+        .pension-box .pb-note, .nisa-box .pb-note { font-size: 11px; color: #e0b84a; margin-top: 5px; line-height: 1.45; }
+        .pension-box .pb-disclaimer, .nisa-box .pb-disclaimer { font-size: 10.5px; color: #888; margin-top: 4px; line-height: 1.4; }
+        .pension-box .zk-dual-item select, .nisa-box .zk-dual-item select { width: 100%; padding: 4px 5px; font-size: 12px; background-color: #262626; color: #4fd8b5; border: 1px solid #2f6e57; font-weight: bold; }
+
+        .notes-toggle-row { margin-bottom: 14px; }
+        .notes-toggle-btn { background: #262626; color: #999; border: 1px solid #444; border-radius: 4px; padding: 7px 14px; font-size: 12px; cursor: pointer; }
+        .notes-toggle-btn:hover { background: #333; color: #ccc; }
+        .advanced-body.notes-hidden .pb-note,
+        .advanced-body.notes-hidden .pb-disclaimer { display: none; }
+
+        .breakdown-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+        .breakdown-table th, .breakdown-table td { border: 1px solid #333; padding: 8px 6px; text-align: center; }
+        .breakdown-table th { background: #232323; color: #ccc; font-weight: normal; }
+        .breakdown-table td { color: #f0f0f0; background: #1e1e1e; }
+        .breakdown-table .sf-neg { color: #ff6b5e; font-weight: bold; }
+        .breakdown-table .sf-pos { color: #4fd8a0; font-weight: bold; }
+
+        #assetChart { width: 100%; height: 260px; display: block; border: 1px solid #333; border-radius: 4px; background: #1a1a1a; margin-top: 16px; }
+        .chart-legend { font-size: 12px; color: #999; margin-top: 8px; text-align: center; }
+
+        .note { font-size: 12px; color: #888; margin-top: 15px; line-height: 1.8; }
+        .disclaimer { font-size: 11px; color: #c9a3f5; background: #221a2c; border: 1px dashed #4a3a5e; border-radius: 4px; padding: 10px 12px; margin-top: 10px; line-height: 1.7; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>FIRE資金逆算シミュレーター
+        <small>合理的生活と投資の実験室（Blogger版）— プロフィールと円安シナリオを入力するだけで、必要額をドンと算出</small>
+    </h1>
+
+    <div class="section sec-profile">
+        <h3>1. あなたのプロフィール（今現在）</h3>
+        <div class="input-grid compact">
+            <div class="input-group">
+                <label>世帯タイプ</label>
+                <select id="householdType" onchange="applyHouseholdPreset()">
+                    <option value="couple">夫婦</option>
+                    <option value="single">単身</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>老後、1か月にいくら必要？（万円）</label>
+                <input type="number" id="monthlyLivingCost" value="30" min="0" step="0.1" oninput="updatePensionAdjustment()">
+            </div>
+            <div class="input-group">
+                <label>現在の年齢</label>
+                <input type="number" id="currentAge" value="45" min="18" max="90" oninput="updateNisaProjection()">
+            </div>
+            <div class="input-group">
+                <label>リタイア予定年齢</label>
+                <input type="number" id="retireAge" value="65" min="40" max="90" oninput="updateNisaProjection()">
+            </div>
+            <div class="input-group">
+                <label>年金受給開始年齢</label>
+                <select id="pensionStartAge" onchange="setVal('pensionStartAgeMirror', this.value); updatePensionAdjustment();">
+                    <optgroup label="繰り上げ（減額・生涯固定）">
+                        <option value="60">60歳（-24.0%）</option>
+                        <option value="61">61歳（-19.2%）</option>
+                        <option value="62">62歳（-14.4%）</option>
+                        <option value="63">63歳（-9.6%）</option>
+                        <option value="64">64歳（-4.8%）</option>
+                    </optgroup>
+                    <optgroup label="標準">
+                        <option value="65" selected>65歳（標準）</option>
+                    </optgroup>
+                    <optgroup label="繰り下げ（増額・生涯固定）">
+                        <option value="66">66歳（+8.4%）</option>
+                        <option value="67">67歳（+16.8%）</option>
+                        <option value="68">68歳（+25.2%）</option>
+                        <option value="69">69歳（+33.6%）</option>
+                        <option value="70">70歳（+42.0%）</option>
+                        <option value="71">71歳（+50.4%）</option>
+                        <option value="72">72歳（+58.8%）</option>
+                        <option value="73">73歳（+67.2%）</option>
+                        <option value="74">74歳（+75.6%）</option>
+                        <option value="75">75歳（+84.0%）</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>想定寿命</label>
+                <input type="number" id="lifeExpectancy" value="90" min="65" max="105" oninput="updateNisaProjection(); updatePensionAdjustment();">
+            </div>
+            <div class="input-group">
+                <label>預貯金（万円）</label>
+                <input type="number" id="savingsAssets" value="300" min="0">
+            </div>
+            <div class="input-group">
+                <label>金融資産（万円・株式や投資信託等）</label>
+                <input type="number" id="investAssets" value="200" min="0" oninput="syncOtherAssetTotal(this.value); updateOtherAssetProjection();">
+            </div>
+            <div class="input-group">
+                <label>新NISAの総資金額（万円）</label>
+                <input type="number" id="nisaTotal" value="100" min="0" step="10" oninput="syncNisaTotal(this.value); updateNisaProjection();">
+            </div>
+            <div class="input-group">
+                <label>運用の想定利回り（年率、%）</label>
+                <input type="number" id="nisaReturn" value="5" min="0" max="15" step="0.1" oninput="syncNisaReturn(this.value); updateNisaProjection();">
+            </div>
+        </div>
+        <div class="preset-row">
+            <button type="button" class="preset-btn" onclick="setVal('monthlyLivingCost',30); updatePensionAdjustment();">生活費 標準 30万円</button>
+            <button type="button" class="preset-btn" onclick="setVal('monthlyLivingCost',43); updatePensionAdjustment();">生活費 ゆとり 43万円</button>
+            <button type="button" class="preset-btn" onclick="setVal('monthlyLivingCost',17); updatePensionAdjustment();">生活費 単身 17万円</button>
+            <button type="button" class="preset-btn" onclick="setVal('lifeExpectancy',85)">寿命 男性目安85歳</button>
+            <button type="button" class="preset-btn" onclick="setVal('lifeExpectancy',90)">寿命 女性目安90歳</button>
+            <button type="button" class="preset-btn" onclick="setVal('lifeExpectancy',95)">寿命 長寿に備え95歳</button>
+            <button type="button" class="preset-btn" onclick="syncNisaTotal(0); updateNisaProjection();">NISA資金なし 0万円</button>
+            <button type="button" class="preset-btn" onclick="syncNisaTotal(100); updateNisaProjection();">NISA少なめ 100万円</button>
+            <button type="button" class="preset-btn" onclick="syncNisaTotal(300); updateNisaProjection();">NISA標準 300万円</button>
+            <button type="button" class="preset-btn" onclick="syncNisaTotal(500); updateNisaProjection();">NISA積極 500万円</button>
+            <button type="button" class="preset-btn" onclick="syncNisaReturn(3); updateNisaProjection();">利回り堅実 3%</button>
+            <button type="button" class="preset-btn" onclick="syncNisaReturn(5); updateNisaProjection();">利回り標準 5%</button>
+            <button type="button" class="preset-btn" onclick="syncNisaReturn(7); updateNisaProjection();">利回り積極 7%</button>
+        </div>
+        <div class="note">預貯金は元本があまり増えない安全資産（現金・普通預金等）、金融資産は株式・投資信託など運用益が見込める資産として、それぞれ複利計算に反映します。新NISAの総資金額は、現在すでに新NISA口座に入っている（またはこれから入れる）金額の合計で、現在の年齢からリタイア年齢まで運用利回りで複利成長させて試算します。</div>
+
+        <div class="sec-inflation">
+            <h3>円安・物価高の影響（生活費の年間上昇率）</h3>
+            <div class="preset-row" id="inflationPresetRow">
+                <button type="button" class="preset-btn" data-rate="1.5" onclick="applyInflationPreset(1.5, this)">楽観シナリオ（円安ゆるやか）1.5%</button>
+                <button type="button" class="preset-btn active" data-rate="2.0" onclick="applyInflationPreset(2.0, this)">標準シナリオ 2.0%</button>
+                <button type="button" class="preset-btn" data-rate="3.5" onclick="applyInflationPreset(3.5, this)">悪い円安シナリオ 3.5%</button>
+            </div>
+            <div class="note">2026年時点の物価・為替見通しに基づく目安です。円安が進み輸入物価が上がるほど、老後の生活費も膨らみます。</div>
+            <input type="hidden" id="inflationRate" value="2.0">
+        </div>
+    </div>
+
+    <button type="button" onclick="runFreshSimulation();">シミュレーション実行</button>
+
+    <div class="hero-result" id="heroResult">
+        <div class="hero-label" id="heroLabel"></div>
+        <div class="hero-amount" id="heroAmount"></div>
+        <div class="hero-note" id="heroNote"></div>
+        <div class="hero-fill" id="heroFill">
+            <div class="hf-label">年金＋副収入＋新NISA＋その他金融資産　今の設定での残り</div>
+            <div class="hf-val" id="hfVal"></div>
+            <div class="hf-sub" id="hfSub"></div>
+        </div>
+    </div>
+
+    <details class="advanced" id="advancedDetails">
+        <summary>年金・資産形成で解決する（年金の見込み額・新NISAを調整）</summary>
+        <div class="advanced-body notes-hidden" id="advancedBody">
+            <div class="notes-toggle-row">
+                <button type="button" class="notes-toggle-btn" id="notesToggleBtn" onclick="toggleNotes()">📝 注釈・注意点を表示する</button>
+            </div>
+            <div class="section sec-cost" style="margin-top:0;">
+                <h3>年金の見込み額</h3>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>65歳時点の年金見込み額（万円・ねんきん定期便の額）</label>
+                        <input type="number" id="pensionBaseAt65" value="20" min="0" step="0.1" oninput="updatePensionAdjustment()">
+                        <div class="preset-row">
+                            <button type="button" class="preset-btn" onclick="setVal('pensionBaseAt65',12); updatePensionAdjustment();">自営業のみ 12万円</button>
+                            <button type="button" class="preset-btn" onclick="setVal('pensionBaseAt65',23.7); updatePensionAdjustment();">標準夫婦 23.7万円</button>
+                            <button type="button" class="preset-btn" onclick="setVal('pensionBaseAt65',28); updatePensionAdjustment();">共働き夫婦 28万円</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="note">ご自身の「ねんきん定期便」に記載されている65歳時点の見込み額を入力してください。プロフィールで選んだ受給開始年齢（繰り上げ/繰り下げ）に応じて、下に増減後の受給額・手取り概算を自動表示します。</div>
+
+                <div class="pension-box" id="pensionBox">
+                    <div class="pb-row pb-row-select">
+                        <span>受給開始年齢</span>
+                        <select id="pensionStartAgeMirror" onchange="updatePensionAdjustment()">
+                            <optgroup label="繰り上げ（減額・生涯固定）">
+                                <option value="60">60歳（-24.0%）</option>
+                                <option value="61">61歳（-19.2%）</option>
+                                <option value="62">62歳（-14.4%）</option>
+                                <option value="63">63歳（-9.6%）</option>
+                                <option value="64">64歳（-4.8%）</option>
+                            </optgroup>
+                            <optgroup label="標準">
+                                <option value="65" selected>65歳（標準）</option>
+                            </optgroup>
+                            <optgroup label="繰り下げ（増額・生涯固定）">
+                                <option value="66">66歳（+8.4%）</option>
+                                <option value="67">67歳（+16.8%）</option>
+                                <option value="68">68歳（+25.2%）</option>
+                                <option value="69">69歳（+33.6%）</option>
+                                <option value="70">70歳（+42.0%）</option>
+                                <option value="71">71歳（+50.4%）</option>
+                                <option value="72">72歳（+58.8%）</option>
+                                <option value="73">73歳（+67.2%）</option>
+                                <option value="74">74歳（+75.6%）</option>
+                                <option value="75">75歳（+84.0%）</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="pb-row"><span>増減率（生涯固定）</span><b id="paRate"></b></div>
+                    <div class="pb-row highlight pb-row-oneline"><b id="paSummaryLine"></b></div>
+                    <div class="pb-disclaimer" id="paTaxBreakdown" style="margin-top: 2px;"></div>
+                    <div class="pb-note" id="paNote"></div>
+                    <div class="pb-disclaimer">※ 手取り額は所得税・住民税に加え、国民健康保険料（65〜74歳）・介護保険料（65歳以上）・後期高齢者医療制度（75歳以上）を含めて概算しています。厚生労働省「公的年金シミュレーター」の東京都新宿区・令和7年度の計算式に準拠した試算で、単身者・年金収入のみ（他の所得なし）を前提としています。配偶者控除等その他の控除は含みません。実際の額や保険料率は市区町村・世帯構成により異なるため、正確な金額は市区町村窓口や「ねんきんネット」でご確認ください。年金は繰り上げても繰り下げても雑所得として課税対象である点は変わりません。受給開始〜想定寿命までの手取り総額は、今の税制・物価水準のまま受給年数分を単純に掛け合わせた概算です（年金額の伸び率やインフレによる目減りは考慮していません）。</div>
+
+                    <div class="pb-row" style="border-top: 1px dashed #333; margin-top: 10px; padding-top: 10px;"><span>老後、1か月にいくら必要？（プロフィールの設定）</span><b id="paLivingCostRef"></b></div>
+                    <div class="pb-row highlight" id="paSideJobRow"><span id="paSideJobLabel"></span><b id="paSideJobVal"></b></div>
+                    <div class="pb-row pb-row-select" id="paSideJobEndAgeRow">
+                        <span>アルバイト・副収入を何歳まで続ける？</span>
+                        <select id="paSideJobEndAge" onchange="updatePensionAdjustment()"></select>
+                    </div>
+                    <div class="pb-row pb-row-select" id="paSideJobReflectRow">
+                        <span>このアルバイト収入をシミュレーションに反映</span>
+                        <select id="paSideJobReflect" onchange="simulate()">
+                            <option value="stop">反映しない（アルバイトなし前提で計算）</option>
+                            <option value="continue">反映する（アルバイトで埋める前提で計算）</option>
+                        </select>
+                    </div>
+                    <div class="pb-note" id="paSideJobNote"></div>
+                    <div class="pb-disclaimer" id="paSideJobTaxNote"></div>
+
+                    <div class="pb-row" style="border-top: 1px dashed #333; margin-top: 6px; padding-top: 6px;"><span>年金を減らさず稼げる範囲（在職老齢年金の基準額<span id="zkLimitLabel"></span>万円まで）</span></div>
+                    <div class="pb-row pb-row-select">
+                        <span>アルバイト（給与）でいくら稼ぐ</span>
+                        <select id="zkArbaito" onchange="updateZaishokuCalc()"></select>
+                    </div>
+                    <div class="pb-row pb-row-select">
+                        <span>副収入（フリーランス等）でいくら稼ぐ</span>
+                        <select id="zkFukugyo" onchange="updateZaishokuCalc()"></select>
+                    </div>
+                    <div class="pb-row highlight"><span>年金＋アルバイト＋副収入 合計（月額）</span><b id="zkTotalVal"></b></div>
+                    <div class="pb-note" id="zkNote"></div>
+                </div>
+            </div>
+
+            <div class="section sec-nisa" style="margin-top:20px;">
+                <h3>新NISAでの資産形成（<span id="nisaPhase1Label">今現在〜65歳</span>）</h3>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>新NISAの総資金額（万円）</label>
+                        <input type="number" id="nisaTotalMirror" value="100" min="0" step="10" oninput="updateNisaProjection()">
+                    </div>
+                    <div class="input-group">
+                        <label>運用の想定利回り（年率、%）</label>
+                        <input type="number" id="nisaReturnMirror" value="5" min="0" max="15" step="0.1" oninput="updateNisaProjection()">
+                    </div>
+                    <div class="input-group">
+                        <label>毎月の積立額（万円）</label>
+                        <select id="nisaMonthly" onchange="updateNisaProjection()"></select>
+                    </div>
+                </div>
+                <div class="preset-row">
+                    <button type="button" class="preset-btn" onclick="setVal('nisaTotalMirror',0); updateNisaProjection();">NISA資金なし 0万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaTotalMirror',100); updateNisaProjection();">NISA少なめ 100万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaTotalMirror',300); updateNisaProjection();">NISA標準 300万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaTotalMirror',500); updateNisaProjection();">NISA積極 500万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaReturnMirror',3); updateNisaProjection();">利回り堅実 3%</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaReturnMirror',5); updateNisaProjection();">利回り標準 5%</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaReturnMirror',7); updateNisaProjection();">利回り積極 7%</button>
+                </div>
+                <div class="note">現在すでに新NISA口座に入っている（またはこれから入れる）金額の合計に加えて、毎月の積立額を1万円単位で選べます（0〜50万円）。現在の年齢からリタイア年齢まで、積立を続けながらこの利回りで複利成長させて試算します（プロフィールの新NISA欄の値が初期値として入りますが、ここで調整してもプロフィール側の値は変わりません）。</div>
+
+                <div class="pension-box nisa-box" id="nisaProjectionBox">
+                    <div class="pb-row highlight"><span>リタイア（<span id="nisaRetireAgeLabel"></span>歳）時点の新NISA資産見込み</span><b id="nisaAtRetireVal"></b></div>
+                    <div class="pb-note" id="nisaProjectionNote"></div>
+                </div>
+            </div>
+
+            <div class="section sec-nisa" style="margin-top:20px;">
+                <h3>新NISAでの資産形成（<span id="nisaPhase2Label">65歳〜想定寿命</span>）</h3>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>この時点の新NISA総資金額（万円）</label>
+                        <input type="number" id="nisaTotal2" value="100" min="0" step="10" oninput="updateNisaProjection2()">
+                    </div>
+                    <div class="input-group">
+                        <label>運用の想定利回り（年率、%）</label>
+                        <input type="number" id="nisaReturn2" value="5" min="0" max="15" step="0.1" oninput="updateNisaProjection2()">
+                    </div>
+                    <div class="input-group">
+                        <label>毎月の積立額（万円）</label>
+                        <select id="nisaMonthly2" onchange="updateNisaProjection2()"></select>
+                    </div>
+                </div>
+                <div class="preset-row">
+                    <button type="button" class="preset-btn" onclick="setVal('nisaTotal2',0); updateNisaProjection2();">NISA資金なし 0万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaTotal2',100); updateNisaProjection2();">NISA少なめ 100万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaTotal2',300); updateNisaProjection2();">NISA標準 300万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaTotal2',500); updateNisaProjection2();">NISA積極 500万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaReturn2',3); updateNisaProjection2();">利回り堅実 3%</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaReturn2',5); updateNisaProjection2();">利回り標準 5%</button>
+                    <button type="button" class="preset-btn" onclick="setVal('nisaReturn2',7); updateNisaProjection2();">利回り積極 7%</button>
+                </div>
+                <div class="note">総資金額には上のブロック（今現在〜リタイア年齢）の計算結果が自動で反映されます。必要であればご自身で入力し直すこともできます。毎月の積立額は1万円単位で選べます（0〜50万円）。リタイア年齢から想定寿命まで、この利回りで複利成長させて試算します。</div>
+
+                <div class="pension-box nisa-box" id="nisaProjection2Box">
+                    <div class="pb-row pb-row-select">
+                        <span>この積立をシミュレーションに反映</span>
+                        <select id="nisaContinueAfterRetire" onchange="simulate()">
+                            <option value="stop">反映しない（取り崩しに専念する前提で計算）</option>
+                            <option value="continue">反映する（この積立額を続けながら取り崩す前提で計算）</option>
+                        </select>
+                    </div>
+                    <div class="pb-row highlight"><span>想定寿命（<span id="nisa2EndAgeLabel"></span>歳）時点の新NISA資産見込み</span><b id="nisa2AtEndVal"></b></div>
+                    <div class="pb-note" id="nisa2ProjectionNote"></div>
+                </div>
+                <input type="hidden" id="pensionGrowthRate" value="0.7">
+            </div>
+
+            <div class="section sec-nisa" style="margin-top:20px;">
+                <h3>その他金融資産での資産形成（<span id="otherAssetPhase1Label">今現在〜65歳</span>）</h3>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>その他金融資産の総資金額（万円）</label>
+                        <input type="number" id="otherAssetTotalMirror" value="200" min="0" step="10" oninput="updateOtherAssetProjection()">
+                    </div>
+                    <div class="input-group">
+                        <label>運用の想定利回り（年率、%）</label>
+                        <input type="number" id="investReturn" value="0" min="0" max="15" step="0.1" oninput="updateOtherAssetProjection()">
+                    </div>
+                    <div class="input-group">
+                        <label>毎月の積立額（万円）</label>
+                        <select id="otherAssetMonthly" onchange="updateOtherAssetProjection()"></select>
+                    </div>
+                </div>
+                <div class="preset-row">
+                    <button type="button" class="preset-btn" onclick="setVal('otherAssetTotalMirror',0); updateOtherAssetProjection();">資産なし 0万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('otherAssetTotalMirror',100); updateOtherAssetProjection();">少なめ 100万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('otherAssetTotalMirror',300); updateOtherAssetProjection();">標準 300万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('otherAssetTotalMirror',500); updateOtherAssetProjection();">積極 500万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('investReturn',3); updateOtherAssetProjection();">利回り堅実 3%</button>
+                    <button type="button" class="preset-btn" onclick="setVal('investReturn',5); updateOtherAssetProjection();">利回り標準 5%</button>
+                    <button type="button" class="preset-btn" onclick="setVal('investReturn',7); updateOtherAssetProjection();">利回り積極 7%</button>
+                </div>
+                <div class="note">現在保有している株式・投資信託等（新NISA以外）の金額の合計に加えて、毎月の積立額を1万円単位で選べます（0〜50万円）。現在の年齢からリタイア年齢まで、積立を続けながらこの利回りで複利成長させて試算します（プロフィールの金融資産欄の値が初期値として入りますが、ここで調整してもプロフィール側の値は変わりません）。</div>
+
+                <div class="pension-box nisa-box" id="otherAssetProjectionBox">
+                    <div class="pb-row highlight"><span>リタイア（<span id="otherAssetRetireAgeLabel"></span>歳）時点のその他金融資産見込み</span><b id="otherAssetAtRetireVal"></b></div>
+                    <div class="pb-note" id="otherAssetProjectionNote"></div>
+                </div>
+            </div>
+
+            <div class="section sec-nisa" style="margin-top:20px;">
+                <h3>その他金融資産での資産形成（<span id="otherAssetPhase2Label">65歳〜想定寿命</span>）</h3>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>この時点のその他金融資産総額（万円）</label>
+                        <input type="number" id="otherAssetTotal2" value="200" min="0" step="10" oninput="updateOtherAssetProjection2()">
+                    </div>
+                    <div class="input-group">
+                        <label>運用の想定利回り（年率、%）</label>
+                        <input type="number" id="otherAssetReturn2" value="0" min="0" max="15" step="0.1" oninput="updateOtherAssetProjection2()">
+                    </div>
+                    <div class="input-group">
+                        <label>毎月の積立額（万円）</label>
+                        <select id="otherAssetMonthly2" onchange="updateOtherAssetProjection2()"></select>
+                    </div>
+                </div>
+                <div class="preset-row">
+                    <button type="button" class="preset-btn" onclick="setVal('otherAssetTotal2',0); updateOtherAssetProjection2();">資産なし 0万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('otherAssetTotal2',100); updateOtherAssetProjection2();">少なめ 100万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('otherAssetTotal2',300); updateOtherAssetProjection2();">標準 300万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('otherAssetTotal2',500); updateOtherAssetProjection2();">積極 500万円</button>
+                    <button type="button" class="preset-btn" onclick="setVal('otherAssetReturn2',3); updateOtherAssetProjection2();">利回り堅実 3%</button>
+                    <button type="button" class="preset-btn" onclick="setVal('otherAssetReturn2',5); updateOtherAssetProjection2();">利回り標準 5%</button>
+                    <button type="button" class="preset-btn" onclick="setVal('otherAssetReturn2',7); updateOtherAssetProjection2();">利回り積極 7%</button>
+                </div>
+                <div class="note">総資金額には上のブロック（今現在〜リタイア年齢）の計算結果が自動で反映されます。必要であればご自身で入力し直すこともできます。毎月の積立額は1万円単位で選べます（0〜50万円）。リタイア年齢から想定寿命まで、この利回りで複利成長させて試算します。</div>
+
+                <div class="pension-box nisa-box" id="otherAssetProjection2Box">
+                    <div class="pb-row pb-row-select">
+                        <span>この積立をシミュレーションに反映</span>
+                        <select id="otherAssetContinueAfterRetire" onchange="simulate()">
+                            <option value="stop">反映しない（取り崩しに専念する前提で計算）</option>
+                            <option value="continue">反映する（この積立額を続けながら取り崩す前提で計算）</option>
+                        </select>
+                    </div>
+                    <div class="pb-row highlight"><span>想定寿命（<span id="otherAsset2EndAgeLabel"></span>歳）時点のその他金融資産見込み</span><b id="otherAsset2AtEndVal"></b></div>
+                    <div class="pb-note" id="otherAssetProjection2Note"></div>
+                </div>
+            </div>
+
+            <button type="button" onclick="simulate(); document.getElementById('heroResult').scrollIntoView({behavior:'smooth'});">この条件で再計算する</button>
+        </div>
+    </details>
+
+    <div class="result-box" id="resultBox">
+        <div class="result-headline" id="resultHeadline"></div>
+        <div class="result-sub" id="resultSub"></div>
+
+        <div class="result-grid" id="resultGrid"></div>
+
+        <h4>月間・年間の収支イメージ（年金でどこまで賄えるか）</h4>
+        <table class="breakdown-table" id="breakdownTable"></table>
+
+        <canvas id="assetChart"></canvas>
+        <div class="chart-legend" id="chartLegend"></div>
+    </div>
+
+    <div class="disclaimer">
+        本ツールは入力された前提条件に基づく簡易試算であり、将来の物価・年金額・運用成果を保証するものではありません。インフレ率・年金伸び率・運用利回り・NISA想定利回りはすべて仮定値です。実際の老後資金計画は、ねんきん定期便や専門家（ファイナンシャルプランナー等）への相談も踏まえてご判断ください。
+    </div>
+
+    <div class="note">
+        ※ リタイアまでの資産成長は、預貯金はそのまま据え置き、金融資産（その他金融資産）・新NISA総資金額はそれぞれの運用利回りで複利運用（毎月の積立額も加算）し、リタイア時点でこれらを合算しています。リタイア後の新NISA・その他金融資産の積立をそれぞれ「反映する」に設定した場合、積立額は毎年の不足額の穴埋めに充てられます。<br>
+        ※ 生活費・年金額は「今の物価水準の感覚」で入力すればOKです。将来のインフレ・物価上昇分はシミュレーション内部で自動的に上乗せして計算しています。
+    </div>
+</div>
+
+<script>
+function setVal(id, val) {
+    document.getElementById(id).value = val;
+}
+
+function toggleNotes() {
+    const body = document.getElementById('advancedBody');
+    const btn = document.getElementById('notesToggleBtn');
+    const hidden = body.classList.toggle('notes-hidden');
+    btn.textContent = hidden ? '📝 注釈・注意点を表示する' : '📝 注釈・注意点を隠す';
+}
+
+function applyHouseholdPreset() {
+    const type = document.getElementById('householdType').value;
+    if (type === 'single') {
+        setVal('monthlyLivingCost', 17);
+        setVal('pensionBaseAt65', 15);
+    } else {
+        setVal('monthlyLivingCost', 30);
+        setVal('pensionBaseAt65', 23.7);
+    }
+    updatePensionAdjustment();
+}
+
+// 65歳時点の見込み額と受給開始年齢から、繰り上げ/繰り下げ後の月額（万円）を算出
+// 繰り上げ: 月0.4%減額、繰り下げ: 月0.7%増額（いずれも生涯固定）
+function computeAdjustedPensionMonthly() {
+    const baseAt65 = parseFloat(document.getElementById('pensionBaseAt65').value) || 0;
+    const startAge = parseFloat(document.getElementById('pensionStartAgeMirror').value);
+    const monthsDiff = (startAge - 65) * 12;
+    const rate = monthsDiff >= 0 ? monthsDiff * 0.007 : monthsDiff * 0.004;
+    return { adjustedMonthlyMan: baseAt65 * (1 + rate), rate, startAge, baseAt65 };
+}
+
+// ⑥ 総所得金額（公的年金等控除後）。受給開始年齢が65歳未満/以上で控除テーブルが異なる（国の公的年金等控除の基準に準拠）
+function calcSotokoku(pensionAnnualYen, startAge) {
+    let wariai, kojo, hikazeiLine;
+    if (startAge < 65) {
+        hikazeiLine = 600000;
+        if (pensionAnnualYen <= 1300000) { wariai = 1.0; kojo = 600000; }
+        else if (pensionAnnualYen <= 4100000) { wariai = 0.75; kojo = 275000; }
+        else if (pensionAnnualYen <= 7700000) { wariai = 0.85; kojo = 685000; }
+        else if (pensionAnnualYen <= 10000000) { wariai = 0.95; kojo = 1455000; }
+        else { wariai = 1.0; kojo = 1955000; }
+    } else {
+        hikazeiLine = 1100000;
+        if (pensionAnnualYen <= 3300000) { wariai = 1.0; kojo = 1100000; }
+        else if (pensionAnnualYen <= 4100000) { wariai = 0.75; kojo = 275000; }
+        else if (pensionAnnualYen <= 7700000) { wariai = 0.85; kojo = 685000; }
+        else if (pensionAnnualYen <= 10000000) { wariai = 0.95; kojo = 1455000; }
+        else { wariai = 1.0; kojo = 1955000; }
+    }
+    if (pensionAnnualYen <= hikazeiLine) return 0;
+    return Math.max(0, pensionAnnualYen * wariai - kojo);
+}
+
+// ② 国民健康保険料（東京都新宿区・令和7年度基準、単身者前提）。75歳以上は後期高齢者医療制度に移行するため0円
+function calcKokuho(sotoku, startAge) {
+    if (startAge >= 75) return 0;
+    const base = Math.max(0, sotoku - 430000);
+    const iryo = Math.min(660000, 47300 + base * 0.0771);
+    const shien = Math.min(260000, 16800 + base * 0.0269);
+    const kaigobun = startAge < 65 ? Math.min(170000, 16600 + base * 0.0225) : 0;
+    return iryo + shien + kaigobun;
+}
+
+// ③ 介護保険料（65歳以上、東京都新宿区・令和7年度の所得段階別定額表。単身者・年金収入のみ前提のため低所得の軽減段階には非対応）
+function calcKaigoHoken(sotoku, startAge) {
+    if (startAge < 65) return 0;
+    if (sotoku < 1250000) return 87120;
+    if (sotoku < 2500000) return 95040;
+    if (sotoku < 3750000) return 110880;
+    if (sotoku < 5000000) return 122760;
+    if (sotoku < 6250000) return 146520;
+    if (sotoku < 7500000) return 166320;
+    if (sotoku < 10000000) return 194040;
+    if (sotoku < 15000000) return 229680;
+    if (sotoku < 25000000) return 269280;
+    if (sotoku < 35000000) return 308880;
+    return 348480;
+}
+
+// ④ 後期高齢者医療制度（75歳以上のみ、東京都新宿区・令和7年度基準）
+function calcKoukikourei(sotoku, startAge) {
+    if (startAge < 75) return 0;
+    const kintouBase = sotoku - 150000;
+    let kintouRate;
+    if (kintouBase <= 430000) kintouRate = 0.3;
+    else if (kintouBase <= 735000) kintouRate = 0.5;
+    else if (kintouBase <= 990000) kintouRate = 0.8;
+    else kintouRate = 1.0;
+    const kintouwari = 47300 * kintouRate;
+
+    const shotokuBase = Math.max(0, sotoku - 430000);
+    let shotokuwari;
+    if (shotokuBase <= 150000) shotokuwari = shotokuBase * 0.0967 * 0.5;
+    else if (shotokuBase <= 200000) shotokuwari = shotokuBase * 0.0949 * 0.75;
+    else shotokuwari = shotokuBase * 0.0967;
+
+    return Math.min(800000, kintouwari + shotokuwari);
+}
+
+// ①所得税基礎控除額（総所得金額に応じた9段階）
+function calcShotokuzeiKisoKojo(sotoku) {
+    if (sotoku <= 1320000) return 950000;
+    if (sotoku <= 3360000) return 880000;
+    if (sotoku <= 4890000) return 680000;
+    if (sotoku <= 6550000) return 630000;
+    if (sotoku <= 23500000) return 580000;
+    if (sotoku <= 24000000) return 480000;
+    if (sotoku <= 24500000) return 320000;
+    if (sotoku <= 25000000) return 160000;
+    return 0;
+}
+
+// ① 所得税
+function calcShotokuzei(sotoku, kokuho, kaigo, koukikourei) {
+    const kisoKojo = calcShotokuzeiKisoKojo(sotoku);
+    const kazeiSotoku = Math.max(0, sotoku - (kokuho + kaigo + koukikourei + kisoKojo));
+    let zeiritsu, kojogaku;
+    if (kazeiSotoku <= 1950000) { zeiritsu = 0.05; kojogaku = 0; }
+    else if (kazeiSotoku <= 3300000) { zeiritsu = 0.10; kojogaku = 97500; }
+    else if (kazeiSotoku <= 6950000) { zeiritsu = 0.20; kojogaku = 427500; }
+    else if (kazeiSotoku <= 9000000) { zeiritsu = 0.23; kojogaku = 636000; }
+    else if (kazeiSotoku <= 18000000) { zeiritsu = 0.33; kojogaku = 1536000; }
+    else if (kazeiSotoku <= 40000000) { zeiritsu = 0.40; kojogaku = 2796000; }
+    else { zeiritsu = 0.45; kojogaku = 4796000; }
+    return Math.max(0, kazeiSotoku * zeiritsu - kojogaku);
+}
+
+// ⑤ 住民税（調整控除込み）
+function calcJuminzei(sotoku, kokuho, kaigo, koukikourei) {
+    if (sotoku <= 450000) return 0;
+    const kazeiSotoku = Math.max(0, sotoku - (kokuho + kaigo + koukikourei + 430000));
+    const choseiKojo = kazeiSotoku <= 2000000
+        ? Math.min(50000, kazeiSotoku) * 0.05
+        : Math.max(2500, (50000 - (kazeiSotoku - 2000000)) * 0.05);
+    return Math.max(0, kazeiSotoku * 0.1 + 5000 - choseiKojo);
+}
+
+// 年金の税・社会保険料引後の手取り額を試算する。
+// 厚生労働省「公的年金シミュレーター」の税・社会保険料試算（東京都新宿区・令和7年度基準）と同じ計算式に準拠。
+// 単身者・年金収入のみ（他の所得なし）を前提とした概算で、実際の市区町村・世帯構成によって金額は異なる。
+function estimateNetPensionIncome(annualIncomeYen, startAge) {
+    const sotoku = calcSotokoku(annualIncomeYen, startAge);
+    const kokuho = calcKokuho(sotoku, startAge);
+    const kaigo = calcKaigoHoken(sotoku, startAge);
+    const koukikourei = calcKoukikourei(sotoku, startAge);
+    const incomeTax = calcShotokuzei(sotoku, kokuho, kaigo, koukikourei);
+    const residentTax = calcJuminzei(sotoku, kokuho, kaigo, koukikourei);
+    const netAnnual = annualIncomeYen - incomeTax - residentTax - kokuho - kaigo - koukikourei;
+    return { netAnnual, incomeTax, residentTax, kokuho, kaigo, koukikourei, sotoku };
+}
+
+function syncNisaTotal(val) {
+    setVal('nisaTotal', val);
+    setVal('nisaTotalMirror', val);
+}
+
+function syncNisaReturn(val) {
+    setVal('nisaReturn', val);
+    setVal('nisaReturnMirror', val);
+}
+
+function syncOtherAssetTotal(val) {
+    setVal('investAssets', val);
+    setVal('otherAssetTotalMirror', val);
+}
+
+function updatePensionAdjustment() {
+    const { adjustedMonthlyMan, rate, startAge } = computeAdjustedPensionMonthly();
+
+    document.getElementById('paRate').textContent = `${rate >= 0 ? '+' : ''}${(rate * 100).toFixed(1)}%`;
+    const adjustedText = `額面 月${adjustedMonthlyMan.toFixed(1)}万円（年${fmt(adjustedMonthlyMan * 12)}万円）`;
+
+    const annualIncomeYen = adjustedMonthlyMan * 12 * 10000;
+    const net = estimateNetPensionIncome(annualIncomeYen, startAge);
+    const netText = `手取り 月${(net.netAnnual / 12 / 10000).toFixed(1)}万円（年${fmt(net.netAnnual / 10000)}万円）`;
+
+    // 受給開始年齢から想定寿命までの手取り総額（今の税制・物価水準のまま受給年数分を単純合計）
+    const lifeExpectancyForTotal = parseFloat(document.getElementById('lifeExpectancy').value) || 0;
+    const receivingYears = Math.max(0, lifeExpectancyForTotal - startAge);
+    const netLifetimeTotalMan = (net.netAnnual / 10000) * receivingYears;
+    const totalText = receivingYears > 0
+        ? `総額 約${fmt(netLifetimeTotalMan)}万円（${startAge}〜${lifeExpectancyForTotal}歳の${receivingYears}年間）`
+        : '総額 －';
+    document.getElementById('paSummaryLine').textContent = `${adjustedText}／${netText}／${totalText}`;
+
+    const breakdownParts = [`所得税 ${fmt(net.incomeTax / 10000)}万円`, `住民税 ${fmt(net.residentTax / 10000)}万円`];
+    if (startAge < 75) breakdownParts.push(`国民健康保険料 ${fmt(net.kokuho / 10000)}万円`);
+    if (startAge >= 65) breakdownParts.push(`介護保険料 ${fmt(net.kaigo / 10000)}万円`);
+    if (startAge >= 75) breakdownParts.push(`後期高齢者医療制度 ${fmt(net.koukikourei / 10000)}万円`);
+    const totalDeductionMan = (net.incomeTax + net.residentTax + net.kokuho + net.kaigo + net.koukikourei) / 10000;
+    document.getElementById('paTaxBreakdown').textContent =
+        `税・社会保険料の内訳（年額）: ${breakdownParts.join('／')}／合計 ${fmt(totalDeductionMan)}万円`;
+
+    let note = '';
+    if (startAge < 65) {
+        note = '⚠ 繰り上げ受給は一度手続きすると取り消し・変更ができません。減額率は一生涯続きます。65歳になる前に障害を負っても、事後重症による障害年金を請求できなくなるなどのリスクがあります。年金は繰り上げても課税対象である点は変わりません（額が減る分、非課税ラインを下回りやすくなるだけです）。';
+    } else if (startAge > 65) {
+        note = '⚠ 繰り下げ待機期間中は、配偶者がいる場合の加給年金（年額約42万円）を受け取れません。年金額が増えることで所得税・住民税に加え、国民健康保険料・介護保険料の負担も増える場合があり、額面ほど手取りは増えないことがあります。';
+    } else {
+        note = '標準の65歳受給です。繰り上げ・繰り下げによる増減はありません。';
+    }
+    document.getElementById('paNote').textContent = note;
+
+    // 老後の希望生活費と年金手取りを比較し、不足分をアルバイトで埋める場合の月額を算出
+    const monthlyLivingCostMan = parseFloat(document.getElementById('monthlyLivingCost').value) || 0;
+    document.getElementById('paLivingCostRef').textContent = `月 ${monthlyLivingCostMan.toFixed(1)} 万円`;
+
+    const netMonthlyMan = net.netAnnual / 12 / 10000;
+    const gapMan = monthlyLivingCostMan - netMonthlyMan;
+    const sideJobRow = document.getElementById('paSideJobRow');
+    const sideJobLabel = document.getElementById('paSideJobLabel');
+    const sideJobVal = document.getElementById('paSideJobVal');
+    const sideJobNote = document.getElementById('paSideJobNote');
+    const sideJobTaxNote = document.getElementById('paSideJobTaxNote');
+    const sideJobEndAgeRow = document.getElementById('paSideJobEndAgeRow');
+    const sideJobReflectRow = document.getElementById('paSideJobReflectRow');
+    if (gapMan > 0.05) {
+        populateSideJobEndAgeSelect();
+        const endAge = parseFloat(document.getElementById('paSideJobEndAge').value) || 0;
+        sideJobEndAgeRow.style.display = '';
+        sideJobReflectRow.style.display = '';
+        sideJobRow.classList.add('warn');
+        sideJobLabel.textContent = 'アルバイト・副収入で埋めるなら（月額の目安）';
+        sideJobVal.textContent = `月 ${gapMan.toFixed(1)} 万円`;
+        sideJobNote.textContent = endAge > startAge
+            ? `年金の手取り（月${netMonthlyMan.toFixed(1)}万円）だけでは希望の生活費に月${gapMan.toFixed(1)}万円足りません。この分をアルバイト等の副収入で、${startAge}歳から${endAge}歳まで補う想定です（今の物価水準での金額）。`
+            : `年金の手取り（月${netMonthlyMan.toFixed(1)}万円）だけでは希望の生活費に月${gapMan.toFixed(1)}万円足りません。下の「アルバイトなし」のままだとこの不足分はシミュレーションに反映されません。補う場合は下のプルダウンで何歳まで続けるか選んでください。`;
+        sideJobTaxNote.innerHTML =
+            '※ 働き方による注意点（2026年度時点の制度）<br>' +
+            '・会社に雇われて厚生年金に加入しながら働く場合、年金額と給与の合計が月65万円（2026年4月からの基準額。令和7年度までは月51万円）を超えると、年金の一部が支給停止されることがあります（在職老齢年金）。<br>' +
+            '・アルバイト等の給与収入のみなら、目安として年123万円程度までは所得税がかからないケースが多いです（2025年度税制改正後。基礎控除＋給与所得控除の合計、年収水準により最大160万円まで拡大）。ただし住民税は年収100万円前後から課税される場合があります。<br>' +
+            '・個人事業主・フリーランスとして収入を得る場合は給与所得控除がなく、事業所得（収入−経費）が目安として年104万円程度（2026年分の基礎控除相当）を超えると課税・確定申告が必要になり得ます。年金収入とも合算されるため、実際のラインは年金額により変動します。<br>' +
+            '・いずれも概算です。正確な基準額・控除額は日本年金機構・税務署・市区町村にご確認ください。';
+    } else {
+        sideJobEndAgeRow.style.display = 'none';
+        sideJobReflectRow.style.display = 'none';
+        sideJobRow.classList.remove('warn');
+        sideJobLabel.textContent = 'アルバイト・副収入は必要？';
+        sideJobVal.textContent = '不要（年金の手取りで足りています）';
+        sideJobNote.textContent = `年金の手取り（月${netMonthlyMan.toFixed(1)}万円）だけで、希望の生活費（月${monthlyLivingCostMan.toFixed(1)}万円）を賄える計算です。`;
+        sideJobTaxNote.innerHTML = '';
+    }
+
+    updateZaishokuCalc();
+}
+
+// 「アルバイト・副収入を何歳まで続ける？」のプルダウンを、年金受給開始年齢〜想定寿命の範囲で生成する
+function populateSideJobEndAgeSelect() {
+    const sel = document.getElementById('paSideJobEndAge');
+    const startAge = parseFloat(document.getElementById('pensionStartAgeMirror').value) || 65;
+    const lifeExpectancy = parseFloat(document.getElementById('lifeExpectancy').value) || 90;
+    const prevVal = sel.value;
+    sel.innerHTML = '';
+    for (let age = startAge; age <= lifeExpectancy; age++) {
+        const opt = document.createElement('option');
+        opt.value = age;
+        if (age === startAge) opt.textContent = `${age}歳まで（アルバイトなし）`;
+        else if (age === lifeExpectancy) opt.textContent = `${age}歳まで（想定寿命まで）`;
+        else opt.textContent = `${age}歳まで`;
+        sel.appendChild(opt);
+    }
+    if (sel.options.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = lifeExpectancy;
+        opt.textContent = `${lifeExpectancy}歳まで`;
+        sel.appendChild(opt);
+    }
+    const hasPrev = Array.prototype.some.call(sel.options, o => o.value === prevVal);
+    sel.value = hasPrev ? prevVal : String(startAge);
+}
+
+// 在職老齢年金の基準額（2026年4月改定後の月額、万円）
+const ZAISHOKU_LIMIT_MAN = 65;
+
+function populateZkSelect(sel, maxMan) {
+    const prevVal = Math.min(parseFloat(sel.value) || 0, Math.max(0, Math.floor(maxMan)));
+    sel.innerHTML = '';
+    for (let v = 0; v <= Math.floor(maxMan); v++) {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = `${v}万円`;
+        sel.appendChild(opt);
+    }
+    sel.value = prevVal;
+}
+
+// アルバイト・副収入を組み合わせても、年金＋アルバイト＋副収入が在職老齢年金の基準額を超えないようプルダウンの選択肢を動的に絞り込む
+function updateZaishokuCalc() {
+    const pensionMan = computeAdjustedPensionMonthly().adjustedMonthlyMan;
+    document.getElementById('zkLimitLabel').textContent = ZAISHOKU_LIMIT_MAN;
+
+    const arbaitoSel = document.getElementById('zkArbaito');
+    const fukugyoSel = document.getElementById('zkFukugyo');
+
+    const maxArbaito = Math.max(0, ZAISHOKU_LIMIT_MAN - pensionMan);
+    populateZkSelect(arbaitoSel, maxArbaito);
+
+    const arbaitoVal = parseFloat(arbaitoSel.value) || 0;
+    const maxFukugyo = Math.max(0, ZAISHOKU_LIMIT_MAN - pensionMan - arbaitoVal);
+    populateZkSelect(fukugyoSel, maxFukugyo);
+
+    const fukugyoVal = parseFloat(fukugyoSel.value) || 0;
+    const totalMan = pensionMan + arbaitoVal + fukugyoVal;
+    document.getElementById('zkTotalVal').textContent = `月 ${totalMan.toFixed(1)} 万円`;
+    document.getElementById('zkNote').textContent =
+        `年金額面（月${pensionMan.toFixed(1)}万円）＋アルバイト（月${arbaitoVal}万円）＋副収入（月${fukugyoVal}万円）＝月${totalMan.toFixed(1)}万円。在職老齢年金の基準額（月${ZAISHOKU_LIMIT_MAN}万円）以下なので年金は減額されません。この基準は本来、厚生年金に加入する働き方（アルバイト）の給与にのみ適用され、フリーランス等の副収入は対象外ですが、ここでは分かりやすさのため同じ上限内で試算しています。`;
+}
+
+// 0万円から maxMan 万円まで step 刻みの選択肢を持つプルダウンを生成する（積立額入力用）
+function populateAmountSelect(sel, maxMan, step) {
+    if (!sel || sel.options.length > 0) return;
+    for (let v = 0; v <= maxMan; v += step) {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = `${v}万円/月`;
+        sel.appendChild(opt);
+    }
+}
+
+// 現在の年齢〜リタイア年齢の新NISA資産見込み（積立を含む）をライブプレビュー表示する
+function updateNisaProjection() {
+    const currentAge = parseFloat(document.getElementById('currentAge').value) || 0;
+    const retireAge = parseFloat(document.getElementById('retireAge').value) || 0;
+    const nisaTotalMan = parseFloat(document.getElementById('nisaTotalMirror').value) || 0;
+    const nisaReturnPct = parseFloat(document.getElementById('nisaReturnMirror').value) || 0;
+    const nisaMonthlyMan = parseFloat(document.getElementById('nisaMonthly').value) || 0;
+    const nisaReturn = nisaReturnPct / 100;
+
+    document.getElementById('nisaPhase1Label').textContent = `${currentAge}歳〜${retireAge}歳`;
+    document.getElementById('nisaRetireAgeLabel').textContent = retireAge;
+
+    const valEl = document.getElementById('nisaAtRetireVal');
+    const noteEl = document.getElementById('nisaProjectionNote');
+
+    if (retireAge <= currentAge) {
+        valEl.textContent = '－';
+        noteEl.textContent = 'リタイア年齢は現在の年齢より後に設定してください。';
+        return;
+    }
+
+    let bal = nisaTotalMan * 10000;
+    for (let age = currentAge; age < retireAge; age++) {
+        bal = bal * (1 + nisaReturn) + nisaMonthlyMan * 10000 * 12;
+    }
+    const balMan = bal / 10000;
+    const totalContribMan = nisaMonthlyMan * 12 * (retireAge - currentAge);
+
+    valEl.textContent = `${retireAge}歳の時点で 約${fmt(balMan)}万円`;
+    if (nisaMonthlyMan > 0) {
+        noteEl.textContent = `現在の総資金額${fmt(nisaTotalMan)}万円に、${currentAge}歳から${retireAge}歳まで毎月${nisaMonthlyMan}万円（合計${fmt(totalContribMan)}万円）を積み立て、年率${nisaReturnPct}%で複利運用した場合の見込みです。`;
+    } else {
+        noteEl.textContent = `現在の総資金額${fmt(nisaTotalMan)}万円を、${currentAge}歳から${retireAge}歳まで年率${nisaReturnPct}%で複利運用した場合の見込みです。`;
+    }
+
+    // 「65歳〜想定寿命」ブロックの起点金額に自動反映する
+    setVal('nisaTotal2', fmt(balMan).replace(/,/g, ''));
+    updateNisaProjection2();
+}
+
+// リタイア年齢〜想定寿命の新NISA資産見込み（積立を含む）をライブプレビュー表示する（起点金額は上のブロックの結果を自動反映、他は独立入力）
+function updateNisaProjection2() {
+    const retireAge = parseFloat(document.getElementById('retireAge').value) || 0;
+    const lifeExpectancy = parseFloat(document.getElementById('lifeExpectancy').value) || 0;
+    const nisaTotal2Man = parseFloat(document.getElementById('nisaTotal2').value) || 0;
+    const nisaReturn2Pct = parseFloat(document.getElementById('nisaReturn2').value) || 0;
+    const nisaMonthly2Man = parseFloat(document.getElementById('nisaMonthly2').value) || 0;
+    const nisaReturn2 = nisaReturn2Pct / 100;
+
+    document.getElementById('nisaPhase2Label').textContent = `${retireAge}歳〜${lifeExpectancy}歳`;
+    document.getElementById('nisa2EndAgeLabel').textContent = lifeExpectancy;
+
+    const valEl = document.getElementById('nisa2AtEndVal');
+    const noteEl = document.getElementById('nisa2ProjectionNote');
+
+    if (lifeExpectancy <= retireAge) {
+        valEl.textContent = '－';
+        noteEl.textContent = '想定寿命はリタイア年齢より後に設定してください。';
+        return;
+    }
+
+    let bal2 = nisaTotal2Man * 10000;
+    for (let age = retireAge; age < lifeExpectancy; age++) {
+        bal2 = bal2 * (1 + nisaReturn2) + nisaMonthly2Man * 10000 * 12;
+    }
+    const endMan = bal2 / 10000;
+    const totalContrib2Man = nisaMonthly2Man * 12 * (lifeExpectancy - retireAge);
+
+    valEl.textContent = `${lifeExpectancy}歳の時点で 約${fmt(endMan)}万円`;
+    if (nisaMonthly2Man > 0) {
+        noteEl.textContent = `この時点の資産${fmt(nisaTotal2Man)}万円に、${retireAge}歳から${lifeExpectancy}歳まで毎月${nisaMonthly2Man}万円（合計${fmt(totalContrib2Man)}万円）を積み立て、年率${nisaReturn2Pct}%で複利運用した場合の見込みです。`;
+    } else {
+        noteEl.textContent = `この時点の資産${fmt(nisaTotal2Man)}万円を、${retireAge}歳から${lifeExpectancy}歳まで年率${nisaReturn2Pct}%で複利運用した場合の見込みです（積立なし）。`;
+    }
+}
+
+// 現在の年齢〜リタイア年齢のその他金融資産見込み（積立を含む）をライブプレビュー表示する（新NISAブロックと同じ構造）
+function updateOtherAssetProjection() {
+    const currentAge = parseFloat(document.getElementById('currentAge').value) || 0;
+    const retireAge = parseFloat(document.getElementById('retireAge').value) || 0;
+    const totalMan = parseFloat(document.getElementById('otherAssetTotalMirror').value) || 0;
+    const returnPct = parseFloat(document.getElementById('investReturn').value) || 0;
+    const monthlyMan = parseFloat(document.getElementById('otherAssetMonthly').value) || 0;
+    const returnRate = returnPct / 100;
+
+    document.getElementById('otherAssetPhase1Label').textContent = `${currentAge}歳〜${retireAge}歳`;
+    document.getElementById('otherAssetRetireAgeLabel').textContent = retireAge;
+
+    const valEl = document.getElementById('otherAssetAtRetireVal');
+    const noteEl = document.getElementById('otherAssetProjectionNote');
+
+    if (retireAge <= currentAge) {
+        valEl.textContent = '－';
+        noteEl.textContent = 'リタイア年齢は現在の年齢より後に設定してください。';
+        return;
+    }
+
+    let bal = totalMan * 10000;
+    for (let age = currentAge; age < retireAge; age++) {
+        bal = bal * (1 + returnRate) + monthlyMan * 10000 * 12;
+    }
+    const balMan = bal / 10000;
+    const totalContribMan = monthlyMan * 12 * (retireAge - currentAge);
+
+    valEl.textContent = `${retireAge}歳の時点で 約${fmt(balMan)}万円`;
+    if (monthlyMan > 0) {
+        noteEl.textContent = `現在の総資金額${fmt(totalMan)}万円に、${currentAge}歳から${retireAge}歳まで毎月${monthlyMan}万円（合計${fmt(totalContribMan)}万円）を積み立て、年率${returnPct}%で複利運用した場合の見込みです。`;
+    } else {
+        noteEl.textContent = `現在の総資金額${fmt(totalMan)}万円を、${currentAge}歳から${retireAge}歳まで年率${returnPct}%で複利運用した場合の見込みです。`;
+    }
+
+    // 「65歳〜想定寿命」ブロックの起点金額に自動反映する
+    setVal('otherAssetTotal2', fmt(balMan).replace(/,/g, ''));
+    updateOtherAssetProjection2();
+}
+
+// リタイア年齢〜想定寿命のその他金融資産見込み（積立を含む）をライブプレビュー表示する（起点金額は上のブロックの結果を自動反映、他は独立入力）
+function updateOtherAssetProjection2() {
+    const retireAge = parseFloat(document.getElementById('retireAge').value) || 0;
+    const lifeExpectancy = parseFloat(document.getElementById('lifeExpectancy').value) || 0;
+    const total2Man = parseFloat(document.getElementById('otherAssetTotal2').value) || 0;
+    const return2Pct = parseFloat(document.getElementById('otherAssetReturn2').value) || 0;
+    const monthly2Man = parseFloat(document.getElementById('otherAssetMonthly2').value) || 0;
+    const return2Rate = return2Pct / 100;
+
+    document.getElementById('otherAssetPhase2Label').textContent = `${retireAge}歳〜${lifeExpectancy}歳`;
+    document.getElementById('otherAsset2EndAgeLabel').textContent = lifeExpectancy;
+
+    const valEl = document.getElementById('otherAsset2AtEndVal');
+    const noteEl = document.getElementById('otherAssetProjection2Note');
+
+    if (lifeExpectancy <= retireAge) {
+        valEl.textContent = '－';
+        noteEl.textContent = '想定寿命はリタイア年齢より後に設定してください。';
+        return;
+    }
+
+    let bal2 = total2Man * 10000;
+    for (let age = retireAge; age < lifeExpectancy; age++) {
+        bal2 = bal2 * (1 + return2Rate) + monthly2Man * 10000 * 12;
+    }
+    const endMan = bal2 / 10000;
+    const totalContrib2Man = monthly2Man * 12 * (lifeExpectancy - retireAge);
+
+    valEl.textContent = `${lifeExpectancy}歳の時点で 約${fmt(endMan)}万円`;
+    if (monthly2Man > 0) {
+        noteEl.textContent = `この時点の資産${fmt(total2Man)}万円に、${retireAge}歳から${lifeExpectancy}歳まで毎月${monthly2Man}万円（合計${fmt(totalContrib2Man)}万円）を積み立て、年率${return2Pct}%で複利運用した場合の見込みです。`;
+    } else {
+        noteEl.textContent = `この時点の資産${fmt(total2Man)}万円を、${retireAge}歳から${lifeExpectancy}歳まで年率${return2Pct}%で複利運用した場合の見込みです（積立なし）。`;
+    }
+}
+
+function applyInflationPreset(rate, btn) {
+    setVal('inflationRate', rate);
+    setVal('pensionGrowthRate', Math.max(0, +(rate - 1.3).toFixed(1)));
+    document.querySelectorAll('#inflationPresetRow .preset-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+}
+
+function fmt(n) {
+    return Math.round(n).toLocaleString('ja-JP');
+}
+
+function readParams() {
+    return {
+        currentAge: parseFloat(document.getElementById('currentAge').value),
+        retireAge: parseFloat(document.getElementById('retireAge').value),
+        pensionStartAge: parseFloat(document.getElementById('pensionStartAgeMirror').value),
+        lifeExpectancy: parseFloat(document.getElementById('lifeExpectancy').value),
+        savingsAssets: parseFloat(document.getElementById('savingsAssets').value) * 10000,
+        investAssets: parseFloat(document.getElementById('otherAssetTotalMirror').value) * 10000,
+        monthlyLivingCost: parseFloat(document.getElementById('monthlyLivingCost').value) * 10000,
+        monthlyPension: computeAdjustedPensionMonthly().adjustedMonthlyMan * 10000,
+        inflationRate: parseFloat(document.getElementById('inflationRate').value) / 100,
+        pensionGrowthRate: parseFloat(document.getElementById('pensionGrowthRate').value) / 100,
+        investReturn: parseFloat(document.getElementById('investReturn').value) / 100,
+        nisaTotal: parseFloat(document.getElementById('nisaTotalMirror').value) * 10000,
+        nisaReturn: parseFloat(document.getElementById('nisaReturnMirror').value) / 100,
+        nisaMonthly: (parseFloat(document.getElementById('nisaMonthly').value) || 0) * 10000,
+        nisaMonthly2: (parseFloat(document.getElementById('nisaMonthly2').value) || 0) * 10000,
+        nisaContinueAfterRetire: document.getElementById('nisaContinueAfterRetire').value === 'continue',
+        otherAssetMonthly: (parseFloat(document.getElementById('otherAssetMonthly').value) || 0) * 10000,
+        otherAssetMonthly2: (parseFloat(document.getElementById('otherAssetMonthly2').value) || 0) * 10000,
+        otherAssetContinueAfterRetire: document.getElementById('otherAssetContinueAfterRetire').value === 'continue',
+        sideJobIncomeMonthly: document.getElementById('paSideJobReflect').value === 'continue' ? computeSideJobGapMan() * 10000 : 0,
+        sideJobEndAge: parseFloat(document.getElementById('paSideJobEndAge').value) || parseFloat(document.getElementById('lifeExpectancy').value),
+    };
+}
+
+// 老後の希望生活費と年金手取りの月額差（プラスなら不足）を計算する純粋関数（表示用・シミュレーション用の両方から使う）
+function computeSideJobGapMan() {
+    const monthlyLivingCostMan = parseFloat(document.getElementById('monthlyLivingCost').value) || 0;
+    const { adjustedMonthlyMan, startAge } = computeAdjustedPensionMonthly();
+    const net = estimateNetPensionIncome(adjustedMonthlyMan * 12 * 10000, startAge);
+    const netMonthlyMan = net.netAnnual / 12 / 10000;
+    return Math.max(0, monthlyLivingCostMan - netMonthlyMan);
+}
+
+// 純粋関数: 与えられたパラメータで資産推移をシミュレーションする（本計算・逆算計算の両方から使う）
+function runSim(p) {
+    // リタイアまで: 預貯金は増えない安全資産として据え置き、金融資産・新NISA総資金額は
+    // それぞれの運用利回りで複利成長させ、リタイア時点で合算する
+    let savingsBalance = p.savingsAssets;
+    let investBalance = p.investAssets;
+    let nisaBalance = p.nisaTotal;
+    for (let age = p.currentAge; age < p.retireAge; age++) {
+        investBalance = investBalance * (1 + p.investReturn) + p.otherAssetMonthly * 12;
+        nisaBalance = nisaBalance * (1 + p.nisaReturn) + p.nisaMonthly * 12;
+    }
+    const assetAtRetire = savingsBalance + investBalance + nisaBalance;
+
+    let balance = assetAtRetire;
+    const ages = [];
+    const balances = [];
+    let depletedAge = null;
+
+    for (let age = p.retireAge; age <= p.lifeExpectancy; age++) {
+        const yearsFromNow = age - p.currentAge;
+        const livingCostThisYear = p.monthlyLivingCost * 12 * Math.pow(1 + p.inflationRate, yearsFromNow);
+        const pensionThisYear = age >= p.pensionStartAge
+            ? p.monthlyPension * 12 * Math.pow(1 + p.pensionGrowthRate, yearsFromNow)
+            : 0;
+        const sideJobIncomeThisYear = (age >= p.pensionStartAge && age < p.sideJobEndAge)
+            ? p.sideJobIncomeMonthly * 12 * Math.pow(1 + p.inflationRate, yearsFromNow)
+            : 0;
+        const netNeed = livingCostThisYear - pensionThisYear - sideJobIncomeThisYear;
+        const contribThisYear = (p.nisaContinueAfterRetire ? p.nisaMonthly2 * 12 : 0) +
+            (p.otherAssetContinueAfterRetire ? p.otherAssetMonthly2 * 12 : 0);
+
+        balance = balance * (1 + p.investReturn) - netNeed + contribThisYear;
+
+        ages.push(age);
+        balances.push(balance);
+        if (depletedAge === null && balance < 0) depletedAge = age;
+    }
+
+    return { assetAtRetire, ages, balances, finalBalance: balances[balances.length - 1], depletedAge };
+}
+
+// 初回シミュレーション結果のヒーロー表示（目標額）— 一度計算したら固定し、以降の再計算では上書きしない
+let frozenHero = null;
+
+// プロフィール欄の「シミュレーション実行」ボタン専用: プロフィールの数値はいつでも変更でき、
+// このボタンを押すたびに目標額（frozenHero）を作り直す。詳細設定側の「この条件で再計算する」や
+// 各トグルは既存のfrozenHeroを維持したまま残りギャップだけ再計算する（simulate()をそのまま呼ぶ）。
+function runFreshSimulation() {
+    frozenHero = null;
+    simulate();
+    document.getElementById('heroResult').scrollIntoView({behavior: 'smooth'});
+}
+
+function simulate() {
+    const p = readParams();
+
+    if (p.lifeExpectancy <= p.retireAge) {
+        alert('想定寿命はリタイア年齢より後の年齢を入力してください。');
+        return;
+    }
+    if (p.retireAge < p.currentAge) {
+        alert('リタイア年齢は現在の年齢以降を入力してください。');
+        return;
+    }
+
+    const sim = runSim(p);
+    const { assetAtRetire, ages, balances, finalBalance, depletedAge } = sim;
+    const yearsToRetire = p.retireAge - p.currentAge;
+
+    // ===== ヒーロー結果（初回シミュレーションの結果を目標額として固定表示） =====
+    const heroResult = document.getElementById('heroResult');
+    heroResult.style.display = 'block';
+    const heroLabel = document.getElementById('heroLabel');
+    const heroAmount = document.getElementById('heroAmount');
+    const heroNote = document.getElementById('heroNote');
+
+    if (frozenHero === null) {
+        if (finalBalance < 0) {
+            const shortfallToday = Math.abs(finalBalance) / Math.pow(1 + p.investReturn, Math.max(yearsToRetire, 0));
+            frozenHero = {
+                isSurplus: false,
+                label: `${p.retireAge}歳（リタイア）までに、追加で用意しておきたい金額の目安`,
+                amountText: `約 ${fmt(shortfallToday / 10000)} 万円`,
+                noteText: `このままだと${depletedAge}歳ごろに資産が尽きる計算です（想定寿命${p.lifeExpectancy}歳までに名目で約${fmt(Math.abs(finalBalance) / 10000)}万円不足）。今のお金の感覚に換算した目安がこの金額です（この目標額は最初の1回だけ計算され、以降は固定表示されます）。`,
+            };
+        } else {
+            frozenHero = {
+                isSurplus: true,
+                label: `${p.retireAge}歳（リタイア）時点の資産見込み`,
+                amountText: `約 ${fmt(assetAtRetire / 10000)} 万円`,
+                noteText: `現在の設定なら、想定寿命（${p.lifeExpectancy}歳）まで資産は持ちます。${p.lifeExpectancy}歳時点で約${fmt(finalBalance / 10000)}万円の余裕が残る計算です（この結果は最初の1回だけ計算され、以降は固定表示されます）。`,
+            };
+        }
+    }
+    heroLabel.textContent = frozenHero.label;
+    heroAmount.textContent = frozenHero.amountText;
+    heroAmount.classList.toggle('surplus', frozenHero.isSurplus);
+    heroNote.textContent = frozenHero.noteText;
+
+    // 「年金＋副収入＋新NISA＋その他金融資産　今の設定での残り」— 今の全設定でどれだけ届いていないかを毎回再計算
+    const hfVal = document.getElementById('hfVal');
+    const hfSub = document.getElementById('hfSub');
+    if (finalBalance < 0) {
+        const remainingToday = Math.abs(finalBalance) / Math.pow(1 + p.investReturn, Math.max(yearsToRetire, 0));
+        hfVal.textContent = `あと 約 ${fmt(remainingToday / 10000)} 万円`;
+        hfSub.textContent = `年金・アルバイト等の副収入・新NISA・その他金融資産を今の設定で計算すると、まだ約${fmt(remainingToday / 10000)}万円足りません。各項目を調整して、この金額が0万円になれば計画は目標を達成できています。`;
+    } else {
+        hfVal.textContent = `あと 0 万円（達成）`;
+        hfSub.textContent = `年金・アルバイト等の副収入・新NISA・その他金融資産を今の設定で計算すると、目標をすでに満たせています。`;
+    }
+
+    // ===== 詳細結果 =====
+    const resultBox = document.getElementById('resultBox');
+    resultBox.style.display = 'block';
+
+    const headline = document.getElementById('resultHeadline');
+    const sub = document.getElementById('resultSub');
+    const grid = document.getElementById('resultGrid');
+
+    if (finalBalance >= 0) {
+        headline.textContent = `想定寿命（${p.lifeExpectancy}歳）まで資産は持ちます`;
+        headline.style.color = '#4fd8a0';
+    } else {
+        headline.textContent = `${depletedAge}歳ごろに資産が尽きる見込みです`;
+        headline.style.color = '#ff6b5e';
+    }
+    sub.textContent = '詳細な内訳は以下の通りです。';
+
+    grid.innerHTML = `
+        <div class="result-card">
+            <div class="rlabel">リタイア時点の資産見込み（預貯金＋金融資産＋新NISA合算）</div>
+            <div class="rval">${fmt(assetAtRetire / 10000)}万円</div>
+        </div>
+        <div class="result-card">
+            <div class="rlabel">老後生活の年数</div>
+            <div class="rval">${p.lifeExpectancy - p.retireAge}年</div>
+        </div>
+        <div class="result-card ${depletedAge ? 'danger' : 'safe'}">
+            <div class="rlabel">資産が尽きる年齢</div>
+            <div class="rval">${depletedAge ? depletedAge + '歳' : 'なし'}</div>
+        </div>
+        <div class="result-card ${finalBalance < 0 ? 'danger' : 'safe'}">
+            <div class="rlabel">寿命時点での過不足額（名目）</div>
+            <div class="rval">${finalBalance < 0 ? '-' : '+'}${fmt(Math.abs(finalBalance) / 10000)}万円</div>
+        </div>
+    `;
+
+    buildBreakdownTable(p);
+    drawAssetChart(ages, balances, p.retireAge, p.pensionStartAge);
+}
+
+// 月間・年間の収支イメージ表（リタイア年齢／中間年齢／想定寿命の3時点）
+function buildBreakdownTable(p) {
+    const refAgesSet = new Set([
+        p.retireAge,
+        Math.round((p.retireAge + p.lifeExpectancy) / 2),
+        p.lifeExpectancy
+    ]);
+    const refAges = [...refAgesSet].sort((a, b) => a - b);
+
+    const rows = refAges.map(age => {
+        const yearsFromNow = age - p.currentAge;
+        const monthlyLiving = (p.monthlyLivingCost * Math.pow(1 + p.inflationRate, yearsFromNow)) / 10000;
+        const monthlyPension = age >= p.pensionStartAge
+            ? (p.monthlyPension * Math.pow(1 + p.pensionGrowthRate, yearsFromNow)) / 10000
+            : 0;
+        const monthlyShortfall = monthlyLiving - monthlyPension;
+        const annualShortfall = monthlyShortfall * 12;
+        return { age, monthlyLiving, monthlyPension, monthlyShortfall, annualShortfall };
+    });
+
+    const cellClass = v => v > 0 ? 'sf-neg' : 'sf-pos';
+    const sign = v => v > 0 ? '-' : '+';
+
+    let html = `
+        <tr>
+            <th>年齢</th>
+            <th>月間生活費（インフレ調整後）</th>
+            <th>月間年金受給額</th>
+            <th>月間の不足/余剰</th>
+            <th>年間の不足/余剰</th>
+        </tr>
+    `;
+    rows.forEach(r => {
+        html += `
+        <tr>
+            <td>${r.age}歳</td>
+            <td>${fmt(r.monthlyLiving)}万円</td>
+            <td>${fmt(r.monthlyPension)}万円</td>
+            <td class="${cellClass(r.monthlyShortfall)}">${sign(r.monthlyShortfall)}${fmt(Math.abs(r.monthlyShortfall))}万円</td>
+            <td class="${cellClass(r.annualShortfall)}">${sign(r.annualShortfall)}${fmt(Math.abs(r.annualShortfall))}万円</td>
+        </tr>
+        `;
+    });
+    document.getElementById('breakdownTable').innerHTML = html;
+}
+
+function drawAssetChart(ages, balances, retireAge, pensionStartAge) {
+    const canvas = document.getElementById('assetChart');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth || 900;
+    canvas.height = 260;
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const pad = { top: 20, bottom: 30, left: 60, right: 15 };
+    const innerW = w - pad.left - pad.right;
+    const innerH = h - pad.top - pad.bottom;
+
+    const minV = Math.min(...balances, 0);
+    const maxV = Math.max(...balances, 0);
+    const span = (maxV - minV) || 1;
+
+    const zeroY = pad.top + innerH - ((0 - minV) / span) * innerH;
+
+    // グリッド線
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+        const y = pad.top + innerH - (innerH * i / 4);
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
+        const val = minV + span * i / 4;
+        ctx.fillStyle = '#999';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'right';
+        ctx.fillText(fmt(val / 10000) + '万', pad.left - 6, y + 3);
+    }
+
+    // ゼロライン強調
+    ctx.strokeStyle = '#ff6b5e';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(pad.left, zeroY); ctx.lineTo(w - pad.right, zeroY); ctx.stroke();
+
+    const n = ages.length;
+    const stepX = innerW / (n - 1 || 1);
+
+    // 年金受給開始年齢の背景帯
+    const pensionStartIdx = ages.findIndex(a => a >= pensionStartAge);
+    if (pensionStartIdx >= 0) {
+        const x = pad.left + pensionStartIdx * stepX;
+        ctx.fillStyle = 'rgba(79,216,181,0.10)';
+        ctx.fillRect(x, pad.top, w - pad.right - x, innerH);
+    }
+
+    // 資産推移ライン
+    ctx.strokeStyle = '#1abc9c';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    balances.forEach((v, i) => {
+        const x = pad.left + i * stepX;
+        const y = pad.top + innerH - ((v - minV) / span) * innerH;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // 塗りつぶし
+    ctx.lineTo(pad.left + (n - 1) * stepX, zeroY);
+    ctx.lineTo(pad.left, zeroY);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(26,188,156,0.15)';
+    ctx.fill();
+
+    // X軸ラベル（年齢）
+    ctx.fillStyle = '#999';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    const labelStep = Math.max(1, Math.ceil(n / 10));
+    for (let i = 0; i < n; i += labelStep) {
+        const x = pad.left + i * stepX;
+        ctx.fillText(ages[i] + '歳', x, h - pad.bottom + 14);
+    }
+    ctx.fillText(ages[n - 1] + '歳', pad.left + (n - 1) * stepX, h - pad.bottom + 14);
+
+    document.getElementById('chartLegend').innerHTML =
+        '<span style="color:#1abc9c;">■</span> 資産残高の推移　' +
+        '<span style="color:rgba(79,216,181,0.7);">■</span> 年金受給開始後　' +
+        '<span style="color:#ff6b5e;">—</span> 資産ゼロライン';
+}
+
+populateAmountSelect(document.getElementById('nisaMonthly'), 50, 1);
+populateAmountSelect(document.getElementById('nisaMonthly2'), 50, 1);
+populateAmountSelect(document.getElementById('otherAssetMonthly'), 50, 1);
+populateAmountSelect(document.getElementById('otherAssetMonthly2'), 50, 1);
+updatePensionAdjustment();
+updateNisaProjection();
+updateNisaProjection2();
+updateOtherAssetProjection();
+updateOtherAssetProjection2();
+</script>
+
+</body>
+</html>
