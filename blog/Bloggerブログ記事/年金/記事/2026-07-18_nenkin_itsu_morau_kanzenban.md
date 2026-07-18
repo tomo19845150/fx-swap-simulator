@@ -12,7 +12,7 @@ account: rational-lab
 platform: Blogger
 blog_id: "7106217722588482146"
 series: 老後資金・年金シリーズ（記事B・統合版）
-related_tool: "https://comforting-malasada-f76eb4.netlify.app"
+related_tool: "https://tomo19845150.github.io/fx-swap-simulator/"
 supersedes:
   - "2026-07-18_nenkin_kuriage_kurisage_sonekibunkiten.md"
   - "2026-07-18_nenkin_60sai_jikan_wo_kau.md"
@@ -115,7 +115,7 @@ sources:
 
 ここまでの論点——繰り上げ・繰り下げの増減率、手取り額の目安（税引後概算）、在職老齢年金の支給停止基準、加給年金の停止——は、当ブログのFIRE資金逆算シミュレーターに組み込み済みです。
 
-<strong><a href="https://comforting-malasada-f76eb4.netlify.app" target="_blank" rel="noopener">FIRE資金逆算シミュレーターを開く</a></strong>（別タブで開きます。「年金の見込み額」ボックスで受給開始年齢を60〜75歳の間で切り替えると、額面・手取り・受給開始〜想定寿命までの手取り総額が連動して表示されます。）
+<strong><a href="https://tomo19845150.github.io/fx-swap-simulator/" target="_blank" rel="noopener">FIRE資金逆算シミュレーターを開く</a></strong>（別タブで開きます。「年金の見込み額」ボックスで受給開始年齢を60〜75歳の間で切り替えると、額面・手取り・受給開始〜想定寿命までの手取り総額が連動して表示されます。）
 
 ## まとめ
 
