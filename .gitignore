@@ -4,3 +4,4 @@ trash/
 *.log
 *.gsheet
 .playwright-mcp/
+.claude/settings.local.json
