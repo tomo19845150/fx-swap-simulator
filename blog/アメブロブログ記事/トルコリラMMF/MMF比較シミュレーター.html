@@ -1,0 +1,728 @@
+<title>米ドル・ランド・リラ MMF比較シミュレーター</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root{
+    --bg:#eef1ef;
+    --surface:#ffffff;
+    --surface-alt:#e2e8e4;
+    --ink:#16211d;
+    --ink-2:#55635e;
+    --ink-3:#7c8983;
+    --border:#d2dad5;
+    --accent:#1f5f5b;
+    --accent-ink:#ffffff;
+    --usd:#5c93d8;
+    --zar:#3fa878;
+    --try:#db6a4e;
+    --usd-bg:rgba(92,147,216,.13);
+    --zar-bg:rgba(63,168,120,.13);
+    --try-bg:rgba(219,106,78,.13);
+    --dep-sp500:#b8863a;
+    --dep-net:#5b7a99;
+    --dep-sp500-bg:rgba(184,134,58,.13);
+    --dep-net-bg:rgba(91,122,153,.13);
+    --good:#2f8f5f;
+    --bad:#c1462f;
+    --shadow: 0 1px 2px rgba(20,30,26,.06), 0 8px 24px -12px rgba(20,30,26,.18);
+    --radius:14px;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Consolas", monospace;
+    --sans: -apple-system, "Yu Gothic Medium", "Yu Gothic", "Hiragino Kaku Gothic ProN", "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#10130f;
+      --surface:#171d18;
+      --surface-alt:#1e2621;
+      --ink:#e7ede9;
+      --ink-2:#a3b2ab;
+      --ink-3:#7c8983;
+      --border:#2a332d;
+      --accent:#57b0a8;
+      --accent-ink:#0d1512;
+      --usd:#7fabe6;
+      --zar:#5fc294;
+      --try:#e88268;
+      --usd-bg:rgba(127,171,230,.14);
+      --zar-bg:rgba(95,194,148,.14);
+      --try-bg:rgba(232,130,104,.14);
+      --dep-sp500:#dba362;
+      --dep-net:#8bacc9;
+      --dep-sp500-bg:rgba(219,163,98,.14);
+      --dep-net-bg:rgba(139,172,201,.14);
+      --good:#5fc294;
+      --bad:#e88268;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10130f; --surface:#171d18; --surface-alt:#1e2621; --ink:#e7ede9; --ink-2:#a3b2ab; --ink-3:#7c8983;
+    --border:#2a332d; --accent:#57b0a8; --accent-ink:#0d1512;
+    --usd:#7fabe6; --zar:#5fc294; --try:#e88268;
+    --usd-bg:rgba(127,171,230,.14); --zar-bg:rgba(95,194,148,.14); --try-bg:rgba(232,130,104,.14);
+    --dep-sp500:#dba362; --dep-net:#8bacc9;
+    --dep-sp500-bg:rgba(219,163,98,.14); --dep-net-bg:rgba(139,172,201,.14);
+    --good:#5fc294; --bad:#e88268;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+  :root[data-theme="light"]{
+    --bg:#eef1ef; --surface:#ffffff; --surface-alt:#e2e8e4; --ink:#16211d; --ink-2:#55635e; --ink-3:#7c8983;
+    --border:#d2dad5; --accent:#1f5f5b; --accent-ink:#ffffff;
+    --usd:#5c93d8; --zar:#3fa878; --try:#db6a4e;
+    --usd-bg:rgba(92,147,216,.13); --zar-bg:rgba(63,168,120,.13); --try-bg:rgba(219,106,78,.13);
+    --dep-sp500:#b8863a; --dep-net:#5b7a99;
+    --dep-sp500-bg:rgba(184,134,58,.13); --dep-net-bg:rgba(91,122,153,.13);
+    --good:#2f8f5f; --bad:#c1462f;
+    --shadow: 0 1px 2px rgba(20,30,26,.06), 0 8px 24px -12px rgba(20,30,26,.18);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--sans);
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:32px 20px 80px;}
+
+  header.top{margin-bottom:28px;}
+  .eyebrow{
+    font-size:12px; letter-spacing:.12em; color:var(--accent); font-weight:700;
+    text-transform:uppercase; margin:0 0 8px;
+  }
+  h1{
+    font-size:clamp(22px,3.4vw,32px); margin:0 0 8px; font-weight:800;
+    letter-spacing:-.01em; text-wrap:balance;
+  }
+  .sub{color:var(--ink-2); margin:0 0 14px; max-width:60ch;}
+  .meta{
+    display:flex; flex-wrap:wrap; gap:8px 16px; font-size:12.5px; color:var(--ink-3);
+    border-top:1px solid var(--border); padding-top:12px;
+  }
+  .meta b{color:var(--ink-2); font-weight:600;}
+
+  .layout{display:grid; grid-template-columns: 260px 1fr; gap:24px; align-items:start;}
+  @media (max-width:860px){ .layout{grid-template-columns:1fr;} }
+
+  aside.panel{
+    position:sticky; top:20px; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:20px; box-shadow:var(--shadow);
+  }
+  @media (max-width:860px){ aside.panel{position:static;} }
+  .panel h2{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-2); margin:0 0 16px;}
+  .field{margin-bottom:18px;}
+  .field label{display:block; font-size:13px; color:var(--ink-2); margin-bottom:6px; font-weight:600;}
+  .field input[type="number"]{
+    width:100%; font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:16px;
+    padding:9px 10px; border:1px solid var(--border); border-radius:9px; background:var(--surface-alt);
+    color:var(--ink);
+  }
+  .field input[type="range"]{width:100%; margin-top:6px; accent-color:var(--accent);}
+  .field .hint{font-size:11.5px; color:var(--ink-3); margin-top:4px;}
+  button#resetBtn{
+    width:100%; padding:10px; border-radius:9px; border:1px solid var(--border); background:var(--surface-alt);
+    color:var(--ink-2); font-size:13px; cursor:pointer; font-weight:600;
+  }
+  button#resetBtn:hover{color:var(--ink); border-color:var(--ink-3);}
+  button#resetBtn:focus-visible, input:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
+
+  .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px;}
+  @media (max-width:960px){ .cards{grid-template-columns:1fr;} }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column;
+  }
+  .card .stripe{height:5px;}
+  .card .body{padding:16px 16px 18px;}
+  .card .card-top{min-height:132px;}
+  .card .idrow{display:flex; align-items:center; gap:9px; margin-bottom:4px; min-height:50px;}
+  .dot{width:11px; height:11px; border-radius:50%; flex:none;}
+  .cur-name{font-weight:800; font-size:15.5px;}
+  .cur-code{
+    font-family:var(--mono); font-size:11px; padding:2px 7px; border-radius:6px;
+    color:var(--ink-2); background:var(--surface-alt); letter-spacing:.03em;
+  }
+  .ref{font-size:12px; color:var(--ink-3); margin:2px 0 14px;}
+
+  .yield-row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;}
+  .yield-row label{font-size:12.5px; color:var(--ink-2); font-weight:600;}
+  .yield-row .inp{display:flex; align-items:center; gap:4px;}
+  .yield-row input{
+    width:76px; font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right;
+    padding:6px 8px; border:1px solid var(--border); border-radius:7px; background:var(--surface-alt); color:var(--ink);
+    font-size:14px;
+  }
+  .yield-row .unit{font-size:12.5px; color:var(--ink-3);}
+
+  .scen-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:6px;
+  }
+  button.scen-head{
+    font-family:var(--sans); font-size:10.5px; color:var(--ink-3); text-align:center; font-weight:700;
+    letter-spacing:.02em; background:var(--surface-alt); border:1.5px solid var(--border); border-radius:7px;
+    padding:5px 2px; cursor:pointer; transition:background .15s,color .15s,border-color .15s;
+  }
+  button.scen-head:hover{border-color:var(--ink-3); color:var(--ink-2);}
+  button.scen-head.active{background:var(--cur-bg); color:var(--cur-color); border-color:var(--cur-color);}
+  button.scen-head:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
+  .scen-fx{display:flex; align-items:center; justify-content:center; gap:2px;}
+  .scen-fx input{
+    width:44px; font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right;
+    padding:4px 4px; border:1px solid var(--border); border-radius:6px; background:var(--surface-alt); color:var(--ink);
+    font-size:12.5px;
+  }
+  .scen-fx .pc{font-size:11px; color:var(--ink-3);}
+
+  .result-grid{
+    display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-top:10px;
+    border-top:1px dashed var(--border); padding-top:10px;
+  }
+  .result-cell{text-align:center; border-radius:8px; padding:4px 2px; transition:background .15s; min-width:0;}
+  .result-cell.active{background:var(--cur-bg);}
+  .result-cell .amt{
+    font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:12.5px; font-weight:700; display:block;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .result-cell .pct{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:11px; display:block; margin-top:2px;}
+  .pct.pos{color:var(--good);}
+  .pct.neg{color:var(--bad);}
+
+  section.panel-block{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:20px; margin-bottom:24px;
+  }
+  section.panel-block h3{margin:0 0 4px; font-size:16px; font-weight:800;}
+  section.panel-block .desc{font-size:13px; color:var(--ink-2); margin:0 0 18px;}
+  section.panel-block .desc-nowrap{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+  .chart{display:flex; flex-direction:column; gap:14px; position:relative; padding-top:22px;}
+  .bar-row{display:grid; grid-template-columns:96px 1fr; align-items:center; gap:10px;}
+  .bar-label{display:flex; align-items:center; gap:7px; font-size:13px; font-weight:700;}
+  .bar-track{position:relative; height:30px; background:var(--surface-alt); border-radius:8px; overflow:visible;}
+  .bar-fill{
+    position:absolute; left:0; top:0; height:100%; border-radius:8px;
+    display:flex; align-items:center; transition:width .35s ease;
+  }
+  .bar-fill .val{
+    position:absolute; left:calc(100% + 8px); white-space:nowrap; font-family:var(--mono);
+    font-variant-numeric:tabular-nums; font-size:12.5px; font-weight:700; color:var(--ink);
+  }
+  .principal-line{
+    position:absolute; top:-6px; bottom:-6px; width:0; border-left:2px dashed var(--ink-3);
+  }
+  .principal-line .plabel{
+    position:absolute; top:-18px; left:-14px; font-size:10.5px; color:var(--ink-3); white-space:nowrap;
+  }
+
+  .tablewrap{overflow-x:auto;}
+  table.detail{width:100%; border-collapse:collapse; font-size:13px; min-width:560px;}
+  table#detailTable{font-size:11.5px;}
+  table#detailTable th, table#detailTable td{padding:7px 8px;}
+  table.detail th, table.detail td{padding:9px 10px; text-align:right; border-bottom:1px solid var(--border);}
+  table.detail th:first-child, table.detail td:first-child{text-align:left;}
+  table.detail thead th{
+    color:var(--ink-2); font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; font-weight:700;
+    border-bottom:1px solid var(--ink-3);
+  }
+  table.detail td{font-family:var(--mono); font-variant-numeric:tabular-nums;}
+  table.detail td:first-child{font-family:var(--sans); font-weight:700;}
+  table.detail tbody tr:hover{background:var(--surface-alt);}
+  table.broker-table th, table.broker-table td{text-align:left; font-family:var(--sans);}
+  table.detail td.active-scenario{background:var(--cur-bg); color:var(--cur-color); font-weight:700; border-radius:6px;}
+  table.detail td.scenario-cell{cursor:pointer; transition:background .12s,color .12s;}
+  table.detail td.scenario-cell:hover{background:var(--surface-alt);}
+  table.detail td.scenario-cell:focus-visible{outline:2px solid var(--accent); outline-offset:-2px;}
+
+  .bar-label{display:flex; flex-direction:column; align-items:flex-start; gap:1px;}
+  .bar-label .code-row{display:flex; align-items:center; gap:7px; font-size:13px; font-weight:700;}
+  .bar-label .scen-tag{font-size:10.5px; font-weight:700; color:var(--cur-color); margin-left:18px;}
+
+  .deposit-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+  @media (max-width:700px){ .deposit-grid{grid-template-columns:1fr;} }
+  .deposit-card{
+    border:1px solid var(--border); border-radius:12px; padding:14px; background:var(--surface-alt);
+  }
+  .deposit-card .idrow{display:flex; align-items:center; gap:9px; margin-bottom:2px;}
+  .deposit-card .note{font-size:11.5px; color:var(--ink-3); margin:2px 0 12px; line-height:1.5; min-height:34px;}
+  .deposit-card .yield-row{margin-bottom:0;}
+  .deposit-card .result{
+    margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);
+    display:flex; align-items:baseline; justify-content:space-between;
+  }
+  .deposit-card .result .amt{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:17px; font-weight:800;}
+  .deposit-card .result .pct{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:12.5px;}
+
+  .formula{
+    font-size:12.5px; color:var(--ink-2); background:var(--surface-alt); border:1px solid var(--border);
+    border-radius:10px; padding:12px 14px; font-family:var(--mono); line-height:1.7; overflow-x:auto;
+  }
+  .disclaimer{font-size:12px; color:var(--ink-3); margin-top:14px; line-height:1.7;}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">投資シミュレーター</p>
+    <h1>米ドル・南アフリカランド・トルコリラ MMF比較シミュレーター</h1>
+    <p class="sub">初期投資額・毎月積立額・運用年数を入力すると、3通貨の外貨建てMMFを「楽観・中庸・悲観・極端」の4シナリオで横並び比較します。利回り・為替変動率はすべて編集可能です。</p>
+    <div class="meta">
+      <span><b>データ基準日:</b> 2026-07-23</span>
+      <span><b>参考レート:</b> USD/JPY 163.15円 / ZAR/JPY 約9.90円 / TRY/JPY 約3.44円</span>
+      <span><b>参考利回り(税引前・過去1年平均目安):</b> USD 3.70%(レンジ目安3.0〜4.3%) / ZAR 6.10%(5.9〜6.8%) / TRY 37.50%(36〜40%)</span>
+    </div>
+    <p class="disclaimer" style="margin-top:8px;">利回りは各中央銀行の政策金利の過去1年間の推移(FRB・SARB・トルコ中銀)とMMF利回りの現在のスプレッドから逆算した目安値。日次MMF利回りの12ヶ月分の実データは非公開のため推計です。カード内で自由に上書きできます。</p>
+  </header>
+
+  <div class="layout">
+    <aside class="panel">
+      <h2>投資条件</h2>
+      <div class="field">
+        <label for="principal">初期投資額(万円)</label>
+        <input type="number" id="principal" value="100" min="0" step="1" />
+        <input type="range" id="principalRange" min="0" max="1000" step="1" value="100" />
+        <div class="hint">1万円単位で入力(スライダーは0〜1,000万円)</div>
+      </div>
+      <div class="field">
+        <label for="monthly">毎月積立額(円)</label>
+        <input type="number" id="monthly" value="30000" min="0" step="1000" />
+        <input type="range" id="monthlyRange" min="0" max="200000" step="1000" value="30000" />
+        <div class="hint">0円なら積立なし(一括投資のみ)。月末拠出・複利想定</div>
+      </div>
+      <div class="field">
+        <label for="years">運用年数</label>
+        <input type="number" id="years" value="3" min="1" max="30" step="1" />
+        <input type="range" id="yearsRange" min="1" max="30" step="1" value="3" />
+      </div>
+      <button id="resetBtn" type="button">前提を初期値にリセット</button>
+    </aside>
+
+    <main>
+      <div class="cards" id="cards"><!-- cards injected by JS --></div>
+
+      <section class="panel-block">
+        <h3>シナリオ別 詳細比較</h3>
+        <p class="desc desc-nowrap">3通貨×4シナリオの評価額・損益率一覧。セルをクリックすると上のカード・チャートに反映されます。</p>
+        <div class="tablewrap">
+          <table class="detail" id="detailTable">
+            <thead>
+              <tr><th>通貨</th><th>楽観</th><th>中庸</th><th>悲観</th><th>極端</th></tr>
+            </thead>
+            <tbody><!-- rows injected --></tbody>
+          </table>
+        </div>
+        <div class="formula" id="formulaBox"></div>
+        <p class="disclaimer">
+          計算式(特定口座・源泉徴収ありを想定):分配金は保有中20.315%源泉徴収した税引後利回りで複利運用し、為替変動による含み益は解約(売却)時に一括して20.315%課税(譲渡所得)します。含み損の場合は為替差益への課税なし(損益通算・繰越控除は未反映)。証券会社による税務上の差はなく、いずれも同じ国税ルールです。詳細は詳細まとめ記事17章を参照してください。過去の実績・想定値は将来の運用成果を保証するものではありません。
+        </p>
+      </section>
+
+      <section class="panel-block">
+        <h3>選択シナリオ比較</h3>
+        <p class="desc">S&P500(複利)・ネット銀行定期預金(単利)と、各通貨カードで選んだシナリオの評価額をまとめて比較(通貨ごとに別シナリオを選択可)。破線は投資元本合計(初期投資額+積立累計)の位置。</p>
+        <div class="chart" id="chart"></div>
+      </section>
+
+      <section class="panel-block">
+        <h3>S&P500・定期預金の前提設定</h3>
+        <p class="desc">上の「選択シナリオ比較」チャートに表示する、S&P500の想定利回りとネット銀行定期預金の参考金利(いずれも税引前)。ここで編集できます。</p>
+        <div class="deposit-grid" id="depositGrid"><!-- injected by JS --></div>
+        <p class="disclaimer">
+          S&P500(円建て)は過去平均が米ドルベースで年7〜11%程度である一方、直近の高値圏を踏まえた今後の見通しは年3%(慎重派)〜6.5%(基本シナリオ)程度とする予想もあり、初期値は中庸目安として年7.0%(税引前)を採用。累投型(分配金なし)を想定し、保有中は非課税で複利運用、解約時の含み益にのみ20.315%を一括課税する計算方式(通貨MMFとは課税タイミングが異なる)。ネット銀行定期預金は現時点で純粋な10年物の新規募集がほぼ無く、住信SBIネット銀行の5年物1.60%を10年目安の参考値として採用(5年ごとに同条件で預け直す前提の簡易試算・単利)。
+        </p>
+      </section>
+
+      <section class="panel-block">
+        <h3>取扱い証券会社と積立の自動化</h3>
+        <p class="desc">3通貨とも取扱いのある主要ネット証券の比較。保有中の運用益再投資はどこも自動だが、「毎月の新規積立」を自動化できるかは証券会社で差がある。</p>
+        <div class="tablewrap">
+          <table class="detail broker-table">
+            <thead>
+              <tr><th>証券会社</th><th>3通貨対応</th><th>積立自動化</th><th>引落方法</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>SBI証券</td><td>○</td><td>○ 毎月/ボーナス月コース</td><td>証券口座預り金(円貨決済のみ)</td></tr>
+              <tr><td>三菱UFJ eスマート証券(旧auカブコム)</td><td>○</td><td>○ 1万円〜1円単位</td><td>銀行自動引落 or 証券口座預り金</td></tr>
+              <tr><td>マネックス証券</td><td>○</td><td>○ 銀行de自動つみたて</td><td>銀行引落(毎月27日→翌月7日買付)</td></tr>
+              <tr><td>楽天証券</td><td>○</td><td>△ 未確認(配当金等からの自動買付は米ドルMMFのみ確認)</td><td>手動発注が前提になる可能性</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="disclaimer">積立を完全自動化したい場合はSBI証券・三菱UFJ eスマート証券・マネックス証券が候補。詳細は「トルコリラMMF検討まとめ.md」14章を参照。</p>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  const CURRENCIES = [
+    { key:"usd", name:"米ドルMMF", code:"USD/JPY", refRate:"163.15円", colorVar:"--usd", bgVar:"--usd-bg",
+      defaultYield:3.70, fx:{o:3, m:0, p:-5, e:-15} },
+    { key:"zar", name:"南アフリカランドMMF", code:"ZAR/JPY", refRate:"約9.90円", colorVar:"--zar", bgVar:"--zar-bg",
+      defaultYield:6.10, fx:{o:5, m:0, p:-8, e:-20} },
+    { key:"try", name:"トルコリラMMF", code:"TRY/JPY", refRate:"約3.44円", colorVar:"--try", bgVar:"--try-bg",
+      defaultYield:37.50, fx:{o:0, m:-7, p:-15, e:-30} },
+  ];
+  const SCEN = ["o","m","p","e"];
+  const SCEN_LABEL = { o:"楽観", m:"中庸", p:"悲観", e:"極端" };
+  const TAX = 0.20315;
+  const selected = {};
+  CURRENCIES.forEach(cur => selected[cur.key] = "m");
+
+  const DEPOSITS = [
+    { key:"sp500", name:"S&P500(円建て・つみたて想定)", colorVar:"--dep-sp500", bgVar:"--dep-sp500-bg", kind:"compound",
+      note:"米国株価指数S&P500(円建て・累投型)の想定年率。過去平均は米ドルベースで年7〜11%程度だが、直近の高値圏を踏まえ今後の見通しは慎重派で年3%前後、基本シナリオ6.5%前後との予想もある", defaultRate:7.00 },
+    { key:"net", name:"ネット銀行定期預金(10年目安)", colorVar:"--dep-net", bgVar:"--dep-net-bg", kind:"simple",
+      note:"住信SBIネット銀行5年物1.60%を10年目安として採用(単利)。現時点で主要ネット銀行に純粋な10年物の新規募集はほぼ無い", defaultRate:1.60 },
+  ];
+
+  const cardsEl = document.getElementById("cards");
+  const chartEl = document.getElementById("chart");
+  const depositGridEl = document.getElementById("depositGrid");
+  const detailBody = document.querySelector("#detailTable tbody");
+  const formulaBox = document.getElementById("formulaBox");
+
+  const principalInput = document.getElementById("principal");
+  const principalRange = document.getElementById("principalRange");
+  const monthlyInput = document.getElementById("monthly");
+  const monthlyRange = document.getElementById("monthlyRange");
+  const yearsInput = document.getElementById("years");
+  const yearsRange = document.getElementById("yearsRange");
+
+  function buildCard(cur){
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.setProperty("--cur-color", `var(${cur.colorVar})`);
+    card.style.setProperty("--cur-bg", `var(${cur.bgVar})`);
+    card.innerHTML = `
+      <div class="stripe" style="background:var(${cur.colorVar})"></div>
+      <div class="body">
+        <div class="card-top">
+          <div class="idrow">
+            <span class="dot" style="background:var(${cur.colorVar})"></span>
+            <span class="cur-name">${cur.name}</span>
+            <span class="cur-code">${cur.code}</span>
+          </div>
+          <p class="ref">参考レート ${cur.refRate}</p>
+          <div class="yield-row">
+            <label for="${cur.key}-yield">想定利回り(税引前・年率)</label>
+            <div class="inp">
+              <input type="number" id="${cur.key}-yield" step="0.01" value="${cur.defaultYield}" />
+              <span class="unit">%</span>
+            </div>
+          </div>
+        </div>
+        <div class="scen-grid">
+          ${SCEN.map(s=>`<button type="button" class="scen-head" data-currency="${cur.key}" data-scenario="${s}">${SCEN_LABEL[s]}</button>`).join("")}
+        </div>
+        <div class="scen-grid">
+          ${SCEN.map(s=>`
+            <div class="scen-fx">
+              <input type="number" id="${cur.key}-fx-${s}" step="1" value="${cur.fx[s]}" />
+              <span class="pc">%/年</span>
+            </div>`).join("")}
+        </div>
+        <div class="result-grid" id="${cur.key}-results">
+          ${SCEN.map(s=>`
+            <div class="result-cell" id="${cur.key}-cellwrap-${s}">
+              <span class="amt" id="${cur.key}-amt-${s}">-</span>
+              <span class="pct" id="${cur.key}-pct-${s}">-</span>
+            </div>`).join("")}
+        </div>
+      </div>
+    `;
+    cardsEl.appendChild(card);
+  }
+
+  function buildDepositCards(){
+    depositGridEl.innerHTML = "";
+    DEPOSITS.forEach(dep=>{
+      const card = document.createElement("div");
+      card.className = "deposit-card";
+      card.style.setProperty("--cur-color", `var(${dep.colorVar})`);
+      card.style.setProperty("--cur-bg", `var(${dep.bgVar})`);
+      card.innerHTML = `
+        <div class="idrow">
+          <span class="dot" style="background:var(${dep.colorVar})"></span>
+          <span class="cur-name">${dep.name}</span>
+        </div>
+        <p class="note">${dep.note}</p>
+        <div class="yield-row">
+          <label for="${dep.key}-rate">${dep.kind === "compound" ? "想定利回り(税引前・年率)" : "金利(単利・税引前・年率)"}</label>
+          <div class="inp">
+            <input type="number" id="${dep.key}-rate" step="0.01" value="${dep.defaultRate}" />
+            <span class="unit">%</span>
+          </div>
+        </div>
+        <div class="result">
+          <span class="amt" id="${dep.key}-amt">-</span>
+          <span class="pct" id="${dep.key}-pct">-</span>
+        </div>
+      `;
+      depositGridEl.appendChild(card);
+    });
+  }
+
+  function buildChartRows(){
+    chartEl.innerHTML = "";
+    DEPOSITS.forEach(dep=>{
+      const row = document.createElement("div");
+      row.className = "bar-row";
+      row.style.setProperty("--cur-color", `var(${dep.colorVar})`);
+      row.style.setProperty("--cur-bg", `var(${dep.bgVar})`);
+      row.innerHTML = `
+        <div class="bar-label">
+          <div class="code-row"><span class="dot" style="background:var(${dep.colorVar})"></span>${dep.name}</div>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="depbar-${dep.key}" style="background:var(${dep.colorVar})">
+            <span class="val" id="depbarval-${dep.key}"></span>
+          </div>
+          <div class="principal-line" id="depline-${dep.key}"><span class="plabel" id="deplabel-${dep.key}"></span></div>
+        </div>
+      `;
+      chartEl.appendChild(row);
+    });
+    CURRENCIES.forEach(cur=>{
+      const row = document.createElement("div");
+      row.className = "bar-row";
+      row.style.setProperty("--cur-color", `var(${cur.colorVar})`);
+      row.style.setProperty("--cur-bg", `var(${cur.bgVar})`);
+      row.innerHTML = `
+        <div class="bar-label">
+          <div class="code-row"><span class="dot" style="background:var(${cur.colorVar})"></span>${cur.code}</div>
+          <span class="scen-tag" id="scentag-${cur.key}"></span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="bar-${cur.key}" style="background:var(${cur.colorVar})">
+            <span class="val" id="barval-${cur.key}"></span>
+          </div>
+          <div class="principal-line" id="pline-${cur.key}"><span class="plabel" id="plabel-${cur.key}"></span></div>
+        </div>
+      `;
+      chartEl.appendChild(row);
+    });
+  }
+
+  function buildDetailRows(){
+    detailBody.innerHTML = "";
+    CURRENCIES.forEach(cur=>{
+      const tr = document.createElement("tr");
+      tr.style.setProperty("--cur-color", `var(${cur.colorVar})`);
+      tr.style.setProperty("--cur-bg", `var(${cur.bgVar})`);
+      tr.innerHTML = `<td>${cur.name}</td>` + SCEN.map(s=>
+        `<td id="${cur.key}-cell-${s}" class="scenario-cell" tabindex="0" role="button"
+          data-currency="${cur.key}" data-scenario="${s}"
+          aria-label="${cur.name} ${SCEN_LABEL[s]}シナリオを選択">-</td>`
+      ).join("");
+      detailBody.appendChild(tr);
+    });
+  }
+
+  function yen(n){
+    const v = Math.round(n);
+    const abs = Math.abs(v);
+    if (abs >= 100000000){
+      return (v/100000000).toLocaleString("ja-JP", {maximumFractionDigits:2}) + "億円";
+    }
+    if (abs >= 10000){
+      return Math.round(v/10000).toLocaleString("ja-JP") + "万円";
+    }
+    return v.toLocaleString("ja-JP") + "円";
+  }
+  function pct(n){
+    const v = (n*100);
+    const sign = v >= 0 ? "+" : "";
+    return sign + v.toFixed(1) + "%";
+  }
+
+  // 月次積立(月末拠出の通常年金)を加味した将来価値。年率をベースに月利へ変換し複利計算する。
+  function futureValueWithContributions(principal, monthly, annualRate, years){
+    const totalMonths = Math.round(years * 12);
+    const monthlyRate = Math.pow(1 + annualRate, 1/12) - 1;
+    const principalFV = principal * Math.pow(1 + monthlyRate, totalMonths);
+    let contributionsFV;
+    if (Math.abs(monthlyRate) < 1e-9){
+      contributionsFV = monthly * totalMonths;
+    } else {
+      contributionsFV = monthly * ((Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate);
+    }
+    return principalFV + contributionsFV;
+  }
+
+  function compute(){
+    const principal = Math.max(0, Number(principalInput.value) || 0) * 10000;
+    const monthly = Math.max(0, Number(monthlyInput.value) || 0);
+    const years = Math.max(1, Number(yearsInput.value) || 1);
+    const totalInvested = principal + monthly * Math.round(years * 12);
+
+    const results = {};
+    CURRENCIES.forEach(cur=>{
+      const yieldPct = Number(document.getElementById(`${cur.key}-yield`).value) || 0;
+      const afterTaxYieldRate = (yieldPct/100) * (1 - TAX);
+      results[cur.key] = {};
+      SCEN.forEach(s=>{
+        const fxPct = Number(document.getElementById(`${cur.key}-fx-${s}`).value) || 0;
+        // 分配金は保有中に20.315%源泉徴収(税引後利回りで複利)。為替差益は解約(売却)時に初めて確定し、
+        // その時点でまとめて20.315%課税(譲渡所得)される――17章の実務に合わせた二段階の税処理。
+        const baseAmt = futureValueWithContributions(principal, monthly, afterTaxYieldRate, years);
+        const fxGrowth = Math.pow(1 + fxPct/100, years);
+        const preTaxFxAmt = baseAmt * fxGrowth;
+        const fxGain = preTaxFxAmt - baseAmt;
+        const fxTax = fxGain > 0 ? fxGain * TAX : 0;
+        const finalAmt = preTaxFxAmt - fxTax;
+        const gain = totalInvested > 0 ? (finalAmt - totalInvested) / totalInvested : 0;
+        results[cur.key][s] = { finalAmt, gain };
+
+        const amtEl = document.getElementById(`${cur.key}-amt-${s}`);
+        const pctEl = document.getElementById(`${cur.key}-pct-${s}`);
+        if (amtEl) amtEl.textContent = yen(finalAmt);
+        if (pctEl){
+          pctEl.textContent = pct(gain);
+          pctEl.className = "pct " + (gain >= 0 ? "pos" : "neg");
+        }
+        const cell = document.getElementById(`${cur.key}-cell-${s}`);
+        if (cell){
+          cell.textContent = yen(finalAmt) + " (" + pct(gain) + ")";
+          cell.classList.toggle("active-scenario", selected[cur.key] === s);
+        }
+        const btn = cardsEl.querySelector(`button.scen-head[data-currency="${cur.key}"][data-scenario="${s}"]`);
+        if (btn) btn.classList.toggle("active", selected[cur.key] === s);
+        const cellWrap = document.getElementById(`${cur.key}-cellwrap-${s}`);
+        if (cellWrap) cellWrap.classList.toggle("active", selected[cur.key] === s);
+      });
+    });
+
+    // 定期預金(単利)とS&P500(複利・累投型で解約時一括課税)の参考値。
+    const depositResults = {};
+    DEPOSITS.forEach(dep=>{
+      const ratePct = Number(document.getElementById(`${dep.key}-rate`).value) || 0;
+      let finalAmt;
+      if (dep.kind === "compound"){
+        // 累投型(分配金なし)の投資信託を想定。保有中は非課税で複利運用し、解約時に含み益へ一括で20.315%課税。
+        const preTaxAmt = futureValueWithContributions(principal, monthly, ratePct/100, years);
+        const gainAmt = preTaxAmt - totalInvested;
+        const taxAmt = gainAmt > 0 ? gainAmt * TAX : 0;
+        finalAmt = preTaxAmt - taxAmt;
+      } else {
+        // 積立分は各回の預入から満期までの残存期間に応じて単利の利息が付くとみなす簡易近似。
+        const rAfterTax = (ratePct/100) * (1 - TAX);
+        const totalMonths = Math.round(years * 12);
+        const principalPart = principal * (1 + rAfterTax * years);
+        const contribPart = monthly * totalMonths + monthly * rAfterTax * (totalMonths * (totalMonths - 1) / 24);
+        finalAmt = principalPart + contribPart;
+      }
+      const gain = totalInvested > 0 ? (finalAmt - totalInvested) / totalInvested : 0;
+      depositResults[dep.key] = finalAmt;
+
+      const amtEl = document.getElementById(`${dep.key}-amt`);
+      const pctEl = document.getElementById(`${dep.key}-pct`);
+      if (amtEl) amtEl.textContent = yen(finalAmt);
+      if (pctEl){
+        pctEl.textContent = pct(gain);
+        pctEl.className = "pct " + (gain >= 0 ? "pos" : "neg");
+      }
+    });
+
+    // S&P500・定期預金+選択中シナリオの3通貨をまとめて同一スケールで比較する。
+    const selectedVals = CURRENCIES.map(cur => results[cur.key][selected[cur.key]].finalAmt);
+    const maxScale = Math.max(totalInvested, ...selectedVals, ...Object.values(depositResults)) * 1.12;
+
+    DEPOSITS.forEach((dep, idx)=>{
+      const val = depositResults[dep.key];
+      const widthPct = maxScale > 0 ? (val / maxScale) * 100 : 0;
+      const bar = document.getElementById(`depbar-${dep.key}`);
+      const label = document.getElementById(`depbarval-${dep.key}`);
+      if (bar) bar.style.width = widthPct.toFixed(2) + "%";
+      if (label) label.textContent = yen(val);
+
+      const linePct = maxScale > 0 ? (totalInvested / maxScale) * 100 : 0;
+      const line = document.getElementById(`depline-${dep.key}`);
+      const plabel = document.getElementById(`deplabel-${dep.key}`);
+      if (line) line.style.left = linePct.toFixed(2) + "%";
+      if (plabel) plabel.textContent = idx === 0 ? "投資元本合計 " + yen(totalInvested) : "";
+    });
+
+    CURRENCIES.forEach(cur=>{
+      const scen = selected[cur.key];
+      const val = results[cur.key][scen].finalAmt;
+      const widthPct = maxScale > 0 ? (val / maxScale) * 100 : 0;
+      const bar = document.getElementById(`bar-${cur.key}`);
+      const label = document.getElementById(`barval-${cur.key}`);
+      if (bar) bar.style.width = widthPct.toFixed(2) + "%";
+      if (label) label.textContent = yen(val);
+
+      const tag = document.getElementById(`scentag-${cur.key}`);
+      if (tag) tag.textContent = SCEN_LABEL[scen] + "シナリオ";
+
+      const linePct = maxScale > 0 ? (totalInvested / maxScale) * 100 : 0;
+      const line = document.getElementById(`pline-${cur.key}`);
+      if (line) line.style.left = linePct.toFixed(2) + "%";
+    });
+
+    formulaBox.textContent =
+      `税引後利回り = 税引前利回り% × (1 − 0.20315)(分配金は保有中に源泉徴収・複利)\n` +
+      `基準評価額 = 初期投資額×(1+税引後月利)^月数 + 毎月積立額×(((1+税引後月利)^月数 − 1) / 税引後月利)\n` +
+      `為替込み評価額(税引前) = 基準評価額 × (1 + 想定為替変動%)^運用年数\n` +
+      `為替差益 = 為替込み評価額 − 基準評価額(含み損の場合は0として非課税)\n` +
+      `最終評価額 = 為替込み評価額 − 為替差益×0.20315(解約時に一括課税)\n` +
+      `初期投資額: ${yen(principal)} / 毎月積立額: ${yen(monthly)} / 運用年数: ${years}年(${Math.round(years*12)}ヶ月) / 投資元本合計: ${yen(totalInvested)}`;
+  }
+
+  CURRENCIES.forEach(buildCard);
+  buildDepositCards();
+  buildChartRows();
+  buildDetailRows();
+
+  cardsEl.querySelectorAll("button.scen-head").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      selected[btn.dataset.currency] = btn.dataset.scenario;
+      compute();
+    });
+  });
+
+  detailBody.addEventListener("click", (e)=>{
+    const cell = e.target.closest("td.scenario-cell");
+    if (!cell) return;
+    selected[cell.dataset.currency] = cell.dataset.scenario;
+    compute();
+  });
+  detailBody.addEventListener("keydown", (e)=>{
+    const cell = e.target.closest("td.scenario-cell");
+    if (!cell) return;
+    if (e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      selected[cell.dataset.currency] = cell.dataset.scenario;
+      compute();
+    }
+  });
+
+  const allInputs = document.querySelectorAll("input[type=number], input[type=range]");
+  allInputs.forEach(inp=>{
+    inp.addEventListener("input", ()=>{
+      if (inp.id === "principal") principalRange.value = inp.value;
+      if (inp.id === "principalRange") principalInput.value = inp.value;
+      if (inp.id === "monthly") monthlyRange.value = inp.value;
+      if (inp.id === "monthlyRange") monthlyInput.value = inp.value;
+      if (inp.id === "years") yearsRange.value = inp.value;
+      if (inp.id === "yearsRange") yearsInput.value = inp.value;
+      compute();
+    });
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", ()=>{
+    principalInput.value = 100; principalRange.value = 100;
+    monthlyInput.value = 30000; monthlyRange.value = 30000;
+    yearsInput.value = 3; yearsRange.value = 3;
+    CURRENCIES.forEach(cur=>{
+      document.getElementById(`${cur.key}-yield`).value = cur.defaultYield;
+      SCEN.forEach(s=> document.getElementById(`${cur.key}-fx-${s}`).value = cur.fx[s]);
+      selected[cur.key] = "m";
+    });
+    DEPOSITS.forEach(dep=>{
+      document.getElementById(`${dep.key}-rate`).value = dep.defaultRate;
+    });
+    compute();
+  });
+
+  compute();
+})();
+</script>
