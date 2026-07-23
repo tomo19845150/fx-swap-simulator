@@ -290,9 +290,9 @@
     <div class="meta">
       <span><b>データ基準日:</b> 2026-07-23</span>
       <span><b>参考レート:</b> USD/JPY 163.15円 / ZAR/JPY 約9.90円 / TRY/JPY 約3.44円</span>
-      <span><b>参考利回り(税引前・過去1年平均目安):</b> USD 3.70%(レンジ目安3.0〜4.3%) / ZAR 6.10%(5.9〜6.8%) / TRY 37.50%(36〜40%)</span>
+      <span><b>参考利回り(税引前・SBI証券 2026-07-21時点):</b> USD 3.39% / ZAR 5.91% / TRY 36.36%</span>
     </div>
-    <p class="disclaimer" style="margin-top:8px;">利回りは各中央銀行の政策金利の過去1年間の推移(FRB・SARB・トルコ中銀)とMMF利回りの現在のスプレッドから逆算した目安値。日次MMF利回りの12ヶ月分の実データは非公開のため推計です。カード内で自由に上書きできます。</p>
+    <p class="disclaimer" style="margin-top:8px;">利回りはSBI証券の外貨建てMMF最新スナップショット値(2026-07-21時点)。楽天証券・マネックス証券・三菱UFJ eスマート証券との比較は詳細まとめ記事19章を参照(トルコリラは4社ともほぼ横並び、米ドルはSBI証券がやや高め)。日々変動するため、カード内で自由に上書きできます。</p>
   </header>
 
   <div class="layout">
@@ -389,11 +389,11 @@
 (function(){
   const CURRENCIES = [
     { key:"usd", name:"米ドルMMF", code:"USD/JPY", refRate:"163.15円", colorVar:"--usd", bgVar:"--usd-bg",
-      defaultYield:3.70, fx:{o:3, m:0, p:-5, e:-15} },
+      defaultYield:3.39, fx:{o:3, m:0, p:-5, e:-15} },
     { key:"zar", name:"南アフリカランドMMF", code:"ZAR/JPY", refRate:"約9.90円", colorVar:"--zar", bgVar:"--zar-bg",
-      defaultYield:6.10, fx:{o:5, m:0, p:-8, e:-20} },
+      defaultYield:5.91, fx:{o:5, m:0, p:-8, e:-20} },
     { key:"try", name:"トルコリラMMF", code:"TRY/JPY", refRate:"約3.44円", colorVar:"--try", bgVar:"--try-bg",
-      defaultYield:37.50, fx:{o:0, m:-7, p:-15, e:-30} },
+      defaultYield:36.36, fx:{o:0, m:-7, p:-15, e:-30} },
   ];
   const SCEN = ["o","m","p","e"];
   const SCEN_LABEL = { o:"楽観", m:"中庸", p:"悲観", e:"極端" };
@@ -688,9 +688,12 @@
       const bar = document.getElementById(`depbar-${dep.key}`);
       const taxBar = document.getElementById(`depbar-${dep.key}-tax`);
       const label = document.getElementById(`depbarval-${dep.key}`);
-      const showTax = showTaxBreakdown && dep.kind === "compound" && taxAmt > 0;
+      const hasTax = dep.kind === "compound" && taxAmt > 0;
+      // showTaxBreakdown=false(税引き前・既定):gross全体を表示し税金部分を赤で色分け
+      // showTaxBreakdown=true(税引き後):税金を差し引いた手取り額まで棒を縮める
+      const showBreakdown = !showTaxBreakdown && hasTax;
 
-      if (showTax){
+      if (showBreakdown){
         const netAmt = grossAmt - taxAmt;
         const netPct = maxScale > 0 ? (netAmt / maxScale) * 100 : 0;
         const taxPct = maxScale > 0 ? (taxAmt / maxScale) * 100 : 0;
@@ -701,10 +704,11 @@
           label.innerHTML = yen(grossAmt) + `<span class="tax-note">税金 -${yen(taxAmt)}</span>`;
         }
       } else {
-        const widthPct = maxScale > 0 ? (val / maxScale) * 100 : 0;
+        const displayVal = showTaxBreakdown ? (grossAmt - taxAmt) : val;
+        const widthPct = maxScale > 0 ? (displayVal / maxScale) * 100 : 0;
         if (bar){ bar.style.width = widthPct.toFixed(2) + "%"; bar.style.borderRadius = "8px"; }
         if (taxBar){ taxBar.style.width = "0%"; }
-        if (label){ label.style.left = `calc(${widthPct.toFixed(2)}% + 8px)`; label.textContent = yen(val); }
+        if (label){ label.style.left = `calc(${widthPct.toFixed(2)}% + 8px)`; label.textContent = yen(displayVal); }
       }
 
       const linePct = maxScale > 0 ? (totalInvested / maxScale) * 100 : 0;
@@ -720,9 +724,12 @@
       const bar = document.getElementById(`bar-${cur.key}`);
       const taxBar = document.getElementById(`bar-${cur.key}-tax`);
       const label = document.getElementById(`barval-${cur.key}`);
-      const showTax = showTaxBreakdown && r.taxAmt > 0;
+      const hasTax = r.taxAmt > 0;
+      // showTaxBreakdown=false(税引き前・既定):gross全体を表示し税金部分を赤で色分け
+      // showTaxBreakdown=true(税引き後):税金を差し引いた手取り額まで棒を縮める
+      const showBreakdown = !showTaxBreakdown && hasTax;
 
-      if (showTax){
+      if (showBreakdown){
         const netAmt = r.grossAmt - r.taxAmt;
         const netPct = maxScale > 0 ? (netAmt / maxScale) * 100 : 0;
         const taxPct = maxScale > 0 ? (r.taxAmt / maxScale) * 100 : 0;
@@ -733,10 +740,11 @@
           label.innerHTML = yen(r.grossAmt) + `<span class="tax-note">税金合計 -${yen(r.taxAmt)}</span>`;
         }
       } else {
-        const widthPct = maxScale > 0 ? (r.finalAmt / maxScale) * 100 : 0;
+        const displayVal = showTaxBreakdown ? (r.grossAmt - r.taxAmt) : r.grossAmt;
+        const widthPct = maxScale > 0 ? (displayVal / maxScale) * 100 : 0;
         if (bar){ bar.style.width = widthPct.toFixed(2) + "%"; bar.style.borderRadius = "8px"; }
         if (taxBar){ taxBar.style.width = "0%"; }
-        if (label){ label.style.left = `calc(${widthPct.toFixed(2)}% + 8px)`; label.textContent = yen(r.finalAmt); }
+        if (label){ label.style.left = `calc(${widthPct.toFixed(2)}% + 8px)`; label.textContent = yen(displayVal); }
       }
 
       const tag = document.getElementById(`scentag-${cur.key}`);
