@@ -277,6 +277,10 @@
   table.detail td:first-child{font-family:var(--sans); font-weight:700;}
   table.detail tbody tr:hover{background:var(--surface-alt);}
   table.broker-table th, table.broker-table td{text-align:left; font-family:var(--sans);}
+  table.broker-table tbody tr{cursor:pointer; transition:background .12s;}
+  table.broker-table tbody tr.active-broker td{color:var(--accent-ink); background:var(--accent);}
+  table.broker-table tbody tr.active-broker td:first-child{font-weight:800;}
+  table.broker-table tbody tr:focus-visible{outline:2px solid var(--accent); outline-offset:-2px;}
   table.detail td.active-scenario{background:var(--cur-bg); color:var(--cur-color); font-weight:700; border-radius:6px;}
   table.detail td.scenario-cell{cursor:pointer; transition:background .12s,color .12s;}
   table.detail td.scenario-cell:hover{background:var(--surface-alt);}
@@ -307,9 +311,9 @@
   }
   .disclaimer{font-size:12px; color:var(--ink-3); margin-top:14px; line-height:1.7;}
 </style>
+
 </head>
 <body>
-
 <div class="wrap">
   <header class="top">
     <p class="eyebrow">投資シミュレーター</p>
@@ -318,7 +322,7 @@
     <div class="meta">
       <span><b>データ基準日:</b> 2026-07-23</span>
       <span><b>参考レート:</b> USD/JPY 163.15円 / ZAR/JPY 約9.90円 / TRY/JPY 約3.44円</span>
-      <span><b>参考利回り(税引前・SBI証券 2026-07-21時点):</b> USD 3.39% / ZAR 5.91% / TRY 36.36%</span>
+      <span id="refYieldMeta"><b>参考利回り(税引前・SBI証券 2026-07-21時点):</b> USD 3.39% / ZAR 5.91% / TRY 36.36%</span>
     </div>
     <p class="disclaimer" style="margin-top:8px;">利回りはSBI証券の外貨建てMMF最新スナップショット値(2026-07-21時点)。楽天証券・マネックス証券・三菱UFJ eスマート証券との比較は詳細まとめ記事19章を参照(トルコリラは4社ともほぼ横並び、米ドルはSBI証券がやや高め)。日々変動するため、カード内で自由に上書きできます。</p>
   </header>
@@ -410,11 +414,11 @@
             <thead>
               <tr><th>証券会社</th><th>3通貨対応</th><th>積立自動化</th><th>引落方法</th></tr>
             </thead>
-            <tbody>
-              <tr><td>SBI証券</td><td>○</td><td>○ 毎月/ボーナス月コース</td><td>証券口座預り金(円貨決済のみ)</td></tr>
-              <tr><td>三菱UFJ eスマート証券(旧auカブコム)</td><td>○</td><td>○ 1万円〜1円単位</td><td>銀行自動引落 or 証券口座預り金</td></tr>
-              <tr><td>マネックス証券</td><td>○</td><td>○ 銀行de自動つみたて</td><td>銀行引落(毎月27日→翌月7日買付)</td></tr>
-              <tr><td>楽天証券</td><td>○</td><td>△ 未確認(配当金等からの自動買付は米ドルMMFのみ確認)</td><td>手動発注が前提になる可能性</td></tr>
+            <tbody id="brokerTableBody">
+              <tr data-broker="sbi" tabindex="0" role="button" aria-label="SBI証券を選択"><td>SBI証券</td><td>○</td><td>○ 毎月/ボーナス月コース</td><td>証券口座預り金(円貨決済のみ)</td></tr>
+              <tr data-broker="mufg" tabindex="0" role="button" aria-label="三菱UFJ eスマート証券を選択"><td>三菱UFJ eスマート証券(旧auカブコム)</td><td>○</td><td>○ 1万円〜1円単位</td><td>銀行自動引落 or 証券口座預り金</td></tr>
+              <tr data-broker="monex" tabindex="0" role="button" aria-label="マネックス証券を選択"><td>マネックス証券</td><td>○</td><td>○ 銀行de自動つみたて</td><td>銀行引落(毎月27日→翌月7日買付)</td></tr>
+              <tr data-broker="rakuten" tabindex="0" role="button" aria-label="楽天証券を選択"><td>楽天証券</td><td>○</td><td>△ 未確認(配当金等からの自動買付は米ドルMMFのみ確認)</td><td>手動発注が前提になる可能性</td></tr>
             </tbody>
           </table>
         </div>
@@ -472,6 +476,8 @@
   const brokerGrid = document.getElementById("brokerGrid");
   const brokerHint = document.getElementById("brokerHint");
   const brokerRange = document.getElementById("brokerRange");
+  const refYieldMeta = document.getElementById("refYieldMeta");
+  const brokerTableBody = document.getElementById("brokerTableBody");
 
   function currentBroker(){
     return BROKERS.find(b => b.key === selectedBroker) || BROKERS[0];
@@ -881,9 +887,14 @@
     brokerGrid.querySelectorAll("button.broker-btn").forEach(btn=>{
       btn.classList.toggle("active", btn.dataset.broker === selectedBroker);
     });
+    brokerTableBody.querySelectorAll("tr").forEach(row=>{
+      row.classList.toggle("active-broker", row.dataset.broker === selectedBroker);
+    });
     const brokerIdx = BROKERS.findIndex(b => b.key === selectedBroker);
     if (brokerIdx >= 0) brokerRange.value = brokerIdx;
     brokerHint.textContent = `${broker.name}の実測値(2026-07-21時点)。米ドル${broker.yield.usd}% / 南アランド${broker.yield.zar}% / トルコリラ${broker.yield.try}%(税引前)。証券会社を切り替えると各カードの想定利回りが上書きされます。`;
+
+    refYieldMeta.innerHTML = `<b>参考利回り(税引前・${broker.name} 2026-07-21時点):</b> USD ${broker.yield.usd.toFixed(2)}% / ZAR ${broker.yield.zar.toFixed(2)}% / TRY ${broker.yield.try.toFixed(2)}%`;
   }
 
   CURRENCIES.forEach(buildCard);
@@ -908,6 +919,20 @@
   brokerRange.addEventListener("input", ()=>{
     const broker = BROKERS[Number(brokerRange.value)] || BROKERS[0];
     applyBroker(broker.key);
+  });
+
+  brokerTableBody.addEventListener("click", (e)=>{
+    const row = e.target.closest("tr[data-broker]");
+    if (!row) return;
+    applyBroker(row.dataset.broker);
+  });
+  brokerTableBody.addEventListener("keydown", (e)=>{
+    const row = e.target.closest("tr[data-broker]");
+    if (!row) return;
+    if (e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      applyBroker(row.dataset.broker);
+    }
   });
 
   detailBody.addEventListener("click", (e)=>{
@@ -990,5 +1015,6 @@
   compute();
 })();
 </script>
+
 </body>
 </html>
