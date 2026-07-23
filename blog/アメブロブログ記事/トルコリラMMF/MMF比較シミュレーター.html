@@ -141,6 +141,15 @@
   button#spreadBtn:hover{opacity:.9;}
   button#spreadBtn:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
   .spread-hint{font-size:11.5px; color:var(--ink-3); margin-top:6px; line-height:1.6;}
+  .broker-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-top:6px;}
+  button.broker-btn{
+    font-family:var(--sans); font-size:11px; color:var(--ink-2); text-align:center; font-weight:700;
+    background:var(--surface-alt); border:1.5px solid var(--border); border-radius:7px;
+    padding:8px 4px; cursor:pointer; line-height:1.3; transition:background .15s,color .15s,border-color .15s;
+  }
+  button.broker-btn:hover{border-color:var(--ink-3); color:var(--ink);}
+  button.broker-btn.active{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  button.broker-btn:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
 
   .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px;}
   @media (max-width:960px){ .cards{grid-template-columns:1fr;} }
@@ -333,6 +342,12 @@
       <p class="sale-tax-hint" id="saleTaxHint">現在の表示:保有中(税引前)の評価額。為替差益・値上がり益への課税はまだ発生していません。</p>
       <button id="spreadBtn" type="button" aria-pressed="false">円貨決済スプレッドを考慮する</button>
       <p class="spread-hint" id="spreadHint">現在の表示:為替スプレッド(往復)は考慮していません。</p>
+      <div class="field" style="margin-top:18px;">
+        <label>証券会社</label>
+        <div class="broker-grid" id="brokerGrid"><!-- buttons injected by JS --></div>
+        <input type="range" id="brokerRange" min="0" max="3" step="1" value="0" />
+        <div class="hint" id="brokerHint">利回り・為替手数料(スプレッド)を証券会社の実測値に切り替えます(2026-07-21時点)</div>
+      </div>
     </aside>
 
     <main>
@@ -406,12 +421,19 @@
 <script>
 (function(){
   const CURRENCIES = [
-    { key:"usd", name:"米ドルMMF", code:"USD/JPY", refRate:"163.15円", refRateNum:163.15, spreadYen:0.25, colorVar:"--usd", bgVar:"--usd-bg",
-      defaultYield:3.39, fx:{o:3, m:0, p:-5, e:-15} },
-    { key:"zar", name:"南アフリカランドMMF", code:"ZAR/JPY", refRate:"約9.90円", refRateNum:9.90, spreadYen:0.25, colorVar:"--zar", bgVar:"--zar-bg",
-      defaultYield:5.91, fx:{o:5, m:0, p:-8, e:-20} },
-    { key:"try", name:"トルコリラMMF", code:"TRY/JPY", refRate:"約3.44円", refRateNum:3.44, spreadYen:0.15, colorVar:"--try", bgVar:"--try-bg",
-      defaultYield:36.36, fx:{o:0, m:-7, p:-15, e:-30} },
+    { key:"usd", name:"米ドルMMF", code:"USD/JPY", refRate:"163.15円", refRateNum:163.15, colorVar:"--usd", bgVar:"--usd-bg",
+      fx:{o:3, m:0, p:-5, e:-15} },
+    { key:"zar", name:"南アフリカランドMMF", code:"ZAR/JPY", refRate:"約9.90円", refRateNum:9.90, colorVar:"--zar", bgVar:"--zar-bg",
+      fx:{o:5, m:0, p:-8, e:-20} },
+    { key:"try", name:"トルコリラMMF", code:"TRY/JPY", refRate:"約3.44円", refRateNum:3.44, colorVar:"--try", bgVar:"--try-bg",
+      fx:{o:0, m:-7, p:-15, e:-30} },
+  ];
+  // 詳細まとめ記事19章(2026-07-21時点)の証券会社別スナップショット。利回りは税引前・年率(%)、spreadYenは円貨決済の為替手数料(片道・円/単位通貨)。
+  const BROKERS = [
+    { key:"sbi", name:"SBI証券", yield:{usd:3.3945, zar:5.9070, try:36.360}, spreadYen:{usd:0.25, zar:0.25, try:0.15} },
+    { key:"rakuten", name:"楽天証券", yield:{usd:3.194, zar:5.944, try:36.265}, spreadYen:{usd:0.25, zar:0.25, try:0.15} },
+    { key:"monex", name:"マネックス証券", yield:{usd:3.092, zar:6.017, try:36.299}, spreadYen:{usd:0.25, zar:0.30, try:0.28} },
+    { key:"mufg", name:"三菱UFJ eスマート証券", yield:{usd:3.0921, zar:5.9078, try:36.3603}, spreadYen:{usd:0.20, zar:0.25, try:0.25} },
   ];
   const SCEN = ["o","m","p","e"];
   const SCEN_LABEL = { o:"楽観", m:"中庸", p:"悲観", e:"極端" };
@@ -421,6 +443,7 @@
   let saleTaxApplied = false;
   let showTaxBreakdown = false;
   let spreadApplied = false;
+  let selectedBroker = "sbi";
 
   const DEPOSITS = [
     { key:"sp500", name:"S&P500(円建て・つみたて想定)", colorVar:"--dep-sp500", bgVar:"--dep-sp500-bg", kind:"compound",
@@ -440,6 +463,22 @@
   const spreadBtn = document.getElementById("spreadBtn");
   const spreadHint = document.getElementById("spreadHint");
   const spreadToggleBtn = document.getElementById("spreadToggleBtn");
+  const brokerGrid = document.getElementById("brokerGrid");
+  const brokerHint = document.getElementById("brokerHint");
+  const brokerRange = document.getElementById("brokerRange");
+
+  function currentBroker(){
+    return BROKERS.find(b => b.key === selectedBroker) || BROKERS[0];
+  }
+
+  function applyBroker(brokerKey){
+    selectedBroker = brokerKey;
+    const broker = currentBroker();
+    CURRENCIES.forEach(cur=>{
+      document.getElementById(`${cur.key}-yield`).value = broker.yield[cur.key];
+    });
+    compute();
+  }
 
   const principalInput = document.getElementById("principal");
   const principalRange = document.getElementById("principalRange");
@@ -466,7 +505,7 @@
           <div class="yield-row">
             <label for="${cur.key}-yield">想定利回り(税引前・年率)</label>
             <div class="inp">
-              <input type="number" id="${cur.key}-yield" step="0.01" value="${cur.defaultYield}" />
+              <input type="number" id="${cur.key}-yield" step="0.01" value="${currentBroker().yield[cur.key]}" />
               <span class="unit">%</span>
             </div>
           </div>
@@ -491,6 +530,12 @@
       </div>
     `;
     cardsEl.appendChild(card);
+  }
+
+  function buildBrokerGrid(){
+    brokerGrid.innerHTML = BROKERS.map(b=>
+      `<button type="button" class="broker-btn" data-broker="${b.key}">${b.name}</button>`
+    ).join("");
   }
 
   function buildDepositCards(){
@@ -618,14 +663,15 @@
     const monthly = Math.max(0, Number(monthlyInput.value) || 0);
     const years = Math.max(1, Number(yearsInput.value) || 1);
     const totalInvested = principal + monthly * Math.round(years * 12);
+    const broker = currentBroker();
 
     const results = {};
     CURRENCIES.forEach(cur=>{
       const yieldPct = Number(document.getElementById(`${cur.key}-yield`).value) || 0;
       const afterTaxYieldRate = (yieldPct/100) * (1 - TAX);
       // 円貨決済の為替スプレッドを考慮する場合:購入時(円→外貨)・解約時(外貨→円)の両方で
-      // 参考レートに対しspreadYen分だけ不利なレートになるとみなし、往復コストとして評価額を割り引く。
-      const spreadPct = spreadApplied ? (cur.spreadYen / cur.refRateNum) : 0;
+      // 参考レートに対し証券会社ごとのspreadYen分だけ不利なレートになるとみなし、往復コストとして評価額を割り引く。
+      const spreadPct = spreadApplied ? (broker.spreadYen[cur.key] / cur.refRateNum) : 0;
       const buyPrincipal = principal * (1 - spreadPct);
       const buyMonthly = monthly * (1 - spreadPct);
       const sellFactor = 1 - spreadPct;
@@ -806,9 +852,9 @@
         ? `最終評価額(現在の表示) = 為替込み評価額 − 為替差益×0.20315 ……「売却時の税金を計算する」で解約時の税引き後の現金を表示中\n`
         : `最終評価額(現在の表示) = 為替込み評価額(為替差益はまだ非課税・保有中の評価額を表示中)\n`) +
       (spreadApplied
-        ? `円貨決済スプレッド(往復)を反映:購入時・解約時とも参考レートに対しUSD0.25円/ZAR0.25円/TRY0.15円分不利なレートを想定\n`
+        ? `円貨決済スプレッド(往復)を反映(${broker.name}):購入時・解約時ともUSD${broker.spreadYen.usd}円/ZAR${broker.spreadYen.zar}円/TRY${broker.spreadYen.try}円分不利なレートを想定\n`
         : ``) +
-      `初期投資額: ${yen(principal)} / 毎月積立額: ${yen(monthly)} / 運用年数: ${years}年(${Math.round(years*12)}ヶ月) / 投資元本合計: ${yen(totalInvested)}`;
+      `証券会社: ${broker.name} / 初期投資額: ${yen(principal)} / 毎月積立額: ${yen(monthly)} / 運用年数: ${years}年(${Math.round(years*12)}ヶ月) / 投資元本合計: ${yen(totalInvested)}`;
 
     saleTaxBtn.textContent = saleTaxApplied ? "保有中(税引前)の評価額に戻す" : "売却時の税金を計算する";
     saleTaxBtn.classList.toggle("active", saleTaxApplied);
@@ -821,13 +867,21 @@
     spreadBtn.classList.toggle("active", spreadApplied);
     spreadBtn.setAttribute("aria-pressed", String(spreadApplied));
     spreadHint.textContent = spreadApplied
-      ? "現在の表示:SBI証券の円貨決済スプレッド(購入時・解約時の往復)を反映した評価額。定期預金・S&P500は円貨決済不要のため対象外。"
+      ? `現在の表示:${broker.name}の円貨決済スプレッド(購入時・解約時の往復)を反映した評価額。定期預金・S&P500は円貨決済不要のため対象外。`
       : "現在の表示:為替スプレッド(往復)は考慮していません。";
     spreadToggleBtn.classList.toggle("active", spreadApplied);
     spreadToggleBtn.setAttribute("aria-pressed", String(spreadApplied));
+
+    brokerGrid.querySelectorAll("button.broker-btn").forEach(btn=>{
+      btn.classList.toggle("active", btn.dataset.broker === selectedBroker);
+    });
+    const brokerIdx = BROKERS.findIndex(b => b.key === selectedBroker);
+    if (brokerIdx >= 0) brokerRange.value = brokerIdx;
+    brokerHint.textContent = `${broker.name}の実測値(2026-07-21時点)。米ドル${broker.yield.usd}% / 南アランド${broker.yield.zar}% / トルコリラ${broker.yield.try}%(税引前)。証券会社を切り替えると各カードの想定利回りが上書きされます。`;
   }
 
   CURRENCIES.forEach(buildCard);
+  buildBrokerGrid();
   buildDepositCards();
   buildChartRows();
   buildDetailRows();
@@ -837,6 +891,17 @@
       selected[btn.dataset.currency] = btn.dataset.scenario;
       compute();
     });
+  });
+
+  brokerGrid.addEventListener("click", (e)=>{
+    const btn = e.target.closest("button.broker-btn");
+    if (!btn) return;
+    applyBroker(btn.dataset.broker);
+  });
+
+  brokerRange.addEventListener("input", ()=>{
+    const broker = BROKERS[Number(brokerRange.value)] || BROKERS[0];
+    applyBroker(broker.key);
   });
 
   detailBody.addEventListener("click", (e)=>{
@@ -873,7 +938,6 @@
     monthlyInput.value = 30000; monthlyRange.value = 30000;
     yearsInput.value = 3; yearsRange.value = 3;
     CURRENCIES.forEach(cur=>{
-      document.getElementById(`${cur.key}-yield`).value = cur.defaultYield;
       SCEN.forEach(s=> document.getElementById(`${cur.key}-fx-${s}`).value = cur.fx[s]);
       selected[cur.key] = "m";
     });
@@ -882,7 +946,7 @@
     });
     saleTaxApplied = false;
     spreadApplied = false;
-    compute();
+    applyBroker("sbi");
   });
 
   saleTaxBtn.addEventListener("click", ()=>{
